@@ -1,25 +1,35 @@
-import {
-	createContext,
-	ReactNode,
-	useContext,
-	useEffect,
-	useState
-} from "react"
+import { createContext, ReactNode, useState } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
-	DEVMENTOR_CONTRACT_ABI
+	DEVMENTOR_CONTRACT_ABI,
+	Engagement
 } from "../constants"
+import { getEngagement, replacer } from "../utils"
+
+interface Mentor {
+	teachingSubjects: string[]
+	mentee: string
+	yearsOfExperience: number
+	language: number
+	totalRating: number | string
+	engagement: Engagement | undefined
+	sessionCount: number | string
+	registered: boolean
+	validated: boolean
+}
 
 interface MentorContextProviderProps {
 	children: ReactNode
 }
 
 interface MentorContextProps {
+	mentorInfo: Mentor
+	mentorAverageRating: number
 	getMentorInfo: (mentorAddress: string) => void
 	getMentorAverageRating: (mentorAddress: string) => void
 	registerAsMentor: (
-		teachingSubjects: number[],
+		teachingSubjects: string[],
 		engagement: number,
 		language: number,
 		yearsOfExperience: number
@@ -29,6 +39,8 @@ interface MentorContextProps {
 }
 
 const MentorContext = createContext<MentorContextProps>({
+	mentorInfo: {} as Mentor,
+	mentorAverageRating: 0,
 	getMentorInfo: () => {},
 	getMentorAverageRating: () => {},
 	registerAsMentor: () => {},
@@ -43,6 +55,9 @@ export default function MentorContextProvider(
 	// State
 	///////////////
 
+	const [mentorInfo, setMentorInfo] = useState<Mentor>({} as Mentor)
+	const [mentorAverageRating, setMentorAverageRating] = useState(0)
+
 	///////////////
 	// Read
 	///////////////
@@ -56,8 +71,23 @@ export default function MentorContextProvider(
 				provider
 			)
 			try {
-				const mentorInfo = await contract.getMentorInfo(mentorAddress)
-				return mentorInfo
+				const mentorInfoArray = await contract.getMentorInfo(
+					mentorAddress
+				)
+				const mentorInfo = {
+					teachingSubjects: JSON.parse(
+						JSON.stringify(mentorInfoArray[0], replacer)
+					),
+					mentee: mentorInfoArray[1],
+					yearsOfExperience: parseInt(mentorInfoArray[2]),
+					language: parseInt(mentorInfoArray[3]),
+					totalRating: mentorInfoArray[4].toString(),
+					engagement: getEngagement(mentorInfoArray[5].toString()),
+					sessionCount: mentorInfoArray[6].toString(),
+					registered: mentorInfoArray[7],
+					validated: mentorInfoArray[8]
+				}
+				setMentorInfo(mentorInfo)
 			} catch (error) {
 				console.log(error)
 			}
@@ -77,7 +107,7 @@ export default function MentorContextProvider(
 			try {
 				const mentorAverageRating =
 					await contract.getMentorAverageRating(mentorAddress)
-				return mentorAverageRating
+				setMentorAverageRating(mentorAverageRating)
 			} catch (error) {
 				console.log(error)
 			}
@@ -91,7 +121,7 @@ export default function MentorContextProvider(
 	///////////////
 
 	async function registerAsMentor(
-		teachingSubjects: number[],
+		teachingSubjects: string[],
 		engagement: number,
 		language: number,
 		yearsOfExperience: number
@@ -105,7 +135,7 @@ export default function MentorContextProvider(
 				signer
 			)
 			try {
-				const registerMentorTx = await contract.registerMentor(
+				const registerMentorTx = await contract.registerAsMentor(
 					teachingSubjects,
 					engagement,
 					language,
@@ -167,6 +197,8 @@ export default function MentorContextProvider(
 	}
 
 	const context: MentorContextProps = {
+		mentorInfo,
+		mentorAverageRating,
 		getMentorInfo,
 		getMentorAverageRating,
 		registerAsMentor,

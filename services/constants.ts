@@ -1,3 +1,28 @@
+export const teachingSubjects = [
+	"Blockchain Basics",
+	"Smart Contracts Basics",
+	"ERC20",
+	"NFTs",
+	"DeFi",
+	"DAOs",
+	"Chainlink",
+	"Smart Contracts Security"
+]
+
+export const levels = ["Novice", "Beginner", "Intermediate"]
+
+export interface Engagement {
+	durationInSeconds: number
+	label: string
+}
+
+export const engagements: Engagement[] = [
+	{ durationInSeconds: 604800, label: "1 week" },
+	{ durationInSeconds: 1209600, label: "2 weeks" },
+	{ durationInSeconds: 1814400, label: "3 weeks" },
+	{ durationInSeconds: 2419200, label: "1 month" }
+]
+
 export const DEVMENTOR_CONTRACT_ADDRESS =
 	"0x659Ac35802485B139879c9774170186d83839be7"
 

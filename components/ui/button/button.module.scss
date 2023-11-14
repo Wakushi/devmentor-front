@@ -1,0 +1,37 @@
+@import "../../../styles/variables.scss";
+
+.button,
+.button_empty {
+	padding: 0.3rem 1.4rem;
+	border: 2px solid transparent;
+	border-radius: 0.2rem;
+	color: #fff;
+	cursor: pointer;
+	transition: 300ms ease-in-out;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: center;
+	width: 200px;
+	height: 50px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.3rem;
+	box-shadow: 4px 4px 8px rgba(0, 0, 0, 0.55);
+
+	&:hover,
+	&:focus-visible {
+		background-color: #fff;
+		color: $secondary-color;
+		transform: translate(0%, -4%);
+	}
+}
+
+.button {
+	background: $secondary-color;
+}
+
+.button_empty {
+	border: 1px solid #fff;
+}
