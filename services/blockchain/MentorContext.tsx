@@ -7,18 +7,6 @@ import {
 } from "../constants"
 import { getEngagement, replacer } from "../utils"
 
-interface Mentor {
-	teachingSubjects: string[]
-	mentee: string
-	yearsOfExperience: number
-	language: number
-	totalRating: number | string
-	engagement: Engagement | undefined
-	sessionCount: number | string
-	registered: boolean
-	validated: boolean
-}
-
 interface MentorContextProviderProps {
 	children: ReactNode
 }
@@ -38,6 +26,18 @@ interface MentorContextProps {
 	validateSessionAsMentor: (menteeAddress: string) => void
 }
 
+interface Mentor {
+	teachingSubjects: string[]
+	mentee: string
+	yearsOfExperience: number
+	language: number
+	totalRating: number
+	engagement: Engagement | undefined
+	sessionCount: number
+	registered: boolean
+	validated: boolean
+}
+
 const MentorContext = createContext<MentorContextProps>({
 	mentorInfo: {} as Mentor,
 	mentorAverageRating: 0,
@@ -47,7 +47,6 @@ const MentorContext = createContext<MentorContextProps>({
 	approveMentor: () => {},
 	validateSessionAsMentor: () => {}
 })
-
 export default function MentorContextProvider(
 	props: MentorContextProviderProps
 ) {
@@ -81,9 +80,9 @@ export default function MentorContextProvider(
 					mentee: mentorInfoArray[1],
 					yearsOfExperience: parseInt(mentorInfoArray[2]),
 					language: parseInt(mentorInfoArray[3]),
-					totalRating: mentorInfoArray[4].toString(),
-					engagement: getEngagement(mentorInfoArray[5].toString()),
-					sessionCount: mentorInfoArray[6].toString(),
+					totalRating: parseInt(mentorInfoArray[4]),
+					engagement: getEngagement(parseInt(mentorInfoArray[5])),
+					sessionCount: parseInt(mentorInfoArray[6]),
 					registered: mentorInfoArray[7],
 					validated: mentorInfoArray[8]
 				}

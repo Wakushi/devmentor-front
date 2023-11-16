@@ -20,7 +20,7 @@ export default function Header() {
 	const router = useRouter()
 
 	const smallNavStyles: Properties = {
-		opacity: displayMiniNav ? 1 : 0,
+		opacity: displayMiniNav ? "1" : "0",
 		transform: displayMiniNav ? "translateY(0%)" : ""
 	}
 
@@ -84,7 +84,9 @@ export default function Header() {
 						className={classes.nav_link}
 						tabIndex={0}
 						onClick={() =>
-							handleConnectionPriorRouting("/mentee/signup")
+							handleConnectionPriorRouting(
+								"/signup/mentee-signup"
+							)
 						}
 					>
 						Register as mentee
@@ -93,7 +95,9 @@ export default function Header() {
 						className={classes.nav_link}
 						tabIndex={0}
 						onClick={() =>
-							handleConnectionPriorRouting("/mentor/signup")
+							handleConnectionPriorRouting(
+								"/signup/mentor-signup"
+							)
 						}
 					>
 						Register as mentor
@@ -105,7 +109,16 @@ export default function Header() {
 							handleConnectionPriorRouting("/mentor/profile")
 						}
 					>
-						Profile
+						Mentor Profile
+					</li>
+					<li
+						className={classes.nav_link}
+						tabIndex={0}
+						onClick={() =>
+							handleConnectionPriorRouting("/mentee/profile")
+						}
+					>
+						Mentee Profile
 					</li>
 					<li>
 						<Button onClick={connectWallet} filled={true}>

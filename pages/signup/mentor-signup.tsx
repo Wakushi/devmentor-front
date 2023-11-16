@@ -5,7 +5,7 @@ import {
 	engagements,
 	Engagement
 } from "../../services/constants"
-import classes from "./signup.module.scss"
+import classes from "./mentor-signup.module.scss"
 import { useRouter } from "next/router"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import {
@@ -28,13 +28,13 @@ interface FormErrors {
 	selfIntroduction?: string
 }
 
-export default function SignupForm() {
+export default function MentorSignup() {
 	const { registerAsMentor } = useContext(MentorContext)
 
 	const { languages } = useContext(BlockchainContext)
 
 	const [formValues, setFormValues] = useState<FormValues>({
-		language: languages[0].id,
+		language: 0,
 		teachingSubjects: [],
 		engagement: 0,
 		yearsOfExperience: 1,
@@ -87,7 +87,6 @@ export default function SignupForm() {
 	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		if (validateForm()) {
-			console.log(formValues)
 			const {
 				language,
 				teachingSubjects,
@@ -101,7 +100,6 @@ export default function SignupForm() {
 				language,
 				yearsOfExperience
 			)
-			// Proceed with form submission logic
 		}
 	}
 
@@ -144,7 +142,7 @@ export default function SignupForm() {
 			) : (
 				<form
 					onSubmit={handleSubmit}
-					className={`${classes.mentor_form} flex flex-col gap-2 p-4`}
+					className={`basic_form flex flex-col gap-2 p-4`}
 				>
 					<label htmlFor="language">Select your language:</label>
 					<select
@@ -176,7 +174,7 @@ export default function SignupForm() {
 						</div>
 					))}
 					{formErrors.teachingSubjects && (
-						<div className={classes.form_error}>
+						<div className={`form_error`}>
 							{formErrors.teachingSubjects}
 						</div>
 					)}
@@ -198,7 +196,7 @@ export default function SignupForm() {
 						)}
 					</select>
 					{formErrors.engagement && (
-						<div className={classes.form_error}>
+						<div className={`form_error`}>
 							{formErrors.engagement}
 						</div>
 					)}
@@ -215,7 +213,7 @@ export default function SignupForm() {
 						onChange={handleInputChange}
 					/>
 					{formErrors.yearsOfExperience && (
-						<div className={classes.form_error}>
+						<div className={`form_error`}>
 							{formErrors.yearsOfExperience}
 						</div>
 					)}
@@ -231,7 +229,7 @@ export default function SignupForm() {
 						onChange={handleTextareaChange}
 					/>
 					{formErrors.selfIntroduction && (
-						<div className={classes.form_error}>
+						<div className={`form_error`}>
 							{formErrors.selfIntroduction}
 						</div>
 					)}

@@ -1,11 +1,11 @@
-import React, { use, useContext, useEffect, useState } from "react"
-import classes from "./profile.module.scss" // Assume that you have a corresponding SASS/SCSS file for styling
+import { useContext, useEffect, useState } from "react"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import { UserContext } from "@/services/UserContext"
 import { getTeachingSubjectLabel } from "@/services/utils"
+import classes from "./profile.module.scss"
 
 export default function MentorProfile() {
-	const [isAvailable, setIsAvailable] = useState(true) // Assuming availability is a toggleable state
+	const [isAvailable, setIsAvailable] = useState(true)
 
 	const { getMentorInfo, mentorInfo } = useContext(MentorContext)
 	const { walletAddress } = useContext(UserContext)
@@ -16,11 +16,16 @@ export default function MentorProfile() {
 		}
 	}, [])
 
+	function getInfos() {
+		console.log("Mentor infos: ", mentorInfo)
+	}
+
 	return (
 		<div className={classes.mentorProfile}>
 			{!mentorInfo.validated ? (
 				<div className={classes.reviewMessage}>
 					YOUR APPLICATION IS BEING REVIEWED
+					<button onClick={getInfos}>get infos</button>
 				</div>
 			) : (
 				<div className={classes.profileDetails}>
@@ -31,7 +36,7 @@ export default function MentorProfile() {
 								{getTeachingSubjectLabel(subject)}
 							</div>
 						))}
-						<button>Update subjects</button>
+						<button onClick={getInfos}>Update subjects</button>
 					</div>
 					<div className={classes.profileSection}>
 						<h2>Engagement : {mentorInfo.engagement?.label}</h2>
@@ -51,7 +56,7 @@ export default function MentorProfile() {
 						<h2>Rating </h2>
 					</div>
 					<div className={classes.profileSection}>
-						<h2>Preferred Language</h2>
+						<h2>Preferred Language : {mentorInfo.language}</h2>
 					</div>
 					<div className={classes.profileSection}>
 						<h2>Accepted Requests : {mentorInfo.sessionCount}</h2>

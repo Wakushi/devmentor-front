@@ -12,7 +12,7 @@ interface BlockchainContextProviderProps {
 interface BlockchainContextProps {
 	languages: Language[]
 	getAllLanguages: () => {}
-	getLanguageById: (languageId: number) => {}
+	getLanguageById: (languageId: number) => Promise<string>
 }
 
 export interface Language {
@@ -23,7 +23,9 @@ export interface Language {
 const BlockchainContext = createContext<BlockchainContextProps>({
 	languages: [],
 	getAllLanguages: async () => {},
-	getLanguageById: async () => {}
+	getLanguageById: async () => {
+		return ""
+	}
 })
 
 export default function BlockchainContextProvider({
@@ -62,7 +64,7 @@ export default function BlockchainContextProvider({
 		}
 	}
 
-	async function getLanguageById(languageId: number) {
+	async function getLanguageById(languageId: number): Promise<string> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
 			DEVMENTOR_CONTRACT_ADDRESS,
@@ -74,6 +76,7 @@ export default function BlockchainContextProvider({
 			return language
 		} catch (error) {
 			console.error(error)
+			return ""
 		}
 	}
 
