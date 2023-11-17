@@ -27,11 +27,15 @@ function getTeachingSubjectLabel(subjectId: string) {
 
 function getLanguageLabel(languageId: number): string {
 	const { languages } = useContext(BlockchainContext)
-	return languages[languageId].label
+	return languages[languageId]?.label
 }
 
 function convertProxyResult(result: any) {
 	return JSON.parse(JSON.stringify(result, replacer))
+}
+
+function getReadableDate(durationInSeconds: number): string {
+	return new Date(durationInSeconds * 1000).toLocaleDateString()
 }
 export {
 	getShortenedAddress,
@@ -39,5 +43,6 @@ export {
 	getEngagement,
 	getTeachingSubjectLabel,
 	convertProxyResult,
-	getLanguageLabel
+	getLanguageLabel,
+	getReadableDate
 }

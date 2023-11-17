@@ -11,7 +11,10 @@ import {
 	BlockchainContext,
 	Language
 } from "@/services/blockchain/BlockchainContext"
-import { MenteeContext } from "@/services/blockchain/MenteeContext"
+import {
+	MenteeContext,
+	MenteeRegistrationAndRequest
+} from "@/services/blockchain/MenteeContext"
 import { ethers } from "ethers"
 
 interface FormValues {
@@ -53,13 +56,16 @@ export default function MenteeSignup() {
 
 	function matchWithRandomMentor() {
 		const { language, teachingSubject, engagement, level } = formValues
-		registerAsMenteeAndMakeRequestForSession(
+		const menteeRegistrationAndRequest: MenteeRegistrationAndRequest = {
 			level,
-			teachingSubject,
+			subject: teachingSubject,
 			language,
 			engagement,
 			matchingMentors,
-			ethers.ZeroAddress,
+			chosenMentor: ethers.ZeroAddress
+		}
+		registerAsMenteeAndMakeRequestForSession(
+			menteeRegistrationAndRequest,
 			"0"
 		)
 	}

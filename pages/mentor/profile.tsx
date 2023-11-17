@@ -1,76 +1,84 @@
 import { useContext, useEffect, useState } from "react"
-import { MentorContext } from "@/services/blockchain/MentorContext"
-import { UserContext } from "@/services/UserContext"
-import { getTeachingSubjectLabel } from "@/services/utils"
+import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
+import { Session, SessionContext } from "@/services/blockchain/SessionContext"
+import { getLanguageLabel, getTeachingSubjectLabel } from "@/services/utils"
+import SessionCard from "@/components/session/session"
+import Loader from "@/components/ui/loader/loader"
 import classes from "./profile.module.scss"
+import { UserContext } from "@/services/UserContext"
 
 export default function MentorProfile() {
-	const [isAvailable, setIsAvailable] = useState(true)
+	const [isLoaded, setIsLoaded] = useState(true)
+	const [mentorInfo, setMentorInfo] = useState<Mentor | null>(null)
+	const [menteeSession, setMenteeSession] = useState<Session | null>(null)
 
-	const { getMentorInfo, mentorInfo } = useContext(MentorContext)
 	const { walletAddress } = useContext(UserContext)
+	const { mentorAverageRating, getMentorInfo } = useContext(MentorContext)
+	const { getMenteeSession } = useContext(SessionContext)
 
 	useEffect(() => {
-		if (walletAddress) {
-			getMentorInfo(walletAddress)
+		if (!mentorInfo) {
+			getMentorInfo(walletAddress).then((mentor) => {
+				setMentorInfo(mentor)
+				if (!mentor) return
+				getMenteeSession(mentor?.mentee).then((session) => {
+					setMenteeSession(session)
+					setIsLoaded(true)
+				})
+			})
 		}
-	}, [])
+	}, [walletAddress])
 
-	function getInfos() {
-		console.log("Mentor infos: ", mentorInfo)
+	if (!isLoaded || !mentorInfo) {
+		return <Loader />
 	}
 
 	return (
-		<div className={classes.mentorProfile}>
+		<div
+			className={`${classes.mentorProfile} flex items-baseline gap-4 fade-in-bottom `}
+		>
 			{!mentorInfo.validated ? (
-				<div className={classes.reviewMessage}>
-					YOUR APPLICATION IS BEING REVIEWED
-					<button onClick={getInfos}>get infos</button>
+				<div className="flex flex-col gap-2">
+					<div className={classes.reviewMessage}>
+						YOUR APPLICATION IS BEING REVIEWED
+					</div>
 				</div>
 			) : (
 				<div className={classes.profileDetails}>
+					<h2>Profile</h2>
 					<div className={classes.profileSection}>
-						<h2>Your subjects</h2>
+						<h3>Your subjects</h3>
 						{mentorInfo.teachingSubjects?.map((subject) => (
 							<div key={subject}>
 								{getTeachingSubjectLabel(subject)}
 							</div>
 						))}
-						<button onClick={getInfos}>Update subjects</button>
+						<button onClick={() => {}}>Update subjects</button>
 					</div>
 					<div className={classes.profileSection}>
-						<h2>Engagement : {mentorInfo.engagement?.label}</h2>
+						<h3>Engagement : {mentorInfo.engagement?.label}</h3>
 						<button>Update engagement</button>
 					</div>
-					<div className={classes.availabilityToggle}>
-						<label>
-							Available
-							<input
-								type="checkbox"
-								checked={isAvailable}
-								onChange={() => setIsAvailable(!isAvailable)}
-							/>
-						</label>
+
+					<div className={classes.profileSection}>
+						<h3>Rating : {mentorAverageRating} </h3>
 					</div>
 					<div className={classes.profileSection}>
-						<h2>Rating </h2>
+						<h3>
+							Preferred Language :{" "}
+							{getLanguageLabel(mentorInfo?.language || 0)}
+						</h3>
 					</div>
 					<div className={classes.profileSection}>
-						<h2>Preferred Language : {mentorInfo.language}</h2>
+						<h3>Accepted Requests : {mentorInfo.sessionCount}</h3>
 					</div>
 					<div className={classes.profileSection}>
-						<h2>Accepted Requests : {mentorInfo.sessionCount}</h2>
-					</div>
-					<div className={classes.profileSection}>
-						<h2>Fulfilled Requests</h2>
-					</div>
-					<div className={classes.profileSection}>
-						<h2>TIPS received : </h2>
-					</div>
-					<div className={classes.profileSection}>
-						<h2>Current mentee : {mentorInfo.mentee}</h2>
+						<h3>Current mentee : {mentorInfo.mentee}</h3>
 					</div>
 				</div>
+			)}
+			{!!menteeSession && (
+				<SessionCard session={menteeSession} mentorView={true} />
 			)}
 		</div>
 	)

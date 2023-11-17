@@ -4,6 +4,11 @@
 
 body {
 	background-color: rgb(247, 247, 247);
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 h2 {
@@ -18,4 +23,23 @@ h2 {
 
 .form_error {
 	color: red;
+}
+
+//////////////////////////
+// KEYFRAMES ANIMATIONS //
+//////////////////////////
+
+.fade-in-bottom {
+	animation: fade-in-bottom 500ms ease-in-out;
+}
+
+@keyframes fade-in-bottom {
+	0% {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }

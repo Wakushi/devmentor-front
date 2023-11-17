@@ -24,35 +24,47 @@ export const engagements: Engagement[] = [
 ]
 
 export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0x659Ac35802485B139879c9774170186d83839be7"
+	"0x8783C9Ed5b1beC15eCccc47E8772bCAAdBe6E139"
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "address",
-				name: "_vrfCoordinator",
-				type: "address"
-			},
-			{
-				internalType: "bytes32",
-				name: "_gasLane",
-				type: "bytes32"
-			},
-			{
-				internalType: "uint64",
-				name: "_subscriptionId",
-				type: "uint64"
-			},
-			{
-				internalType: "uint32",
-				name: "_callbackGasLimit",
-				type: "uint32"
-			},
-			{
-				internalType: "string[]",
-				name: "_languages",
-				type: "string[]"
+				components: [
+					{
+						internalType: "address",
+						name: "vrfCoordinator",
+						type: "address"
+					},
+					{
+						internalType: "bytes32",
+						name: "gasLane",
+						type: "bytes32"
+					},
+					{
+						internalType: "uint64",
+						name: "subscriptionId",
+						type: "uint64"
+					},
+					{
+						internalType: "uint32",
+						name: "callbackGasLimit",
+						type: "uint32"
+					},
+					{
+						internalType: "string[]",
+						name: "languages",
+						type: "string[]"
+					},
+					{
+						internalType: "address",
+						name: "priceFeed",
+						type: "address"
+					}
+				],
+				internalType: "struct DEVMentor.DEVMentorConfig",
+				name: "config",
+				type: "tuple"
 			}
 		],
 		stateMutability: "nonpayable",
@@ -130,6 +142,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		type: "error"
 	},
 	{
+		inputs: [],
+		name: "DEVMentor__NotEnoughLockedValue",
+		type: "error"
+	},
+	{
 		inputs: [
 			{
 				internalType: "address",
@@ -199,6 +216,203 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				indexed: true,
 				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "MenteeConfirmedSession",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "valueLocked",
+				type: "uint256"
+			}
+		],
+		name: "MenteeLockedValue",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "MenteeMatchedWithMentor",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			}
+		],
+		name: "MenteeOpenedRequest",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			}
+		],
+		name: "MenteeRegistered",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "value",
+				type: "uint256"
+			}
+		],
+		name: "MenteeValueSent",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "MentorApproved",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "MentorConfirmedSession",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "MentorRegistered",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "requestId",
+				type: "uint256"
+			}
+		],
+		name: "MentorSelectionRequestSent",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "tipper",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "value",
+				type: "uint256"
+			}
+		],
+		name: "MentorTipped",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
 				name: "previousOwner",
 				type: "address"
 			},
@@ -211,6 +425,101 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		],
 		name: "OwnershipTransferred",
 		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			}
+		],
+		name: "RequestCancelled",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "engagement",
+				type: "uint256"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "valueLocked",
+				type: "uint256"
+			}
+		],
+		name: "SessionCreated",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "rating",
+				type: "uint256"
+			}
+		],
+		name: "SessionRated",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "SessionValidated",
+		type: "event"
+	},
+	{
+		inputs: [],
+		name: "MINIMUM_LOCKED_VALUE",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
 	},
 	{
 		inputs: [
@@ -272,6 +581,19 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		type: "function"
 	},
 	{
+		inputs: [],
+		name: "getEthPrice",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
 		inputs: [
 			{
 				internalType: "uint256",
@@ -293,7 +615,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "enum DEVMentor.Subject",
+				internalType: "enum SessionRegistry.Subject",
 				name: "_subject",
 				type: "uint8"
 			},
@@ -357,7 +679,53 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "bool"
 					}
 				],
-				internalType: "struct DEVMentor.Mentee",
+				internalType: "struct MenteeRegistry.Mentee",
+				name: "",
+				type: "tuple"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			}
+		],
+		name: "getMenteeRequest",
+		outputs: [
+			{
+				components: [
+					{
+						internalType: "enum MenteeRegistry.Level",
+						name: "level",
+						type: "uint8"
+					},
+					{
+						internalType: "enum SessionRegistry.Subject",
+						name: "learningSubject",
+						type: "uint8"
+					},
+					{
+						internalType: "bool",
+						name: "accepted",
+						type: "bool"
+					},
+					{
+						internalType: "uint256",
+						name: "engagement",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "valueLocked",
+						type: "uint256"
+					}
+				],
+				internalType: "struct MenteeRegistry.MenteeRequest",
 				name: "",
 				type: "tuple"
 			}
@@ -413,7 +781,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "bool"
 					}
 				],
-				internalType: "struct DEVMentor.Session",
+				internalType: "struct SessionRegistry.Session",
 				name: "",
 				type: "tuple"
 			}
@@ -453,7 +821,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				components: [
 					{
-						internalType: "enum DEVMentor.Subject[]",
+						internalType: "enum SessionRegistry.Subject[]",
 						name: "teachingSubjects",
 						type: "uint8[]"
 					},
@@ -498,9 +866,144 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "bool"
 					}
 				],
-				internalType: "struct DEVMentor.Mentor",
+				internalType: "struct MentorRegistry.Mentor",
 				name: "",
 				type: "tuple"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_requestId",
+				type: "uint256"
+			}
+		],
+		name: "getMentorSelectionRequest",
+		outputs: [
+			{
+				components: [
+					{
+						internalType: "address",
+						name: "mentee",
+						type: "address"
+					},
+					{
+						internalType: "address[]",
+						name: "matchingMentors",
+						type: "address[]"
+					},
+					{
+						internalType: "uint256",
+						name: "engagement",
+						type: "uint256"
+					}
+				],
+				internalType: "struct MentorRegistry.MentorSelectionRequest",
+				name: "",
+				type: "tuple"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			},
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
+		name: "getSession",
+		outputs: [
+			{
+				components: [
+					{
+						internalType: "address",
+						name: "mentor",
+						type: "address"
+					},
+					{
+						internalType: "address",
+						name: "mentee",
+						type: "address"
+					},
+					{
+						internalType: "uint256",
+						name: "startTime",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "engagement",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "valueLocked",
+						type: "uint256"
+					},
+					{
+						internalType: "bool",
+						name: "mentorConfirmed",
+						type: "bool"
+					},
+					{
+						internalType: "bool",
+						name: "menteeConfirmed",
+						type: "bool"
+					}
+				],
+				internalType: "struct SessionRegistry.Session",
+				name: "",
+				type: "tuple"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			}
+		],
+		name: "isAccountMentee",
+		outputs: [
+			{
+				internalType: "bool",
+				name: "",
+				type: "bool"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
+		name: "isAccountMentor",
+		outputs: [
+			{
+				internalType: "bool",
+				name: "",
+				type: "bool"
 			}
 		],
 		stateMutability: "view",
@@ -528,29 +1031,41 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "enum DEVMentor.Subject",
-				name: "_subject",
-				type: "uint8"
-			},
-			{
-				internalType: "enum DEVMentor.Level",
-				name: "_level",
-				type: "uint8"
-			},
-			{
-				internalType: "uint256",
-				name: "_engagement",
-				type: "uint256"
-			},
-			{
-				internalType: "address[]",
-				name: "_matchingMentors",
-				type: "address[]"
-			},
-			{
-				internalType: "address",
-				name: "_chosenMentor",
-				type: "address"
+				components: [
+					{
+						internalType: "enum MenteeRegistry.Level",
+						name: "level",
+						type: "uint8"
+					},
+					{
+						internalType: "enum SessionRegistry.Subject",
+						name: "subject",
+						type: "uint8"
+					},
+					{
+						internalType: "uint256",
+						name: "language",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "engagement",
+						type: "uint256"
+					},
+					{
+						internalType: "address[]",
+						name: "matchingMentors",
+						type: "address[]"
+					},
+					{
+						internalType: "address",
+						name: "chosenMentor",
+						type: "address"
+					}
+				],
+				internalType: "struct DEVMentor.MenteeRegistrationAndRequest",
+				name: "request",
+				type: "tuple"
 			}
 		],
 		name: "openRequestForSession",
@@ -592,34 +1107,41 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "enum DEVMentor.Level",
-				name: "_level",
-				type: "uint8"
-			},
-			{
-				internalType: "enum DEVMentor.Subject",
-				name: "_subject",
-				type: "uint8"
-			},
-			{
-				internalType: "uint256",
-				name: "_language",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "_engagement",
-				type: "uint256"
-			},
-			{
-				internalType: "address[]",
-				name: "_matchingMentors",
-				type: "address[]"
-			},
-			{
-				internalType: "address",
-				name: "_chosenMentor",
-				type: "address"
+				components: [
+					{
+						internalType: "enum MenteeRegistry.Level",
+						name: "level",
+						type: "uint8"
+					},
+					{
+						internalType: "enum SessionRegistry.Subject",
+						name: "subject",
+						type: "uint8"
+					},
+					{
+						internalType: "uint256",
+						name: "language",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "engagement",
+						type: "uint256"
+					},
+					{
+						internalType: "address[]",
+						name: "matchingMentors",
+						type: "address[]"
+					},
+					{
+						internalType: "address",
+						name: "chosenMentor",
+						type: "address"
+					}
+				],
+				internalType: "struct DEVMentor.MenteeRegistrationAndRequest",
+				name: "request",
+				type: "tuple"
 			}
 		],
 		name: "registerAsMenteeAndMakeRequestForSession",
@@ -630,24 +1152,31 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "enum DEVMentor.Subject[]",
-				name: "_teachingSubjects",
-				type: "uint8[]"
-			},
-			{
-				internalType: "uint256",
-				name: "_engagement",
-				type: "uint256"
-			},
-			{
-				internalType: "uint8",
-				name: "_language",
-				type: "uint8"
-			},
-			{
-				internalType: "uint8",
-				name: "_yearsOfExperience",
-				type: "uint8"
+				components: [
+					{
+						internalType: "enum SessionRegistry.Subject[]",
+						name: "teachingSubjects",
+						type: "uint8[]"
+					},
+					{
+						internalType: "uint256",
+						name: "engagement",
+						type: "uint256"
+					},
+					{
+						internalType: "uint8",
+						name: "language",
+						type: "uint8"
+					},
+					{
+						internalType: "uint8",
+						name: "yearsOfExperience",
+						type: "uint8"
+					}
+				],
+				internalType: "struct DEVMentor.MentorRegistration",
+				name: "registration",
+				type: "tuple"
 			}
 		],
 		name: "registerAsMentor",
@@ -660,6 +1189,19 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		name: "renounceOwnership",
 		outputs: [],
 		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
+		name: "tipMentor",
+		outputs: [],
+		stateMutability: "payable",
 		type: "function"
 	},
 	{

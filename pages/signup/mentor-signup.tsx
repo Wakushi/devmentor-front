@@ -7,7 +7,10 @@ import {
 } from "../../services/constants"
 import classes from "./mentor-signup.module.scss"
 import { useRouter } from "next/router"
-import { MentorContext } from "@/services/blockchain/MentorContext"
+import {
+	MentorContext,
+	MentorRegistration
+} from "@/services/blockchain/MentorContext"
 import {
 	BlockchainContext,
 	Language
@@ -94,12 +97,13 @@ export default function MentorSignup() {
 				yearsOfExperience
 			} = formValues
 			setSubmittedForm(true)
-			registerAsMentor(
+			const mentorRegistration: MentorRegistration = {
 				teachingSubjects,
 				engagement,
 				language,
 				yearsOfExperience
-			)
+			}
+			registerAsMentor(mentorRegistration)
 		}
 	}
 

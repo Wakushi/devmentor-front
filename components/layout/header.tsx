@@ -1,5 +1,4 @@
 import classes from "./header.module.scss"
-import Link from "next/link"
 import Button from "@/components/ui/button/button"
 import { useContext, useEffect, useRef, useState } from "react"
 import { UserContext } from "@/services/UserContext"
@@ -9,9 +8,13 @@ import { useRouter } from "next/router"
 import { getShortenedAddress } from "@/services/utils"
 import Burger from "@/components/ui/burger/burger"
 import { Properties } from "csstype"
+import { MenteeContext } from "@/services/blockchain/MenteeContext"
+import { MentorContext } from "@/services/blockchain/MentorContext"
 
 export default function Header() {
 	const { walletAddress, connectWallet } = useContext(UserContext)
+	const { isAccountMentee } = useContext(MenteeContext)
+	const { isAccountMentor } = useContext(MentorContext)
 	const shortenWalletAddress = walletAddress
 		? getShortenedAddress(walletAddress)
 		: null
@@ -49,6 +52,22 @@ export default function Header() {
 			}
 		} else {
 			router.push(route)
+		}
+	}
+
+	function goToProfile() {
+		if (walletAddress) {
+			isAccountMentee(walletAddress).then((isMentee) => {
+				if (isMentee) {
+					router.push("/mentee/profile")
+				} else {
+					isAccountMentor(walletAddress).then((isMentor) => {
+						if (isMentor) {
+							router.push("/mentor/profile")
+						}
+					})
+				}
+			})
 		}
 	}
 
@@ -105,20 +124,9 @@ export default function Header() {
 					<li
 						className={classes.nav_link}
 						tabIndex={0}
-						onClick={() =>
-							handleConnectionPriorRouting("/mentor/profile")
-						}
+						onClick={goToProfile}
 					>
-						Mentor Profile
-					</li>
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={() =>
-							handleConnectionPriorRouting("/mentee/profile")
-						}
-					>
-						Mentee Profile
+						Profile
 					</li>
 					<li>
 						<Button onClick={connectWallet} filled={true}>

@@ -39,6 +39,7 @@ export default function BlockchainContextProvider({
 
 	useEffect(() => {
 		getAllLanguages()
+		listenToEvents()
 	}, [])
 
 	///////////////
@@ -83,6 +84,50 @@ export default function BlockchainContextProvider({
 	///////////////
 	// Write
 	///////////////
+
+	///////////////
+	// Events
+	///////////////
+
+	function listenToEvents() {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			provider
+		)
+
+		console.log("Listening to events...")
+
+		contract.on("MentorSelectionRequestSent", (mentee, requestId) => {
+			console.log("MentorSelectionRequestSent event:", mentee, requestId)
+		})
+
+		contract.on("MenteeMatchedWithMentor", (mentee, mentor) => {
+			console.log("MenteeMatchedWithMentor event:", mentee, mentor)
+		})
+
+		contract.on("MenteeRegistered", (mentee) => {
+			console.log("MenteeRegistered event:", mentee)
+		})
+
+		contract.on("MenteeOpenedRequest", (mentee) => {
+			console.log("MenteeOpenedRequest event:", mentee)
+		})
+
+		contract.on(
+			"SessionCreated",
+			(mentee, mentor, engagement, valueLocked) => {
+				console.log(
+					"SessionCreated event:",
+					mentee,
+					mentor,
+					engagement,
+					valueLocked
+				)
+			}
+		)
+	}
 
 	const context: BlockchainContextProps = {
 		languages,

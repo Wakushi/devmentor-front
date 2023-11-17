@@ -12,21 +12,17 @@ interface MentorContextProviderProps {
 }
 
 interface MentorContextProps {
-	mentorInfo: Mentor
+	mentorInfo: Mentor | null
 	mentorAverageRating: number
-	getMentorInfo: (mentorAddress: string) => void
+	getMentorInfo: (mentorAddress: string) => Promise<Mentor | null>
 	getMentorAverageRating: (mentorAddress: string) => void
-	registerAsMentor: (
-		teachingSubjects: string[],
-		engagement: number,
-		language: number,
-		yearsOfExperience: number
-	) => void
+	isAccountMentor: (mentorAddress: string) => Promise<boolean>
+	registerAsMentor: (mentorRegistration: MentorRegistration) => void
 	approveMentor: (mentorAddress: string) => void
 	validateSessionAsMentor: (menteeAddress: string) => void
 }
 
-interface Mentor {
+export interface Mentor {
 	teachingSubjects: string[]
 	mentee: string
 	yearsOfExperience: number
@@ -38,11 +34,19 @@ interface Mentor {
 	validated: boolean
 }
 
+export interface MentorRegistration {
+	teachingSubjects: string[]
+	engagement: number
+	language: number
+	yearsOfExperience: number
+}
+
 const MentorContext = createContext<MentorContextProps>({
-	mentorInfo: {} as Mentor,
+	mentorInfo: null,
 	mentorAverageRating: 0,
-	getMentorInfo: () => {},
+	getMentorInfo: () => Promise.resolve(null),
 	getMentorAverageRating: () => {},
+	isAccountMentor: () => Promise.resolve(false),
 	registerAsMentor: () => {},
 	approveMentor: () => {},
 	validateSessionAsMentor: () => {}
@@ -54,14 +58,16 @@ export default function MentorContextProvider(
 	// State
 	///////////////
 
-	const [mentorInfo, setMentorInfo] = useState<Mentor>({} as Mentor)
+	const [mentorInfo, setMentorInfo] = useState<Mentor | null>(null)
 	const [mentorAverageRating, setMentorAverageRating] = useState(0)
 
 	///////////////
 	// Read
 	///////////////
 
-	async function getMentorInfo(mentorAddress: string) {
+	async function getMentorInfo(
+		mentorAddress: string
+	): Promise<Mentor | null> {
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.BrowserProvider(window.ethereum)
 			const contract = new ethers.Contract(
@@ -73,7 +79,7 @@ export default function MentorContextProvider(
 				const mentorInfoArray = await contract.getMentorInfo(
 					mentorAddress
 				)
-				const mentorInfo = {
+				return {
 					teachingSubjects: JSON.parse(
 						JSON.stringify(mentorInfoArray[0], replacer)
 					),
@@ -86,13 +92,13 @@ export default function MentorContextProvider(
 					registered: mentorInfoArray[7],
 					validated: mentorInfoArray[8]
 				}
-				setMentorInfo(mentorInfo)
 			} catch (error) {
 				console.log(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
 		}
+		return null
 	}
 
 	async function getMentorAverageRating(mentorAddress: string) {
@@ -106,7 +112,7 @@ export default function MentorContextProvider(
 			try {
 				const mentorAverageRating =
 					await contract.getMentorAverageRating(mentorAddress)
-				setMentorAverageRating(mentorAverageRating)
+				setMentorAverageRating(parseInt(mentorAverageRating))
 			} catch (error) {
 				console.log(error)
 			}
@@ -115,16 +121,30 @@ export default function MentorContextProvider(
 		}
 	}
 
+	async function isAccountMentor(mentorAddress: string): Promise<boolean> {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				provider
+			)
+			try {
+				return await contract.isAccountMentor(mentorAddress)
+			} catch (error) {
+				console.log(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+		return false
+	}
+
 	///////////////
 	// Write
 	///////////////
 
-	async function registerAsMentor(
-		teachingSubjects: string[],
-		engagement: number,
-		language: number,
-		yearsOfExperience: number
-	) {
+	async function registerAsMentor(mentorRegistration: MentorRegistration) {
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.BrowserProvider(window.ethereum)
 			const signer = await provider.getSigner()
@@ -135,10 +155,7 @@ export default function MentorContextProvider(
 			)
 			try {
 				const registerMentorTx = await contract.registerAsMentor(
-					teachingSubjects,
-					engagement,
-					language,
-					yearsOfExperience
+					mentorRegistration
 				)
 				await registerMentorTx.wait()
 				console.log("Mentor registered!")
@@ -200,6 +217,7 @@ export default function MentorContextProvider(
 		mentorAverageRating,
 		getMentorInfo,
 		getMentorAverageRating,
+		isAccountMentor,
 		registerAsMentor,
 		approveMentor,
 		validateSessionAsMentor

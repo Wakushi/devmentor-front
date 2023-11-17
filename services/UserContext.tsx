@@ -13,19 +13,19 @@ interface UserContextProviderProps {
 }
 
 interface UserContextProps {
-	walletAddress: string | null
+	walletAddress: string
 	connectWallet: () => Promise<string | undefined>
 }
 
 const UserContext = createContext<UserContextProps>({
-	walletAddress: null,
+	walletAddress: "",
 	connectWallet: (): Promise<string | undefined> => {
 		return new Promise<string | undefined>(() => {})
 	}
 })
 
 export default function UserContextProvider(props: UserContextProviderProps) {
-	const [walletAddress, setWalletAddress] = useState<string | null>(null)
+	const [walletAddress, setWalletAddress] = useState<string>("")
 	const router = useRouter()
 	const { openSnackBar } = useContext(SnackbarContext)
 

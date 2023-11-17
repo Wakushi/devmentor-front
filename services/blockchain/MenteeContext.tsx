@@ -11,22 +11,17 @@ interface MenteeContextProviderProps {
 }
 
 interface MenteeContextProps {
-	menteeInfo: Mentee | null
 	matchingMentors: string[]
 	getMatchingMentors: (
 		subject: number,
 		engagement: number,
 		language: number
 	) => Promise<void>
-	getMenteeInfo: (menteeAddress: string) => Promise<any>
-	getMenteeSession: (menteeAddress: string) => Promise<any>
+	getMenteeInfo: (menteeAddress: string) => Promise<Mentee | null>
+	getMenteeRequest: (menteeAddress: string) => Promise<any>
+	isAccountMentee: (menteeAddress: string) => Promise<boolean>
 	registerAsMenteeAndMakeRequestForSession: (
-		level: number,
-		subject: number,
-		language: number,
-		engagement: number,
-		matchingMentors: string[],
-		chosenMentor: string,
+		menteeRegistrationAndRequest: MenteeRegistrationAndRequest,
 		valueLocked: string
 	) => Promise<void>
 	openRequestForSession: (
@@ -43,7 +38,7 @@ interface MenteeContextProps {
 	) => Promise<void>
 }
 
-interface Mentee {
+export interface Mentee {
 	language: number
 	sessionCount: number
 	mentor: string
@@ -51,12 +46,21 @@ interface Mentee {
 	hasRequest: boolean
 }
 
+export interface MenteeRegistrationAndRequest {
+	level: number
+	subject: number
+	language: number
+	engagement: number
+	matchingMentors: string[]
+	chosenMentor: string
+}
+
 const MenteeContext = createContext<MenteeContextProps>({
-	menteeInfo: null,
 	matchingMentors: [],
 	getMatchingMentors: async () => {},
-	getMenteeInfo: async () => ({}),
-	getMenteeSession: async () => ({}),
+	getMenteeInfo: async () => Promise.resolve(null),
+	getMenteeRequest: async () => ({}),
+	isAccountMentee: async () => Promise.resolve(false),
 	registerAsMenteeAndMakeRequestForSession: async () => {},
 	openRequestForSession: async () => {},
 	validateSessionAsMentee: async () => {}
@@ -70,11 +74,49 @@ export default function MenteeContextProvider({
 	///////////////
 
 	const [matchingMentors, setMatchingMentors] = useState<string[]>([])
-	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
 
 	///////////////
 	// Read
 	///////////////
+
+	async function getMenteeInfo(
+		menteeAddress: string
+	): Promise<Mentee | null> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			provider
+		)
+		try {
+			const menteeInfoArray = await contract.getMenteeInfo(menteeAddress)
+			return {
+				language: parseInt(menteeInfoArray[0]),
+				sessionCount: parseInt(menteeInfoArray[1]),
+				mentor: menteeInfoArray[2],
+				registered: menteeInfoArray[3],
+				hasRequest: menteeInfoArray[4]
+			}
+		} catch (error) {
+			console.error("Error in getMenteeInfo:", error)
+		}
+		return null
+	}
+
+	async function getMenteeRequest(menteeAddress: string) {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			provider
+		)
+		try {
+			const menteeRequest = await contract.getMenteeRequest(menteeAddress)
+			return menteeRequest
+		} catch (error) {
+			console.error("Error in getMenteeRequest:", error)
+		}
+	}
 
 	async function getMatchingMentors(
 		subject: number,
@@ -99,42 +141,23 @@ export default function MenteeContextProvider({
 		}
 	}
 
-	async function getMenteeInfo(menteeAddress: string) {
-		const provider = new ethers.BrowserProvider(window.ethereum)
-		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
-			provider
-		)
-		try {
-			const menteeInfoArray = await contract.getMenteeInfo(menteeAddress)
-			const menteeInfo = {
-				language: parseInt(menteeInfoArray[0]),
-				sessionCount: parseInt(menteeInfoArray[1]),
-				mentor: menteeInfoArray[2],
-				registered: menteeInfoArray[3],
-				hasRequest: menteeInfoArray[4]
+	async function isAccountMentee(menteeAddress: string): Promise<boolean> {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				provider
+			)
+			try {
+				return await contract.isAccountMentee(menteeAddress)
+			} catch (error) {
+				console.log(error)
 			}
-			setMenteeInfo(menteeInfo)
-			console.log("Mentee info:", menteeInfo)
-		} catch (error) {
-			console.error("Error in getMenteeInfo:", error)
+		} else {
+			console.log("Please install MetaMask")
 		}
-	}
-
-	async function getMenteeSession(menteeAddress: string) {
-		const provider = new ethers.BrowserProvider(window.ethereum)
-		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
-			provider
-		)
-		try {
-			const menteeSession = await contract.getMenteeSession(menteeAddress)
-			return menteeSession
-		} catch (error) {
-			console.error("Error in getMenteeSession:", error)
-		}
+		return false
 	}
 
 	///////////////
@@ -142,12 +165,7 @@ export default function MenteeContextProvider({
 	///////////////
 
 	async function registerAsMenteeAndMakeRequestForSession(
-		level: number,
-		subject: number,
-		language: number,
-		engagement: number,
-		matchingMentors: string[],
-		chosenMentor: string,
+		menteeRegistrationAndRequest: MenteeRegistrationAndRequest,
 		valueLocked: string
 	) {
 		if (typeof window.ethereum !== "undefined") {
@@ -161,12 +179,7 @@ export default function MenteeContextProvider({
 			try {
 				const transaction =
 					await contract.registerAsMenteeAndMakeRequestForSession(
-						level,
-						subject,
-						language,
-						engagement,
-						matchingMentors,
-						chosenMentor,
+						menteeRegistrationAndRequest,
 						{ value: ethers.parseEther(valueLocked) }
 					)
 				await transaction.wait()
@@ -245,11 +258,11 @@ export default function MenteeContextProvider({
 	}
 
 	const context: MenteeContextProps = {
-		menteeInfo,
 		matchingMentors,
 		getMatchingMentors,
 		getMenteeInfo,
-		getMenteeSession,
+		getMenteeRequest,
+		isAccountMentee,
 		registerAsMenteeAndMakeRequestForSession,
 		openRequestForSession,
 		validateSessionAsMentee
