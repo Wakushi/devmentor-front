@@ -1,9 +1,18 @@
 import { ethers } from "ethers"
-import { ReactNode, createContext, use, useEffect, useState } from "react"
+import {
+	ReactNode,
+	createContext,
+	use,
+	useContext,
+	useEffect,
+	useState
+} from "react"
 import {
 	DEVMENTOR_CONTRACT_ABI,
 	DEVMENTOR_CONTRACT_ADDRESS
 } from "../constants"
+import { useRouter } from "next/router"
+import { SnackbarContext } from "../SnackbarContext"
 
 interface BlockchainContextProviderProps {
 	children: ReactNode
@@ -56,6 +65,9 @@ export default function BlockchainContextProvider({
 	const [isRegistered, setIsRegistered] = useState(false)
 	const [isWaitingForTransaction, setIsWaitingForTransaction] =
 		useState<boolean>(false)
+	const { openSnackBar } = useContext(SnackbarContext)
+
+	const router = useRouter()
 
 	useEffect(() => {
 		getAllLanguages()
@@ -138,6 +150,8 @@ export default function BlockchainContextProvider({
 
 		contract.on("MenteeMatchedWithMentor", (mentee, mentor) => {
 			console.log("MenteeMatchedWithMentor event:", mentee, mentor)
+			setIsWaitingForTransaction(false)
+			router.push("/match")
 		})
 
 		contract.on("MenteeRegistered", (mentee) => {
@@ -154,6 +168,13 @@ export default function BlockchainContextProvider({
 
 		contract.on("MenteeOpenedRequest", (mentee) => {
 			console.log("MenteeOpenedRequest event:", mentee)
+			router.push("/mentee/profile")
+		})
+
+		contract.on("RequestCancelled", (mentee) => {
+			console.log("RequestCancelled event:", mentee)
+			openSnackBar("cancelledRequest")
+			setIsWaitingForTransaction(false)
 		})
 
 		contract.on(

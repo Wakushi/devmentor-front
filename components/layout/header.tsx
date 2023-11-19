@@ -1,13 +1,11 @@
 import classes from "./header.module.scss"
 import Button from "@/components/ui/button/button"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { UserContext } from "@/services/UserContext"
 import Image from "next/image"
 import metamask from "@/assets/images/logo/metamask-logo.png"
 import { useRouter } from "next/router"
 import { getShortenedAddress } from "@/services/utils"
-import Burger from "@/components/ui/burger/burger"
-import { Properties } from "csstype"
 import { MenteeContext } from "@/services/blockchain/MenteeContext"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 
@@ -19,7 +17,6 @@ export default function Header() {
 		? getShortenedAddress(walletAddress)
 		: null
 	const headerRef = useRef<HTMLHeadElement | null>(null)
-	const [displayMiniNav, setDisplayMiniNav] = useState(false)
 	const router = useRouter()
 
 	useEffect(() => {
@@ -64,10 +61,6 @@ export default function Header() {
 				}
 			})
 		}
-	}
-
-	function handleBurgerToggle() {
-		setDisplayMiniNav((preDisplayMiniNav) => !preDisplayMiniNav)
 	}
 
 	return (
@@ -119,6 +112,15 @@ export default function Header() {
 					<li
 						className={classes.nav_link}
 						tabIndex={0}
+						onClick={() =>
+							handleConnectionPriorRouting("/mentee/session-form")
+						}
+					>
+						Open session
+					</li>
+					<li
+						className={classes.nav_link}
+						tabIndex={0}
 						onClick={goToProfile}
 					>
 						Profile
@@ -141,7 +143,6 @@ export default function Header() {
 						</Button>
 					</li>
 				</ul>
-				<Burger handleClick={handleBurgerToggle} />
 			</nav>
 		</header>
 	)

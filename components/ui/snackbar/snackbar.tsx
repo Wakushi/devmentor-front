@@ -15,6 +15,9 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "error":
 				return "Something went wrong"
 
+			case "cancelledRequest":
+				return "Request cancelled"
+
 			default:
 				return ""
 		}

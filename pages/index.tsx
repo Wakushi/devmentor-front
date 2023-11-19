@@ -1,18 +1,35 @@
 import Button from "@/components/ui/button/button"
 import { useContext, useState } from "react"
 import { MentorContext } from "@/services/blockchain/MentorContext"
+import { SessionContext } from "@/services/blockchain/SessionContext"
 
 export default function Landing() {
 	const { approveMentor } = useContext(MentorContext)
-	const [mentorToValidate, setMentorToValidate] = useState("")
+	const { adminCompleteSession } = useContext(SessionContext)
+
+	const [formValues, setFormValues] = useState<any>({
+		mentorAddress: "",
+		menteeAddress: ""
+	})
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-		setMentorToValidate(event.target.value)
+		setFormValues({
+			...formValues,
+			[event.target.name]: event.target.value
+		})
 	}
 
 	function onApproveMentor() {
-		console.log("mentorToValidate: ", mentorToValidate)
-		approveMentor(mentorToValidate)
+		approveMentor(formValues.mentorAddress)
+	}
+
+	function onCompleteSession() {
+		console.log(formValues.mentorAddress, formValues.menteeAddress)
+		adminCompleteSession(
+			formValues.mentorAddress,
+			formValues.menteeAddress,
+			"0"
+		)
 	}
 
 	return (
@@ -21,14 +38,35 @@ export default function Landing() {
 				<div className="flex flex-col items-center gap-2">
 					<input
 						id="mentorToValidate"
-						name="mentorToValidate"
+						name="mentorAddress"
 						type="text"
 						placeholder="Enter mentor address"
-						value={mentorToValidate}
+						value={formValues.mentorAddress}
 						onChange={handleInputChange}
 					/>
 					<Button onClick={onApproveMentor} filled={true}>
 						Validate mentor
+					</Button>
+				</div>
+				<div className="flex flex-col items-center gap-2">
+					<input
+						id="mentorToValidate"
+						name="menteeAddress"
+						type="text"
+						placeholder="Enter mentee address"
+						value={formValues.menteeAddress}
+						onChange={handleInputChange}
+					/>
+					<input
+						id="mentorToValidate"
+						name="mentorAddress"
+						type="text"
+						placeholder="Enter mentor address"
+						value={formValues.mentorAddress}
+						onChange={handleInputChange}
+					/>
+					<Button onClick={onCompleteSession} filled={true}>
+						Complete session
 					</Button>
 				</div>
 			</div>

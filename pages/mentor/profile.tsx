@@ -52,7 +52,7 @@ export default function MentorProfile() {
 						<h3>Your subjects</h3>
 						{mentorInfo.teachingSubjects?.map((subject) => (
 							<div key={subject}>
-								{getTeachingSubjectLabel(subject)}
+								{getTeachingSubjectLabel(+subject)}
 							</div>
 						))}
 						<button onClick={() => {}}>Update subjects</button>

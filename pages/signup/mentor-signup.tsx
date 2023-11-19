@@ -1,5 +1,5 @@
 import Button from "@/components/ui/button/button"
-import { useContext, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import {
 	teachingSubjects,
 	engagements,
@@ -34,6 +34,7 @@ interface FormErrors {
 
 export default function MentorSignup() {
 	const { registerAsMentor } = useContext(MentorContext)
+	const { setIsRegistered } = useContext(BlockchainContext)
 
 	const {
 		languages,
@@ -54,6 +55,12 @@ export default function MentorSignup() {
 	const [submittedForm, setSubmittedForm] = useState(false)
 
 	const router = useRouter()
+
+	useEffect(() => {
+		if (setIsRegistered) {
+			setIsRegistered(false)
+		}
+	}, [])
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
 		if (event.target.type === "checkbox") {
@@ -153,7 +160,7 @@ export default function MentorSignup() {
 			) : (
 				<form
 					onSubmit={handleSubmit}
-					className={`basic_form flex flex-col gap-2 p-4`}
+					className={`basic-card flex flex-col gap-2 p-4`}
 				>
 					<label htmlFor="language">Select your language:</label>
 					<select

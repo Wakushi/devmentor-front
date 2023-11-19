@@ -23,15 +23,29 @@ export interface Session {
 
 interface SessionContextProps {
 	getMenteeSession: (menteeAddress: string) => Promise<Session | null>
+	adminCompleteSession: (
+		menteeAddress: string,
+		mentorAddress: string,
+		valueLocked: string
+	) => Promise<void>
 }
 
 const SessionContext = createContext<SessionContextProps>({
-	getMenteeSession: async () => Promise.resolve(null)
+	getMenteeSession: async () => Promise.resolve(null),
+	adminCompleteSession: async () => Promise.resolve()
 })
 
 export default function SessionContextProvider({
 	children
 }: SessionContextProviderProps) {
+	///////////////
+	// State
+	///////////////
+
+	///////////////
+	// Read
+	///////////////
+
 	async function getMenteeSession(
 		menteeAddress: string
 	): Promise<Session | null> {
@@ -61,8 +75,42 @@ export default function SessionContextProvider({
 		return null
 	}
 
+	///////////////
+	// Write
+	///////////////
+
+	async function adminCompleteSession(
+		mentorAddress: string,
+		menteeAddress: string,
+		valueLocked: string
+	) {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const signer = await provider.getSigner()
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				signer
+			)
+			try {
+				const transaction = await contract.adminCompleteSession(
+					mentorAddress,
+					menteeAddress,
+					valueLocked
+				)
+				await transaction.wait()
+				console.log("Completed session")
+			} catch (error) {
+				console.error("Error in adminCompleteSession:", error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+	}
+
 	const context: SessionContextProps = {
-		getMenteeSession
+		getMenteeSession,
+		adminCompleteSession
 	}
 
 	return (

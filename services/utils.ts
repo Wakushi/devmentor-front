@@ -1,4 +1,4 @@
-import { Engagement, engagements, teachingSubjects } from "./constants"
+import { Engagement, engagements, levels, teachingSubjects } from "./constants"
 
 function getShortenedAddress(address: string): string {
 	return address ? address.slice(0, 6) + "..." + address.slice(-4) : address
@@ -19,8 +19,12 @@ function getEngagement(engagementDuration: number) {
 	)
 }
 
-function getTeachingSubjectLabel(subjectId: string) {
-	return teachingSubjects[+subjectId]
+function getLevelLabel(levelId: number) {
+	return levels[levelId]
+}
+
+function getTeachingSubjectLabel(subjectId: number) {
+	return teachingSubjects[subjectId]
 }
 
 function convertProxyResult(result: any) {
@@ -41,5 +45,6 @@ export {
 	getTeachingSubjectLabel,
 	convertProxyResult,
 	getReadableDate,
-	isAddressZero
+	isAddressZero,
+	getLevelLabel
 }

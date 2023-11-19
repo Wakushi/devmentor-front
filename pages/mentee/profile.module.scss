@@ -1,6 +1,7 @@
 .menteeProfile {
 	max-width: 1000px;
 	margin: 20px auto 0;
+	flex-wrap: wrap;
 
 	.profileDetails {
 		width: 100%;
@@ -10,12 +11,6 @@
 		border-radius: 12px;
 		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 		margin-bottom: 30px;
-
-		h2 {
-			font-size: 1.8rem;
-			font-weight: 600;
-			color: #0077ff;
-		}
 
 		.profileSection {
 			border-bottom: 1px solid #eaecef;
@@ -35,5 +30,8 @@
 				}
 			}
 		}
+	}
+
+	.request {
 	}
 }

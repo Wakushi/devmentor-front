@@ -1,67 +1,93 @@
-import Button from "@/components/ui/button/button"
-import { useContext, useState } from "react"
-import {
-	teachingSubjects,
-	engagements,
-	Engagement,
-	levels
-} from "../../services/constants"
+import { useContext, useEffect, useState } from "react"
+import { engagements } from "../../services/constants"
 import classes from "./mentee-signup.module.scss"
 import {
-	BlockchainContext,
-	Language
-} from "@/services/blockchain/BlockchainContext"
-import {
+	Mentee,
 	MenteeContext,
 	MenteeRegistrationAndRequest
 } from "@/services/blockchain/MenteeContext"
 import { ethers } from "ethers"
-import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
-import { getShortenedAddress } from "@/services/utils"
+import { Mentor } from "@/services/blockchain/MentorContext"
 import MentorList from "@/components/mentor-list/mentor-list"
+import MenteeForm, { FormValues } from "@/components/mentee-form/mentee-from"
+import Loader from "@/components/ui/loader/loader"
+import WaitingModal from "@/components/waiting-modal/waiting-modal"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import { UserContext } from "@/services/UserContext"
+import { useRouter } from "next/router"
+import Button from "@/components/ui/button/button"
 
-interface FormValues {
-	language: number
-	teachingSubject: number
-	engagement: number
-	level: number
+interface MenteeSignupProps {
+	registered?: boolean
 }
 
-export default function MenteeSignup() {
-	const { getMatchingMentors, registerAsMenteeAndMakeRequestForSession } =
-		useContext(MenteeContext)
-	const { getMentorAverageRating } = useContext(MentorContext)
-	const { languages, getLanguageLabel } = useContext(BlockchainContext)
+export default function MenteeSignup({ registered }: MenteeSignupProps) {
+	/////////////
+	// CONTEXT //
+	/////////////
+
+	const {
+		getMatchingMentors,
+		registerAsMenteeAndMakeRequestForSession,
+		openRequestForSession
+	} = useContext(MenteeContext)
+	const { isWaitingForTransaction } = useContext(BlockchainContext)
+	const { walletAddress } = useContext(UserContext)
+	const { getMenteeInfo } = useContext(MenteeContext)
+
+	/////////////
+	//  STATE  //
+	/////////////
 	const [submittedForm, setSubmittedForm] = useState(false)
+	const [isLoading, setIsLoading] = useState(false)
+	const [matchingMentors, setMatchingMentors] = useState<Mentor[]>([])
+	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
 	const [formValues, setFormValues] = useState<FormValues>({
 		language: 0,
 		teachingSubject: 0,
 		engagement: engagements[0].durationInSeconds,
 		level: 0
 	})
-	const [matchingMentors, setMatchingMentors] = useState<Mentor[]>([])
 
-	function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
-		setFormValues({
-			...formValues,
-			[event.target.name]: event.target.value
-		})
-	}
+	const router = useRouter()
+
+	useEffect(() => {
+		if (!menteeInfo) {
+			getMenteeInfo(walletAddress).then((mentee) => {
+				setMenteeInfo(mentee)
+			})
+		}
+	}, [walletAddress])
 
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
+		setIsLoading(true)
 		const { language, teachingSubject, engagement } = formValues
 		getMatchingMentors(teachingSubject, engagement, language).then(
 			(mentors: Mentor[]) => {
+				if (!mentors.length) {
+					matchWithRandomMentor(mentors, false)
+					setSubmittedForm(true)
+					return
+				}
+				if (mentors.length === 1) {
+					setMatchingMentors(mentors)
+					matchWithRandomMentor(mentors, true)
+					setSubmittedForm(true)
+					return
+				}
 				setMatchingMentors(mentors)
 				setSubmittedForm(true)
 			}
 		)
 	}
 
-	function matchWithRandomMentor() {
+	function matchWithRandomMentor(
+		mentors: Mentor[],
+		expectedMatching: boolean
+	) {
 		const { language, teachingSubject, engagement, level } = formValues
-		const matchingMentorsAddresses: string[] = matchingMentors.map(
+		const matchingMentorsAddresses: string[] = mentors.map(
 			(mentor: Mentor) => mentor.address
 		)
 		const menteeRegistrationAndRequest: MenteeRegistrationAndRequest = {
@@ -72,9 +98,34 @@ export default function MenteeSignup() {
 			matchingMentors: matchingMentorsAddresses,
 			chosenMentor: ethers.ZeroAddress
 		}
-		registerAsMenteeAndMakeRequestForSession(
-			menteeRegistrationAndRequest,
-			"0"
+		if (!registered) {
+			registerAsMenteeAndMakeRequestForSession(
+				menteeRegistrationAndRequest,
+				"0",
+				expectedMatching
+			)
+		} else {
+			openRequestForSession(
+				menteeRegistrationAndRequest,
+				"0",
+				expectedMatching
+			)
+		}
+	}
+
+	if (menteeInfo?.registered && !registered) {
+		return (
+			<div className="flex flex-col items-center gap-5">
+				<h2>You are already registered as a mentee.</h2>
+				<Button
+					onClick={() => {
+						router.push("/mentee/session-form")
+					}}
+					filled={true}
+				>
+					Open a session
+				</Button>
+			</div>
 		)
 	}
 
@@ -82,92 +133,51 @@ export default function MenteeSignup() {
 		<>
 			{submittedForm ? (
 				<div className="flex flex-col justify-center items-center gap-4">
-					<MentorList mentors={matchingMentors} />
-					<div className="flex justify-center items-center gap-4">
-						<button
-							onClick={matchWithRandomMentor}
-							className={`${classes.big_button}`}
-						>
-							Match with a random mentor
-						</button>
-						<button className={`${classes.big_button}`}>
-							Lock asset and choose a mentor
-						</button>
-					</div>
+					{matchingMentors.length > 1 ? (
+						<>
+							<MentorList mentors={matchingMentors} />
+							<div className="flex justify-center items-center gap-4">
+								<button
+									onClick={() =>
+										matchWithRandomMentor(
+											matchingMentors,
+											true
+										)
+									}
+									className={`${classes.big_button}`}
+								>
+									Match with a random mentor
+								</button>
+								<button className={`${classes.big_button}`}>
+									Lock asset and choose a mentor
+								</button>
+							</div>
+						</>
+					) : (
+						<div className="flex flex-col justify-center items-center gap-4">
+							<h4>
+								{matchingMentors.length
+									? "Mentor found, opening a session..."
+									: "No mentor found, we'll open a request for you to be automatically matched !"}
+							</h4>
+							<Loader />
+						</div>
+					)}
 				</div>
 			) : (
-				<form
-					onSubmit={handleSubmit}
-					className={`basic_form flex flex-col gap-2 p-4`}
-				>
-					<label htmlFor="language">Select your language:</label>
-					<select
-						id="language"
-						name="language"
-						value={formValues.language}
-						onChange={handleSelectChange}
-					>
-						{languages.map(({ label, id }: Language) => (
-							<option key={label} value={id}>
-								{label}
-							</option>
-						))}
-					</select>
-					<br />
-					<label htmlFor="level">Select your level:</label>
-					<select
-						id="level"
-						name="level"
-						value={formValues.level}
-						onChange={handleSelectChange}
-					>
-						{levels.map((level) => (
-							<option key={level} value={level}>
-								{level}
-							</option>
-						))}
-					</select>
-					<br />
-					<label>Subject you want to learn:</label>
-					<select
-						id="teachingSubject"
-						name="teachingSubject"
-						value={formValues.teachingSubject}
-						onChange={handleSelectChange}
-					>
-						{teachingSubjects.map((subject, index) => (
-							<option key={subject} value={index}>
-								{subject}
-							</option>
-						))}
-					</select>
-					<br />
-					<label htmlFor="engagement">Select your engagement:</label>
-					<select
-						id="engagement"
-						name="engagement"
-						value={formValues.engagement}
-						onChange={handleSelectChange}
-					>
-						{engagements.map(
-							({ durationInSeconds, label }: Engagement) => (
-								<option key={label} value={durationInSeconds}>
-									{label}
-								</option>
-							)
-						)}
-					</select>
-					<br />
-
-					<Button
-						onClick={() => {
-							handleSubmit
-						}}
-						filled={true}
-					>
-						Submit
-					</Button>
-				</form>
+				<MenteeForm
+					handleSubmit={handleSubmit}
+					formValues={formValues}
+					setFormValues={setFormValues}
+					isLoading={isLoading}
+				/>
+			)}
+			{isWaitingForTransaction && (
+				<WaitingModal>
+					<div className="flex flex-col gap-2">
+						<h4>Matching you with a mentor. Please wait...</h4>
+					</div>
+				</WaitingModal>
 			)}
 		</>
 	)

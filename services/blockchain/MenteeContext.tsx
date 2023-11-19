@@ -2,10 +2,12 @@ import { createContext, ReactNode, useContext, useState } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
-	DEVMENTOR_CONTRACT_ABI
+	DEVMENTOR_CONTRACT_ABI,
+	Engagement
 } from "../constants"
-import { convertProxyResult } from "../utils"
+import { convertProxyResult, getEngagement } from "../utils"
 import { Mentor, MentorContext } from "./MentorContext"
+import { BlockchainContext } from "./BlockchainContext"
 
 interface MenteeContextProviderProps {
 	children: ReactNode
@@ -18,24 +20,23 @@ interface MenteeContextProps {
 		language: number
 	) => Promise<Mentor[]>
 	getMenteeInfo: (menteeAddress: string) => Promise<Mentee | null>
-	getMenteeRequest: (menteeAddress: string) => Promise<any>
+	getMenteeRequest: (menteeAddress: string) => Promise<MenteeRequest | null>
 	isAccountMentee: (menteeAddress: string) => Promise<boolean>
 	registerAsMenteeAndMakeRequestForSession: (
 		menteeRegistrationAndRequest: MenteeRegistrationAndRequest,
-		valueLocked: string
+		valueLocked: string,
+		expectedMatching: boolean
 	) => Promise<void>
 	openRequestForSession: (
-		subject: number,
-		level: number,
-		engagement: number,
-		matchingMentors: string[],
-		chosenMentor: string,
-		valueLocked: string
+		menteeRegistrationAndRequest: MenteeRegistrationAndRequest,
+		valueLocked: string,
+		expectedMatching: boolean
 	) => Promise<void>
 	validateSessionAsMentee: (
 		mentorAddress: string,
 		rating: number
 	) => Promise<void>
+	cancelRequestForSession: () => Promise<void>
 }
 
 export interface Mentee {
@@ -55,20 +56,30 @@ export interface MenteeRegistrationAndRequest {
 	chosenMentor: string
 }
 
+export interface MenteeRequest {
+	level: number
+	subject: number
+	accepted: boolean
+	engagement: Engagement | undefined
+	valueLocked: string
+}
+
 const MenteeContext = createContext<MenteeContextProps>({
 	getMatchingMentors: async () => Promise.resolve([]),
 	getMenteeInfo: async () => Promise.resolve(null),
-	getMenteeRequest: async () => ({}),
+	getMenteeRequest: async () => Promise.resolve(null),
 	isAccountMentee: async () => Promise.resolve(false),
 	registerAsMenteeAndMakeRequestForSession: async () => {},
 	openRequestForSession: async () => {},
-	validateSessionAsMentee: async () => {}
+	validateSessionAsMentee: async () => {},
+	cancelRequestForSession: async () => {}
 })
 
 export default function MenteeContextProvider({
 	children
 }: MenteeContextProviderProps) {
 	const { getMentorInfo } = useContext(MentorContext)
+	const { waitForTransaction } = useContext(BlockchainContext)
 
 	///////////////
 	// State
@@ -102,7 +113,9 @@ export default function MenteeContextProvider({
 		return null
 	}
 
-	async function getMenteeRequest(menteeAddress: string) {
+	async function getMenteeRequest(
+		menteeAddress: string
+	): Promise<MenteeRequest | null> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
 			DEVMENTOR_CONTRACT_ADDRESS,
@@ -110,11 +123,20 @@ export default function MenteeContextProvider({
 			provider
 		)
 		try {
-			const menteeRequest = await contract.getMenteeRequest(menteeAddress)
-			return menteeRequest
+			const menteeRequestArray = await contract.getMenteeRequest(
+				menteeAddress
+			)
+			return {
+				level: parseInt(menteeRequestArray[0]),
+				subject: parseInt(menteeRequestArray[1]),
+				accepted: menteeRequestArray[2],
+				engagement: getEngagement(parseInt(menteeRequestArray[3])),
+				valueLocked: menteeRequestArray[4]
+			}
 		} catch (error) {
 			console.error("Error in getMenteeRequest:", error)
 		}
+		return null
 	}
 
 	async function getMatchingMentors(
@@ -174,7 +196,8 @@ export default function MenteeContextProvider({
 
 	async function registerAsMenteeAndMakeRequestForSession(
 		menteeRegistrationAndRequest: MenteeRegistrationAndRequest,
-		valueLocked: string
+		valueLocked: string,
+		expectedMatching: boolean
 	) {
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.BrowserProvider(window.ethereum)
@@ -190,6 +213,9 @@ export default function MenteeContextProvider({
 						menteeRegistrationAndRequest,
 						{ value: ethers.parseEther(valueLocked) }
 					)
+				if (expectedMatching && waitForTransaction) {
+					waitForTransaction(transaction.hash)
+				}
 				await transaction.wait()
 				console.log("Mentee registered and request made!")
 			} catch (error) {
@@ -204,12 +230,9 @@ export default function MenteeContextProvider({
 	}
 
 	async function openRequestForSession(
-		subject: number,
-		level: number,
-		engagement: number,
-		matchingMentors: string[],
-		chosenMentor: string,
-		valueLocked: string
+		menteeRequestForSession: MenteeRegistrationAndRequest,
+		valueLocked: string,
+		expectedMatching: boolean
 	) {
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.BrowserProvider(window.ethereum)
@@ -221,13 +244,12 @@ export default function MenteeContextProvider({
 			)
 			try {
 				const transaction = await contract.openRequestForSession(
-					subject,
-					level,
-					engagement,
-					matchingMentors,
-					chosenMentor,
+					menteeRequestForSession,
 					{ value: ethers.parseEther(valueLocked) }
 				)
+				if (expectedMatching && waitForTransaction) {
+					waitForTransaction(transaction.hash)
+				}
 				await transaction.wait()
 				console.log("Session request opened!")
 			} catch (error) {
@@ -265,6 +287,29 @@ export default function MenteeContextProvider({
 		}
 	}
 
+	async function cancelRequestForSession() {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const signer = await provider.getSigner()
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				signer
+			)
+			try {
+				const transaction = await contract.cancelRequestForSession()
+				if (transaction.hash && waitForTransaction) {
+					waitForTransaction(transaction.hash)
+				}
+				await transaction.wait()
+			} catch (error) {
+				console.error("Error in cancelRequestForSession:", error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+	}
+
 	const context: MenteeContextProps = {
 		getMatchingMentors,
 		getMenteeInfo,
@@ -272,7 +317,8 @@ export default function MenteeContextProvider({
 		isAccountMentee,
 		registerAsMenteeAndMakeRequestForSession,
 		openRequestForSession,
-		validateSessionAsMentee
+		validateSessionAsMentee,
+		cancelRequestForSession
 	}
 
 	return (

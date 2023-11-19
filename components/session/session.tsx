@@ -5,6 +5,7 @@ import { Session } from "@/services/blockchain/SessionContext"
 import { useContext } from "react"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import { MenteeContext } from "@/services/blockchain/MenteeContext"
+import { useRouter } from "next/router"
 
 interface SessionProps {
 	session: Session
@@ -24,6 +25,12 @@ export default function SessionCard({ session, mentorView }: SessionProps) {
 
 	const { validateSessionAsMentor } = useContext(MentorContext)
 	const { validateSessionAsMentee } = useContext(MenteeContext)
+
+	const router = useRouter()
+
+	function openRequest() {
+		router.push("/mentee/session-form")
+	}
 
 	function confirmSession() {
 		if (mentorView) {
@@ -52,16 +59,19 @@ export default function SessionCard({ session, mentorView }: SessionProps) {
 
 	if (!startTime) {
 		return (
-			<div className={classes.session}>
-				<div className={classes.sessionDetail}>
+			<div className={`${classes.session} basic-card`}>
+				<div className={`${classes.sessionDetail} flex-col gap-5`}>
 					<span>No session scheduled</span>
+					<Button onClick={openRequest} filled={true}>
+						Open session
+					</Button>
 				</div>
 			</div>
 		)
 	}
 
 	return (
-		<div className={classes.session}>
+		<div className={`${classes.session} basic-card`}>
 			<h3>Session</h3>
 			{mentorView ? (
 				<div className={classes.sessionDetail}>
