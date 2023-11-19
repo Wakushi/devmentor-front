@@ -24,7 +24,6 @@ export default function Landing() {
 	}
 
 	function onCompleteSession() {
-		console.log(formValues.mentorAddress, formValues.menteeAddress)
 		adminCompleteSession(
 			formValues.mentorAddress,
 			formValues.menteeAddress,
@@ -33,7 +32,7 @@ export default function Landing() {
 	}
 
 	return (
-		<div className="flex flex-col gap-4">
+		<div className="page flex flex-col gap-4">
 			<div className="flex gap-4">
 				<div className="flex flex-col items-center gap-2">
 					<input

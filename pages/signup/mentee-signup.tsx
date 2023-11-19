@@ -17,11 +17,13 @@ import { UserContext } from "@/services/UserContext"
 import { useRouter } from "next/router"
 import Button from "@/components/ui/button/button"
 
-interface MenteeSignupProps {
+interface MenteeSignupAndRequestProps {
 	registered?: boolean
 }
 
-export default function MenteeSignup({ registered }: MenteeSignupProps) {
+export default function MenteeSignupAndRequest({
+	registered
+}: MenteeSignupAndRequestProps) {
 	/////////////
 	// CONTEXT //
 	/////////////
@@ -115,7 +117,7 @@ export default function MenteeSignup({ registered }: MenteeSignupProps) {
 
 	if (menteeInfo?.registered && !registered) {
 		return (
-			<div className="flex flex-col items-center gap-5">
+			<div className="page flex flex-col items-center gap-5">
 				<h2>You are already registered as a mentee.</h2>
 				<Button
 					onClick={() => {
@@ -132,7 +134,7 @@ export default function MenteeSignup({ registered }: MenteeSignupProps) {
 	return (
 		<>
 			{submittedForm ? (
-				<div className="flex flex-col justify-center items-center gap-4">
+				<div className=" flex flex-col justify-center items-center gap-4">
 					{matchingMentors.length > 1 ? (
 						<>
 							<MentorList mentors={matchingMentors} />
@@ -165,12 +167,14 @@ export default function MenteeSignup({ registered }: MenteeSignupProps) {
 					)}
 				</div>
 			) : (
-				<MenteeForm
-					handleSubmit={handleSubmit}
-					formValues={formValues}
-					setFormValues={setFormValues}
-					isLoading={isLoading}
-				/>
+				<div>
+					<MenteeForm
+						handleSubmit={handleSubmit}
+						formValues={formValues}
+						setFormValues={setFormValues}
+						isLoading={isLoading}
+					/>
+				</div>
 			)}
 			{isWaitingForTransaction && (
 				<WaitingModal>

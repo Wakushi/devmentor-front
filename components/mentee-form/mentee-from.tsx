@@ -66,8 +66,8 @@ export default function MenteeForm({
 				value={formValues.level}
 				onChange={handleSelectChange}
 			>
-				{levels.map((level) => (
-					<option key={level} value={level}>
+				{levels.map((level, index) => (
+					<option key={level} value={index}>
 						{level}
 					</option>
 				))}

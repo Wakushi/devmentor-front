@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "@/services/UserContext"
 import { Mentee, MenteeContext } from "@/services/blockchain/MenteeContext"
-import MenteeSignup from "../signup/mentee-signup"
 import Button from "@/components/ui/button/button"
 import { useRouter } from "next/router"
 import classes from "./session-form.module.scss"
 import { isAddressZero } from "@/services/utils"
+import MenteeSignupAndRequest from "../signup/mentee-signup"
 
 export default function SessionFormPage() {
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
@@ -23,7 +23,7 @@ export default function SessionFormPage() {
 
 	if (!menteeInfo?.registered) {
 		return (
-			<div className={classes.session_form_page}>
+			<div className={`${classes.session_form_page} page`}>
 				<h1>Open a session</h1>
 				<div className="flex flex-col items-center gap-5">
 					<h2>You need to register as a mentee first.</h2>
@@ -41,7 +41,7 @@ export default function SessionFormPage() {
 	}
 
 	return (
-		<div className={classes.session_form_page}>
+		<div className={`${classes.session_form_page} page`}>
 			<h1>Open a session</h1>
 			{menteeInfo?.hasRequest ||
 			(menteeInfo && !isAddressZero(menteeInfo?.mentor)) ? (
@@ -60,7 +60,7 @@ export default function SessionFormPage() {
 					</Button>
 				</div>
 			) : (
-				<MenteeSignup registered={true} />
+				<MenteeSignupAndRequest registered={true} />
 			)}
 		</div>
 	)

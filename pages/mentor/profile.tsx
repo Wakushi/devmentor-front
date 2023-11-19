@@ -37,7 +37,7 @@ export default function MentorProfile() {
 
 	return (
 		<div
-			className={`${classes.mentorProfile} flex flex-col items-center gap-4 fade-in-bottom `}
+			className={`${classes.mentorProfile} page flex flex-col items-center gap-4 fade-in-bottom `}
 		>
 			{!mentorInfo.validated ? (
 				<div className="flex flex-col gap-2">

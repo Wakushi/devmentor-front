@@ -18,7 +18,7 @@ export default function Layout(props: LayoutProps) {
 				<Snackbar snackbarMessageType={snackbarMessageType} />
 			)}
 			<Header />
-			<main className={classes.main_container}>{props.children}</main>
+			<main>{props.children}</main>
 		</>
 	)
 }

@@ -1,13 +1,14 @@
 @import "../../styles/variables.scss";
 
 .big_button {
-	background-color: rgba(31, 158, 48, 0.342);
+	background-color: $secondary-color;
 	height: 300px;
 	max-width: 300px;
 	border: 1px solid rgba(0, 0, 0, 0.411);
 	border-radius: 10px;
-	color: #000000;
+	color: #fff;
 	padding: 10px 20px;
+	transition: 500ms ease-in-out;
 	text-align: center;
 	font-size: 2rem;
 	opacity: 0.6;
