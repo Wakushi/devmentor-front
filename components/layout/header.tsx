@@ -22,11 +22,6 @@ export default function Header() {
 	const [displayMiniNav, setDisplayMiniNav] = useState(false)
 	const router = useRouter()
 
-	const smallNavStyles: Properties = {
-		opacity: displayMiniNav ? "1" : "0",
-		transform: displayMiniNav ? "translateY(0%)" : ""
-	}
-
 	useEffect(() => {
 		const handleScroll = () => {
 			if (!headerRef.current) return
@@ -147,44 +142,6 @@ export default function Header() {
 					</li>
 				</ul>
 				<Burger handleClick={handleBurgerToggle} />
-			</nav>
-			<nav
-				style={smallNavStyles}
-				className={`${classes.small_nav_bar} flex items-center gap-4`}
-			>
-				<ul className="flex items-center gap-8">
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={() => handleConnectionPriorRouting("/create")}
-					>
-						Register as mentee
-					</li>
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={() => handleConnectionPriorRouting("/wallets")}
-					>
-						Register as mentor
-					</li>
-					<li className={classes.wallet_button}>
-						<Button onClick={connectWallet} filled={true}>
-							{walletAddress ? (
-								<>
-									<Image
-										src={metamask}
-										alt="Metamask Logo"
-										width={40}
-										height={40}
-									/>{" "}
-									{shortenWalletAddress}
-								</>
-							) : (
-								"Connect wallet"
-							)}
-						</Button>
-					</li>
-				</ul>
 			</nav>
 		</header>
 	)

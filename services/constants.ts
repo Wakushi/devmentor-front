@@ -24,7 +24,7 @@ export const engagements: Engagement[] = [
 ]
 
 export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0x8783C9Ed5b1beC15eCccc47E8772bCAAdBe6E139"
+	"0xF15142420907453d40531289DAa4A07b1FBAd3c6"
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
@@ -540,6 +540,29 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				internalType: "address",
 				name: "_mentor",
 				type: "address"
+			},
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_valueLocked",
+				type: "uint256"
+			}
+		],
+		name: "adminCompleteSession",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
 			}
 		],
 		name: "approveMentor",
@@ -615,7 +638,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "enum SessionRegistry.Subject",
+				internalType: "enum IDEVMentor.Subject",
 				name: "_subject",
 				type: "uint8"
 			},
@@ -700,12 +723,12 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				components: [
 					{
-						internalType: "enum MenteeRegistry.Level",
+						internalType: "enum IDEVMentor.Level",
 						name: "level",
 						type: "uint8"
 					},
 					{
-						internalType: "enum SessionRegistry.Subject",
+						internalType: "enum IDEVMentor.Subject",
 						name: "learningSubject",
 						type: "uint8"
 					},
@@ -821,7 +844,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				components: [
 					{
-						internalType: "enum SessionRegistry.Subject[]",
+						internalType: "enum IDEVMentor.Subject[]",
 						name: "teachingSubjects",
 						type: "uint8[]"
 					},
@@ -1033,12 +1056,12 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				components: [
 					{
-						internalType: "enum MenteeRegistry.Level",
+						internalType: "enum IDEVMentor.Level",
 						name: "level",
 						type: "uint8"
 					},
 					{
-						internalType: "enum SessionRegistry.Subject",
+						internalType: "enum IDEVMentor.Subject",
 						name: "subject",
 						type: "uint8"
 					},
@@ -1063,7 +1086,8 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "address"
 					}
 				],
-				internalType: "struct DEVMentor.MenteeRegistrationAndRequest",
+				internalType:
+					"struct MenteeRegistry.MenteeRegistrationAndRequest",
 				name: "request",
 				type: "tuple"
 			}
@@ -1109,12 +1133,12 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				components: [
 					{
-						internalType: "enum MenteeRegistry.Level",
+						internalType: "enum IDEVMentor.Level",
 						name: "level",
 						type: "uint8"
 					},
 					{
-						internalType: "enum SessionRegistry.Subject",
+						internalType: "enum IDEVMentor.Subject",
 						name: "subject",
 						type: "uint8"
 					},
@@ -1139,7 +1163,8 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "address"
 					}
 				],
-				internalType: "struct DEVMentor.MenteeRegistrationAndRequest",
+				internalType:
+					"struct MenteeRegistry.MenteeRegistrationAndRequest",
 				name: "request",
 				type: "tuple"
 			}
@@ -1154,7 +1179,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				components: [
 					{
-						internalType: "enum SessionRegistry.Subject[]",
+						internalType: "enum IDEVMentor.Subject[]",
 						name: "teachingSubjects",
 						type: "uint8[]"
 					},
@@ -1174,7 +1199,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "uint8"
 					}
 				],
-				internalType: "struct DEVMentor.MentorRegistration",
+				internalType: "struct MentorRegistry.MentorRegistration",
 				name: "registration",
 				type: "tuple"
 			}

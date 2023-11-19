@@ -11,8 +11,15 @@ interface BlockchainContextProviderProps {
 
 interface BlockchainContextProps {
 	languages: Language[]
+	isWaitingForTransaction?: boolean
+	isRegistered?: boolean
+	setIsRegistered?: (isRegistered: boolean) => void
+	waitForTransaction?: (transactionHash: string) => void
+	transactionHash?: string
+	setTransactionHash?: (transactionHash: string) => void
 	getAllLanguages: () => {}
 	getLanguageById: (languageId: number) => Promise<string>
+	getLanguageLabel: (languageId: number) => string
 }
 
 export interface Language {
@@ -22,8 +29,17 @@ export interface Language {
 
 const BlockchainContext = createContext<BlockchainContextProps>({
 	languages: [],
+	isWaitingForTransaction: false,
+	isRegistered: false,
+	setIsRegistered: () => {},
+	waitForTransaction: (transactionHash: string) => {},
+	transactionHash: "",
+	setTransactionHash: () => {},
 	getAllLanguages: async () => {},
 	getLanguageById: async () => {
+		return ""
+	},
+	getLanguageLabel: () => {
 		return ""
 	}
 })
@@ -35,7 +51,11 @@ export default function BlockchainContextProvider({
 	// State
 	///////////////
 
-	const [languages, setLanguages] = useState([])
+	const [languages, setLanguages] = useState<Language[]>([])
+	const [transactionHash, setTransactionHash] = useState<string>("")
+	const [isRegistered, setIsRegistered] = useState(false)
+	const [isWaitingForTransaction, setIsWaitingForTransaction] =
+		useState<boolean>(false)
 
 	useEffect(() => {
 		getAllLanguages()
@@ -82,6 +102,19 @@ export default function BlockchainContextProvider({
 	}
 
 	///////////////
+	// Utils
+	///////////////
+
+	function waitForTransaction(transactionHash: string) {
+		setTransactionHash(transactionHash)
+		setIsWaitingForTransaction(true)
+	}
+
+	function getLanguageLabel(languageId: number): string {
+		return languages[languageId]?.label
+	}
+
+	///////////////
 	// Write
 	///////////////
 
@@ -109,6 +142,14 @@ export default function BlockchainContextProvider({
 
 		contract.on("MenteeRegistered", (mentee) => {
 			console.log("MenteeRegistered event:", mentee)
+			setIsWaitingForTransaction(false)
+			setIsRegistered(true)
+		})
+
+		contract.on("MentorRegistered", (mentor) => {
+			console.log("Mentor registered event:", mentor)
+			setIsWaitingForTransaction(false)
+			setIsRegistered(true)
 		})
 
 		contract.on("MenteeOpenedRequest", (mentee) => {
@@ -129,10 +170,27 @@ export default function BlockchainContextProvider({
 		)
 	}
 
+	function listenForTransactionMine(transactionResponse: any, provider: any) {
+		console.log(`Mining ${transactionResponse.hash}`)
+		return new Promise<void>((resolve) => {
+			provider.once(transactionResponse.hash, () => {
+				setIsWaitingForTransaction(false)
+				resolve()
+			})
+		})
+	}
+
 	const context: BlockchainContextProps = {
 		languages,
+		isRegistered,
+		setIsRegistered,
+		isWaitingForTransaction,
+		waitForTransaction,
+		transactionHash,
+		setTransactionHash,
 		getAllLanguages,
-		getLanguageById
+		getLanguageById,
+		getLanguageLabel
 	}
 
 	return (

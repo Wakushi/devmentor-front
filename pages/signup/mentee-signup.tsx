@@ -16,6 +16,9 @@ import {
 	MenteeRegistrationAndRequest
 } from "@/services/blockchain/MenteeContext"
 import { ethers } from "ethers"
+import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
+import { getShortenedAddress } from "@/services/utils"
+import MentorList from "@/components/mentor-list/mentor-list"
 
 interface FormValues {
 	language: number
@@ -25,12 +28,10 @@ interface FormValues {
 }
 
 export default function MenteeSignup() {
-	const {
-		getMatchingMentors,
-		matchingMentors,
-		registerAsMenteeAndMakeRequestForSession
-	} = useContext(MenteeContext)
-	const { languages } = useContext(BlockchainContext)
+	const { getMatchingMentors, registerAsMenteeAndMakeRequestForSession } =
+		useContext(MenteeContext)
+	const { getMentorAverageRating } = useContext(MentorContext)
+	const { languages, getLanguageLabel } = useContext(BlockchainContext)
 	const [submittedForm, setSubmittedForm] = useState(false)
 	const [formValues, setFormValues] = useState<FormValues>({
 		language: 0,
@@ -38,6 +39,7 @@ export default function MenteeSignup() {
 		engagement: engagements[0].durationInSeconds,
 		level: 0
 	})
+	const [matchingMentors, setMatchingMentors] = useState<Mentor[]>([])
 
 	function handleSelectChange(event: React.ChangeEvent<HTMLSelectElement>) {
 		setFormValues({
@@ -49,19 +51,25 @@ export default function MenteeSignup() {
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		const { language, teachingSubject, engagement } = formValues
-		getMatchingMentors(teachingSubject, engagement, language).then(() => {
-			setSubmittedForm(true)
-		})
+		getMatchingMentors(teachingSubject, engagement, language).then(
+			(mentors: Mentor[]) => {
+				setMatchingMentors(mentors)
+				setSubmittedForm(true)
+			}
+		)
 	}
 
 	function matchWithRandomMentor() {
 		const { language, teachingSubject, engagement, level } = formValues
+		const matchingMentorsAddresses: string[] = matchingMentors.map(
+			(mentor: Mentor) => mentor.address
+		)
 		const menteeRegistrationAndRequest: MenteeRegistrationAndRequest = {
 			level,
 			subject: teachingSubject,
 			language,
 			engagement,
-			matchingMentors,
+			matchingMentors: matchingMentorsAddresses,
 			chosenMentor: ethers.ZeroAddress
 		}
 		registerAsMenteeAndMakeRequestForSession(
@@ -74,12 +82,7 @@ export default function MenteeSignup() {
 		<>
 			{submittedForm ? (
 				<div className="flex flex-col justify-center items-center gap-4">
-					<h4>List of matching mentors </h4>
-					<ul>
-						{matchingMentors.map((mentor) => (
-							<li key={mentor}>{mentor}</li>
-						))}
-					</ul>
+					<MentorList mentors={matchingMentors} />
 					<div className="flex justify-center items-center gap-4">
 						<button
 							onClick={matchWithRandomMentor}

@@ -1,11 +1,10 @@
 import Button from "@/components/ui/button/button"
-import React, { useContext, useState } from "react"
+import { useContext, useState } from "react"
 import {
 	teachingSubjects,
 	engagements,
 	Engagement
 } from "../../services/constants"
-import classes from "./mentor-signup.module.scss"
 import { useRouter } from "next/router"
 import {
 	MentorContext,
@@ -15,6 +14,8 @@ import {
 	BlockchainContext,
 	Language
 } from "@/services/blockchain/BlockchainContext"
+import WaitingModal from "@/components/waiting-modal/waiting-modal"
+import { getShortenedAddress } from "@/services/utils"
 
 interface FormValues {
 	language: number
@@ -34,7 +35,12 @@ interface FormErrors {
 export default function MentorSignup() {
 	const { registerAsMentor } = useContext(MentorContext)
 
-	const { languages } = useContext(BlockchainContext)
+	const {
+		languages,
+		isWaitingForTransaction,
+		isRegistered,
+		transactionHash
+	} = useContext(BlockchainContext)
 
 	const [formValues, setFormValues] = useState<FormValues>({
 		language: 0,
@@ -45,7 +51,6 @@ export default function MentorSignup() {
 	})
 
 	const [formErrors, setFormErrors] = useState<FormErrors>({})
-
 	const [submittedForm, setSubmittedForm] = useState(false)
 
 	const router = useRouter()
@@ -87,26 +92,6 @@ export default function MentorSignup() {
 		})
 	}
 
-	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-		event.preventDefault()
-		if (validateForm()) {
-			const {
-				language,
-				teachingSubjects,
-				engagement,
-				yearsOfExperience
-			} = formValues
-			setSubmittedForm(true)
-			const mentorRegistration: MentorRegistration = {
-				teachingSubjects,
-				engagement,
-				language,
-				yearsOfExperience
-			}
-			registerAsMentor(mentorRegistration)
-		}
-	}
-
 	function validateForm(): boolean {
 		let errors: FormErrors = {}
 		if (formValues.teachingSubjects.length === 0) {
@@ -127,14 +112,36 @@ export default function MentorSignup() {
 		return Object.keys(errors).length === 0
 	}
 
+	function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+		event.preventDefault()
+		if (validateForm()) {
+			const {
+				language,
+				teachingSubjects,
+				engagement,
+				yearsOfExperience
+			} = formValues
+			setSubmittedForm(true)
+			const mentorRegistration: MentorRegistration = {
+				teachingSubjects,
+				engagement,
+				language,
+				yearsOfExperience
+			}
+			registerAsMentor(mentorRegistration)
+		}
+	}
+
 	function goToProfilePage() {
 		router.push("/mentor/profile")
 	}
 
 	return (
 		<>
-			{submittedForm ? (
-				<div className="flex flex-col justify-center items-center gap-4">
+			{isRegistered ? (
+				<div
+					className={`form_confirmation flex flex-col justify-center items-center gap-4`}
+				>
 					<h4>
 						Your application will be reviewed and if everything is
 						fine we'll validate your mentor account !{" "}
@@ -247,6 +254,25 @@ export default function MentorSignup() {
 						Submit
 					</Button>
 				</form>
+			)}
+			{isWaitingForTransaction && !!transactionHash && (
+				<WaitingModal>
+					<div className="flex flex-col gap-2">
+						<h4>
+							Your application is being processed. Please wait...
+						</h4>
+						<p>
+							You can check the status of your transaction here:{" "}
+						</p>
+						<a
+							href={`https://sepolia.etherscan.io/tx/${transactionHash}`}
+							target="_blank"
+							rel="noreferrer"
+						>
+							{getShortenedAddress(transactionHash)}
+						</a>
+					</div>
+				</WaitingModal>
 			)}
 		</>
 	)

@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useState } from "react"
+import { createContext, ReactNode, useContext, useState } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
@@ -6,16 +6,16 @@ import {
 	Engagement
 } from "../constants"
 import { getEngagement, replacer } from "../utils"
+import { SnackbarContext } from "../SnackbarContext"
+import { BlockchainContext } from "./BlockchainContext"
 
 interface MentorContextProviderProps {
 	children: ReactNode
 }
 
 interface MentorContextProps {
-	mentorInfo: Mentor | null
-	mentorAverageRating: number
 	getMentorInfo: (mentorAddress: string) => Promise<Mentor | null>
-	getMentorAverageRating: (mentorAddress: string) => void
+	getMentorAverageRating: (mentor: Mentor) => number
 	isAccountMentor: (mentorAddress: string) => Promise<boolean>
 	registerAsMentor: (mentorRegistration: MentorRegistration) => void
 	approveMentor: (mentorAddress: string) => void
@@ -23,6 +23,7 @@ interface MentorContextProps {
 }
 
 export interface Mentor {
+	address: string
 	teachingSubjects: string[]
 	mentee: string
 	yearsOfExperience: number
@@ -42,10 +43,8 @@ export interface MentorRegistration {
 }
 
 const MentorContext = createContext<MentorContextProps>({
-	mentorInfo: null,
-	mentorAverageRating: 0,
 	getMentorInfo: () => Promise.resolve(null),
-	getMentorAverageRating: () => {},
+	getMentorAverageRating: () => 0,
 	isAccountMentor: () => Promise.resolve(false),
 	registerAsMentor: () => {},
 	approveMentor: () => {},
@@ -54,12 +53,12 @@ const MentorContext = createContext<MentorContextProps>({
 export default function MentorContextProvider(
 	props: MentorContextProviderProps
 ) {
+	const { openSnackBar } = useContext(SnackbarContext)
+	const { waitForTransaction } = useContext(BlockchainContext)
+
 	///////////////
 	// State
 	///////////////
-
-	const [mentorInfo, setMentorInfo] = useState<Mentor | null>(null)
-	const [mentorAverageRating, setMentorAverageRating] = useState(0)
 
 	///////////////
 	// Read
@@ -80,6 +79,7 @@ export default function MentorContextProvider(
 					mentorAddress
 				)
 				return {
+					address: mentorAddress,
 					teachingSubjects: JSON.parse(
 						JSON.stringify(mentorInfoArray[0], replacer)
 					),
@@ -99,26 +99,6 @@ export default function MentorContextProvider(
 			console.log("Please install MetaMask")
 		}
 		return null
-	}
-
-	async function getMentorAverageRating(mentorAddress: string) {
-		if (typeof window.ethereum !== "undefined") {
-			const provider = new ethers.BrowserProvider(window.ethereum)
-			const contract = new ethers.Contract(
-				DEVMENTOR_CONTRACT_ADDRESS,
-				DEVMENTOR_CONTRACT_ABI,
-				provider
-			)
-			try {
-				const mentorAverageRating =
-					await contract.getMentorAverageRating(mentorAddress)
-				setMentorAverageRating(parseInt(mentorAverageRating))
-			} catch (error) {
-				console.log(error)
-			}
-		} else {
-			console.log("Please install MetaMask")
-		}
 	}
 
 	async function isAccountMentor(mentorAddress: string): Promise<boolean> {
@@ -157,10 +137,14 @@ export default function MentorContextProvider(
 				const registerMentorTx = await contract.registerAsMentor(
 					mentorRegistration
 				)
+				if (registerMentorTx.hash && waitForTransaction) {
+					waitForTransaction(registerMentorTx.hash)
+				}
+				console.log("TX: ", registerMentorTx)
 				await registerMentorTx.wait()
-				console.log("Mentor registered!")
 			} catch (error) {
-				console.log(error)
+				openSnackBar("error")
+				console.error(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -183,7 +167,8 @@ export default function MentorContextProvider(
 				await approveMentorTx.wait()
 				console.log("Mentor approved!")
 			} catch (error) {
-				console.log(error)
+				openSnackBar("error")
+				console.error(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -205,16 +190,23 @@ export default function MentorContextProvider(
 				await validateSessionAsMentorTx.wait()
 				console.log("Session validated !")
 			} catch (error) {
-				console.log(error)
+				openSnackBar("error")
+				console.error(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
 		}
 	}
 
+	///////////////
+	// Utils
+	///////////////
+
+	function getMentorAverageRating(mentor: Mentor): number {
+		return +mentor.totalRating / +mentor.sessionCount || 0
+	}
+
 	const context: MentorContextProps = {
-		mentorInfo,
-		mentorAverageRating,
 		getMentorInfo,
 		getMentorAverageRating,
 		isAccountMentor,

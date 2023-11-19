@@ -21,10 +21,6 @@
 	background-size: 8px 400%;
 	background-repeat: no-repeat;
 	animation: matrix 1s infinite linear;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translate(-50%, -50%);
 }
 
 @keyframes matrix {

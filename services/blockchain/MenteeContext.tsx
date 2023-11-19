@@ -1,22 +1,22 @@
-import { createContext, ReactNode, useState } from "react"
+import { createContext, ReactNode, useContext, useState } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
 	DEVMENTOR_CONTRACT_ABI
 } from "../constants"
 import { convertProxyResult } from "../utils"
+import { Mentor, MentorContext } from "./MentorContext"
 
 interface MenteeContextProviderProps {
 	children: ReactNode
 }
 
 interface MenteeContextProps {
-	matchingMentors: string[]
 	getMatchingMentors: (
 		subject: number,
 		engagement: number,
 		language: number
-	) => Promise<void>
+	) => Promise<Mentor[]>
 	getMenteeInfo: (menteeAddress: string) => Promise<Mentee | null>
 	getMenteeRequest: (menteeAddress: string) => Promise<any>
 	isAccountMentee: (menteeAddress: string) => Promise<boolean>
@@ -56,8 +56,7 @@ export interface MenteeRegistrationAndRequest {
 }
 
 const MenteeContext = createContext<MenteeContextProps>({
-	matchingMentors: [],
-	getMatchingMentors: async () => {},
+	getMatchingMentors: async () => Promise.resolve([]),
 	getMenteeInfo: async () => Promise.resolve(null),
 	getMenteeRequest: async () => ({}),
 	isAccountMentee: async () => Promise.resolve(false),
@@ -69,11 +68,11 @@ const MenteeContext = createContext<MenteeContextProps>({
 export default function MenteeContextProvider({
 	children
 }: MenteeContextProviderProps) {
+	const { getMentorInfo } = useContext(MentorContext)
+
 	///////////////
 	// State
 	///////////////
-
-	const [matchingMentors, setMatchingMentors] = useState<string[]>([])
 
 	///////////////
 	// Read
@@ -122,7 +121,7 @@ export default function MenteeContextProvider({
 		subject: number,
 		engagement: number,
 		language: number
-	) {
+	): Promise<Mentor[]> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
 			DEVMENTOR_CONTRACT_ADDRESS,
@@ -130,15 +129,24 @@ export default function MenteeContextProvider({
 			provider
 		)
 		try {
-			const matchingMentors = await contract.getMatchingMentors(
+			const matchingMentorsResponse = await contract.getMatchingMentors(
 				subject,
 				engagement,
 				language
 			)
-			setMatchingMentors(convertProxyResult(matchingMentors))
+			const matchingMentorsAddresses = convertProxyResult(
+				matchingMentorsResponse
+			)
+			let matchingMentors: Mentor[] = []
+			for (const mentorAddress of matchingMentorsAddresses) {
+				const mentor = await getMentorInfo(mentorAddress)
+				if (mentor) matchingMentors.push(mentor)
+			}
+			return matchingMentors
 		} catch (error) {
 			console.error("Error in getMatchingMentors:", error)
 		}
+		return []
 	}
 
 	async function isAccountMentee(menteeAddress: string): Promise<boolean> {
@@ -258,7 +266,6 @@ export default function MenteeContextProvider({
 	}
 
 	const context: MenteeContextProps = {
-		matchingMentors,
 		getMatchingMentors,
 		getMenteeInfo,
 		getMenteeRequest,

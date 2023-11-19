@@ -1,6 +1,4 @@
-import { useContext } from "react"
 import { Engagement, engagements, teachingSubjects } from "./constants"
-import { BlockchainContext } from "./blockchain/BlockchainContext"
 
 function getShortenedAddress(address: string): string {
 	return address ? address.slice(0, 6) + "..." + address.slice(-4) : address
@@ -25,11 +23,6 @@ function getTeachingSubjectLabel(subjectId: string) {
 	return teachingSubjects[+subjectId]
 }
 
-function getLanguageLabel(languageId: number): string {
-	const { languages } = useContext(BlockchainContext)
-	return languages[languageId]?.label
-}
-
 function convertProxyResult(result: any) {
 	return JSON.parse(JSON.stringify(result, replacer))
 }
@@ -37,12 +30,16 @@ function convertProxyResult(result: any) {
 function getReadableDate(durationInSeconds: number): string {
 	return new Date(durationInSeconds * 1000).toLocaleDateString()
 }
+
+function isAddressZero(address: string) {
+	return address === "0x0000000000000000000000000000000000000000"
+}
 export {
 	getShortenedAddress,
 	replacer,
 	getEngagement,
 	getTeachingSubjectLabel,
 	convertProxyResult,
-	getLanguageLabel,
-	getReadableDate
+	getReadableDate,
+	isAddressZero
 }

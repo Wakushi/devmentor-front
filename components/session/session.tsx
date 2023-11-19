@@ -2,6 +2,9 @@ import { getReadableDate } from "@/services/utils"
 import classes from "./session.module.scss"
 import Button from "../ui/button/button"
 import { Session } from "@/services/blockchain/SessionContext"
+import { useContext } from "react"
+import { MentorContext } from "@/services/blockchain/MentorContext"
+import { MenteeContext } from "@/services/blockchain/MenteeContext"
 
 interface SessionProps {
 	session: Session
@@ -19,8 +22,15 @@ export default function SessionCard({ session, mentorView }: SessionProps) {
 		menteeConfirmed
 	} = session
 
+	const { validateSessionAsMentor } = useContext(MentorContext)
+	const { validateSessionAsMentee } = useContext(MenteeContext)
+
 	function confirmSession() {
-		console.log("Confirm session")
+		if (mentorView) {
+			validateSessionAsMentor(mentee)
+		} else {
+			// validateSessionAsMentee(mentor, 5) // Open a modal for the mentee to rate the mentor
+		}
 	}
 
 	const ConfirmationStatus = ({

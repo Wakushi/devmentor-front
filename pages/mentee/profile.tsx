@@ -1,11 +1,11 @@
 import { useContext, useEffect, useState } from "react"
 import { UserContext } from "@/services/UserContext"
 import { Mentee, MenteeContext } from "@/services/blockchain/MenteeContext"
-import { getLanguageLabel } from "@/services/utils"
 import classes from "./profile.module.scss"
 import Loader from "@/components/ui/loader/loader"
 import SessionCard from "@/components/session/session"
 import { Session, SessionContext } from "@/services/blockchain/SessionContext"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 
 export default function MenteeProfile() {
 	const [isLoaded, setIsLoaded] = useState(false)
@@ -15,6 +15,7 @@ export default function MenteeProfile() {
 	const { walletAddress } = useContext(UserContext)
 	const { getMenteeInfo } = useContext(MenteeContext)
 	const { getMenteeSession } = useContext(SessionContext)
+	const { getLanguageLabel } = useContext(BlockchainContext)
 
 	useEffect(() => {
 		if (!menteeInfo) {

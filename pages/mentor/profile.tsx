@@ -1,11 +1,12 @@
 import { useContext, useEffect, useState } from "react"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import { Session, SessionContext } from "@/services/blockchain/SessionContext"
-import { getLanguageLabel, getTeachingSubjectLabel } from "@/services/utils"
+import { getTeachingSubjectLabel, isAddressZero } from "@/services/utils"
 import SessionCard from "@/components/session/session"
 import Loader from "@/components/ui/loader/loader"
 import classes from "./profile.module.scss"
 import { UserContext } from "@/services/UserContext"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 
 export default function MentorProfile() {
 	const [isLoaded, setIsLoaded] = useState(true)
@@ -13,8 +14,9 @@ export default function MentorProfile() {
 	const [menteeSession, setMenteeSession] = useState<Session | null>(null)
 
 	const { walletAddress } = useContext(UserContext)
-	const { mentorAverageRating, getMentorInfo } = useContext(MentorContext)
+	const { getMentorInfo, getMentorAverageRating } = useContext(MentorContext)
 	const { getMenteeSession } = useContext(SessionContext)
+	const { getLanguageLabel } = useContext(BlockchainContext)
 
 	useEffect(() => {
 		if (!mentorInfo) {
@@ -35,7 +37,7 @@ export default function MentorProfile() {
 
 	return (
 		<div
-			className={`${classes.mentorProfile} flex items-baseline gap-4 fade-in-bottom `}
+			className={`${classes.mentorProfile} flex flex-col items-center gap-4 fade-in-bottom `}
 		>
 			{!mentorInfo.validated ? (
 				<div className="flex flex-col gap-2">
@@ -61,7 +63,7 @@ export default function MentorProfile() {
 					</div>
 
 					<div className={classes.profileSection}>
-						<h3>Rating : {mentorAverageRating} </h3>
+						<h3>Rating : {getMentorAverageRating(mentorInfo)} </h3>
 					</div>
 					<div className={classes.profileSection}>
 						<h3>
@@ -73,7 +75,12 @@ export default function MentorProfile() {
 						<h3>Accepted Requests : {mentorInfo.sessionCount}</h3>
 					</div>
 					<div className={classes.profileSection}>
-						<h3>Current mentee : {mentorInfo.mentee}</h3>
+						<h3>
+							Current mentee :{" "}
+							{isAddressZero(mentorInfo.mentee)
+								? "You don't have a mentee."
+								: mentorInfo.mentee}
+						</h3>
 					</div>
 				</div>
 			)}
