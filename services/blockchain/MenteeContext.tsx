@@ -1,11 +1,11 @@
-import { createContext, ReactNode, useContext, useState } from "react"
+import { createContext, ReactNode, useContext } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
 	DEVMENTOR_CONTRACT_ABI,
 	Engagement
 } from "../constants"
-import { convertProxyResult, getEngagement } from "../utils"
+import { convertProxyResult, getEngagement, isAddressZero } from "../utils"
 import { Mentor, MentorContext } from "./MentorContext"
 import { BlockchainContext } from "./BlockchainContext"
 
@@ -34,7 +34,8 @@ interface MenteeContextProps {
 	) => Promise<void>
 	validateSessionAsMentee: (
 		mentorAddress: string,
-		rating: number
+		rating: number,
+		tipAmountInUSD: string
 	) => Promise<void>
 	cancelRequestForSession: () => Promise<void>
 }
@@ -79,7 +80,8 @@ export default function MenteeContextProvider({
 	children
 }: MenteeContextProviderProps) {
 	const { getMentorInfo } = useContext(MentorContext)
-	const { waitForTransaction } = useContext(BlockchainContext)
+	const { waitForTransaction, getEthPriceInUsd } =
+		useContext(BlockchainContext)
 
 	///////////////
 	// State
@@ -99,6 +101,7 @@ export default function MenteeContextProvider({
 			provider
 		)
 		try {
+			if(!menteeAddress || isAddressZero(menteeAddress)) return null
 			const menteeInfoArray = await contract.getMenteeInfo(menteeAddress)
 			return {
 				language: parseInt(menteeInfoArray[0]),
@@ -262,7 +265,8 @@ export default function MenteeContextProvider({
 
 	async function validateSessionAsMentee(
 		mentorAddress: string,
-		rating: number
+		rating: number,
+		tipAmountInUSD: string
 	) {
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.BrowserProvider(window.ethereum)
@@ -273,11 +277,21 @@ export default function MenteeContextProvider({
 				signer
 			)
 			try {
-				const transaction = await contract.validateSessionAsMentee(
-					mentorAddress,
-					rating
-				)
-				await transaction.wait()
+				getEthPriceInUsd().then(async (price) => {
+					const tipAmountInEth = tipAmountInUSD
+						? (+tipAmountInUSD / price).toFixed(4)
+						: "0"
+
+					const transaction = await contract.validateSessionAsMentee(
+						mentorAddress,
+						rating,
+						{ value: ethers.parseEther(tipAmountInEth) }
+					)
+					if (waitForTransaction) {
+						waitForTransaction(transaction.hash)
+					}
+					await transaction.wait()
+				})
 				console.log("Session validated and rated by mentee!")
 			} catch (error) {
 				console.error("Error in validateSessionAsMentee:", error)

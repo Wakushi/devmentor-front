@@ -24,7 +24,7 @@ export const engagements: Engagement[] = [
 ]
 
 export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0xF15142420907453d40531289DAa4A07b1FBAd3c6"
+	"0xb27fB5D5b96AB8e42603C358A1dbB17AB20A4FbA"
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
@@ -820,25 +820,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				type: "address"
 			}
 		],
-		name: "getMentorAverageRating",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "averageRating",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_mentor",
-				type: "address"
-			}
-		],
 		name: "getMentorInfo",
 		outputs: [
 			{
@@ -1246,6 +1227,29 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			},
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_engagement",
+				type: "uint256"
+			}
+		],
+		name: "updateSessionEngagement",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
 				name: "_mentor",
 				type: "address"
 			},
@@ -1257,7 +1261,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		],
 		name: "validateSessionAsMentee",
 		outputs: [],
-		stateMutability: "nonpayable",
+		stateMutability: "payable",
 		type: "function"
 	},
 	{

@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useState } from "react"
+import { createContext, ReactNode, useContext } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
@@ -185,6 +185,7 @@ export default function MentorContextProvider(
 				signer
 			)
 			try {
+				waitForTransaction
 				const validateSessionAsMentorTx =
 					await contract.validateSessionAsMentor(menteeAddress)
 				await validateSessionAsMentorTx.wait()

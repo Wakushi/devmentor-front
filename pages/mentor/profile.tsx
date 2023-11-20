@@ -1,22 +1,29 @@
-import { useContext, useEffect, useState } from "react"
+import { MouseEvent, useContext, useEffect, useState } from "react"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import { Session, SessionContext } from "@/services/blockchain/SessionContext"
 import { getTeachingSubjectLabel, isAddressZero } from "@/services/utils"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import { UserContext } from "@/services/UserContext"
 import SessionCard from "@/components/session/session"
 import Loader from "@/components/ui/loader/loader"
 import classes from "./profile.module.scss"
-import { UserContext } from "@/services/UserContext"
-import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
+import Button from "@/components/ui/button/button"
+import WaitingModal from "@/components/waiting-modal/waiting-modal"
 
 export default function MentorProfile() {
 	const [isLoaded, setIsLoaded] = useState(true)
 	const [mentorInfo, setMentorInfo] = useState<Mentor | null>(null)
 	const [menteeSession, setMenteeSession] = useState<Session | null>(null)
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+		useState(false)
 
 	const { walletAddress } = useContext(UserContext)
-	const { getMentorInfo, getMentorAverageRating } = useContext(MentorContext)
+	const { getMentorInfo, getMentorAverageRating, validateSessionAsMentor } =
+		useContext(MentorContext)
 	const { getMenteeSession } = useContext(SessionContext)
-	const { getLanguageLabel } = useContext(BlockchainContext)
+	const { getLanguageLabel, isWaitingForTransaction } =
+		useContext(BlockchainContext)
 
 	useEffect(() => {
 		if (!mentorInfo) {
@@ -31,13 +38,22 @@ export default function MentorProfile() {
 		}
 	}, [walletAddress])
 
+	function onConfirmSession() {
+		setIsConfirmationModalOpen(true)
+	}
+
+	function validateSession() {
+		if (!mentorInfo) return
+		validateSessionAsMentor(mentorInfo?.mentee)
+	}
+
 	if (!isLoaded || !mentorInfo) {
 		return <Loader />
 	}
 
 	return (
 		<div
-			className={`${classes.mentorProfile} page flex flex-col items-center gap-4 fade-in-bottom `}
+			className={`${classes.mentorProfile} page flex  items-center gap-4 fade-in-bottom `}
 		>
 			{!mentorInfo.validated ? (
 				<div className="flex flex-col gap-2">
@@ -85,7 +101,47 @@ export default function MentorProfile() {
 				</div>
 			)}
 			{!!menteeSession && (
-				<SessionCard session={menteeSession} mentorView={true} />
+				<SessionCard
+					session={menteeSession}
+					mentorView={true}
+					confirmSession={onConfirmSession}
+				/>
+			)}
+			{isWaitingForTransaction && (
+				<WaitingModal>
+					<div className="flex flex-col gap-2">
+						<h4>Validating session...</h4>
+					</div>
+				</WaitingModal>
+			)}
+			{isConfirmationModalOpen && (
+				<ConfirmationModal
+					outsideClickHandler={(event: MouseEvent<HTMLElement>) => {
+						if (
+							event.target instanceof HTMLElement &&
+							event.target.id !== "modal-container"
+						)
+							return
+						setIsConfirmationModalOpen(false)
+					}}
+				>
+					<div className="flex flex-col gap-2">
+						<h4>Validate your session</h4>
+						<div className="flex justify-center gap-2">
+							<Button onClick={validateSession} filled={true}>
+								Confirm
+							</Button>
+							<Button
+								onClick={() => {
+									setIsConfirmationModalOpen(false)
+								}}
+								filled={true}
+							>
+								Cancel
+							</Button>
+						</div>
+					</div>
+				</ConfirmationModal>
 			)}
 		</div>
 	)

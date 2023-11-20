@@ -2,17 +2,19 @@ import { getReadableDate } from "@/services/utils"
 import classes from "./session.module.scss"
 import Button from "../ui/button/button"
 import { Session } from "@/services/blockchain/SessionContext"
-import { useContext } from "react"
-import { MentorContext } from "@/services/blockchain/MentorContext"
-import { MenteeContext } from "@/services/blockchain/MenteeContext"
 import { useRouter } from "next/router"
 
 interface SessionProps {
 	session: Session
 	mentorView: boolean
+	confirmSession: () => void
 }
 
-export default function SessionCard({ session, mentorView }: SessionProps) {
+export default function SessionCard({
+	session,
+	mentorView,
+	confirmSession
+}: SessionProps) {
 	const {
 		mentee,
 		mentor,
@@ -23,21 +25,10 @@ export default function SessionCard({ session, mentorView }: SessionProps) {
 		menteeConfirmed
 	} = session
 
-	const { validateSessionAsMentor } = useContext(MentorContext)
-	const { validateSessionAsMentee } = useContext(MenteeContext)
-
 	const router = useRouter()
 
 	function openRequest() {
 		router.push("/mentee/session-form")
-	}
-
-	function confirmSession() {
-		if (mentorView) {
-			validateSessionAsMentor(mentee)
-		} else {
-			// validateSessionAsMentee(mentor, 5) // Open a modal for the mentee to rate the mentor
-		}
 	}
 
 	const ConfirmationStatus = ({
@@ -62,9 +53,11 @@ export default function SessionCard({ session, mentorView }: SessionProps) {
 			<div className={`${classes.session} basic-card`}>
 				<div className={`${classes.sessionDetail} flex-col gap-5`}>
 					<span>No session scheduled</span>
-					<Button onClick={openRequest} filled={true}>
-						Open session
-					</Button>
+					{!mentorView && (
+						<Button onClick={openRequest} filled={true}>
+							Open session
+						</Button>
+					)}
 				</div>
 			</div>
 		)

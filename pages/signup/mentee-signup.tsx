@@ -44,6 +44,7 @@ export default function MenteeSignupAndRequest({
 	const [isLoading, setIsLoading] = useState(false)
 	const [matchingMentors, setMatchingMentors] = useState<Mentor[]>([])
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
+	const [waitingModalMessage, setWaitingModalMessage] = useState("")
 	const [formValues, setFormValues] = useState<FormValues>({
 		language: 0,
 		teachingSubject: 0,
@@ -68,10 +69,14 @@ export default function MenteeSignupAndRequest({
 		getMatchingMentors(teachingSubject, engagement, language).then(
 			(mentors: Mentor[]) => {
 				if (!mentors.length) {
+					setWaitingModalMessage("Opening request. Please wait...")
 					matchWithRandomMentor(mentors, false)
 					setSubmittedForm(true)
 					return
 				}
+				setWaitingModalMessage(
+					"Matching you with a mentor. Please wait..."
+				)
 				if (mentors.length === 1) {
 					setMatchingMentors(mentors)
 					matchWithRandomMentor(mentors, true)
@@ -156,7 +161,11 @@ export default function MenteeSignupAndRequest({
 							</div>
 						</>
 					) : (
-						<div className="flex flex-col justify-center items-center gap-4">
+						<div
+							className={`${
+								registered ? "" : "page"
+							} flex flex-col justify-center items-center gap-4`}
+						>
 							<h4>
 								{matchingMentors.length
 									? "Mentor found, opening a session..."
@@ -167,7 +176,7 @@ export default function MenteeSignupAndRequest({
 					)}
 				</div>
 			) : (
-				<div>
+				<div className={registered ? "" : "page"}>
 					<MenteeForm
 						handleSubmit={handleSubmit}
 						formValues={formValues}
@@ -179,7 +188,7 @@ export default function MenteeSignupAndRequest({
 			{isWaitingForTransaction && (
 				<WaitingModal>
 					<div className="flex flex-col gap-2">
-						<h4>Matching you with a mentor. Please wait...</h4>
+						<h4>{waitingModalMessage}</h4>
 					</div>
 				</WaitingModal>
 			)}

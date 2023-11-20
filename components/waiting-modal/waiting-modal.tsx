@@ -6,11 +6,11 @@ interface WaitingModalProps {
 	children: ReactNode
 }
 
-export default function WaitingModal(props: WaitingModalProps) {
+export default function WaitingModal({children}: WaitingModalProps) {
 	return (
 		<div className={classes.modal_container}>
 			<div className={classes.modal_inner}>
-				{props.children}
+				{children}
 				<Loader />
 			</div>
 		</div>

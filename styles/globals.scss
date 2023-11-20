@@ -70,6 +70,35 @@ h4 {
 	color: red;
 }
 
+.dark-input {
+	position: relative;
+	border: 1px solid rgba(140, 140, 140, 0.29);
+	background-color: rgba(63, 63, 63, 0.28);
+	border-radius: 0.3rem;
+	box-shadow: inset 1px 1px 8px #000000;
+	width: 100%;
+
+	input {
+		background: transparent;
+		color: #fff;
+		width: 100%;
+		padding: 1rem;
+		font-size: 1rem;
+		border-radius: 0.3rem;
+		font-weight: 300;
+		border: transparent;
+	}
+
+	.dollar-symbol {
+		position: absolute;
+		top: 50%;
+		right: 2rem;
+		transform: translateY(-50%);
+		color: #ffffff86;
+		font-size: 1.2rem;
+	}
+}
+
 //////////////////////////
 // KEYFRAMES ANIMATIONS //
 //////////////////////////

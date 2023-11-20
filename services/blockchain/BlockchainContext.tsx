@@ -2,7 +2,6 @@ import { ethers } from "ethers"
 import {
 	ReactNode,
 	createContext,
-	use,
 	useContext,
 	useEffect,
 	useState
@@ -29,6 +28,7 @@ interface BlockchainContextProps {
 	getAllLanguages: () => {}
 	getLanguageById: (languageId: number) => Promise<string>
 	getLanguageLabel: (languageId: number) => string
+	getEthPriceInUsd: () => Promise<number>
 }
 
 export interface Language {
@@ -50,8 +50,13 @@ const BlockchainContext = createContext<BlockchainContextProps>({
 	},
 	getLanguageLabel: () => {
 		return ""
+	},
+	getEthPriceInUsd: async () => {
+		return 0
 	}
 })
+
+const ETH_PRICE_MULTIPLIER = 100000000
 
 export default function BlockchainContextProvider({
 	children
@@ -113,6 +118,22 @@ export default function BlockchainContextProvider({
 		}
 	}
 
+	async function getEthPriceInUsd(): Promise<number> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			provider
+		)
+		try {
+			const ethPriceInUsd = await contract.getEthPrice()
+			return parseInt(ethPriceInUsd) / ETH_PRICE_MULTIPLIER
+		} catch (error) {
+			console.error(error)
+			return 0
+		}
+	}
+
 	///////////////
 	// Utils
 	///////////////
@@ -171,10 +192,21 @@ export default function BlockchainContextProvider({
 			router.push("/mentee/profile")
 		})
 
+		contract.on("MenteeConfirmedSession", (mentee, mentor) => {
+			console.log("MenteeConfirmedSession event:", mentee, mentor)
+			setIsWaitingForTransaction(false)
+			openSnackBar("menteeConfirmedSession")
+		})
+
 		contract.on("RequestCancelled", (mentee) => {
 			console.log("RequestCancelled event:", mentee)
 			openSnackBar("cancelledRequest")
 			setIsWaitingForTransaction(false)
+		})
+
+		contract.on("MentorTipped", (mentee, mentor, value) => {
+			console.log("Tip event:", mentee, mentor, value)
+			openSnackBar("tipSent")
 		})
 
 		contract.on(
@@ -211,7 +243,8 @@ export default function BlockchainContextProvider({
 		setTransactionHash,
 		getAllLanguages,
 		getLanguageById,
-		getLanguageLabel
+		getLanguageLabel,
+		getEthPriceInUsd
 	}
 
 	return (

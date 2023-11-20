@@ -1,0 +1,53 @@
+@import "../../styles/variables.scss";
+
+.modal_container,
+.modal_inner {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.modal_container {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 99;
+	width: 100%;
+	min-height: 100vh;
+	background-color: rgba(0, 0, 0, 0.7);
+	cursor: pointer;
+
+	.modal_inner {
+		position: relative;
+		border-radius: 0.4rem;
+		padding: 5rem;
+		cursor: default;
+		gap: 1rem;
+		border: 1px solid $secondary-color;
+		background-color: rgba(0, 0, 0, 0.63);
+
+		h4,
+		p,
+		a {
+			text-align: center;
+			color: #fff;
+		}
+
+		h4 {
+			font-size: 1.6rem;
+		}
+
+		p,
+		a {
+			font-size: 1.2rem;
+		}
+
+		a {
+			&:hover {
+				text-decoration: underline;
+				color: $secondary-color;
+			}
+		}
+	}
+}

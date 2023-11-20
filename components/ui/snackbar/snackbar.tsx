@@ -18,6 +18,12 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "cancelledRequest":
 				return "Request cancelled"
 
+			case "tipSent":
+				return "Tip successfully sent !"
+
+			case "menteeConfirmedSession":
+				return "Session confirmed !"
+
 			default:
 				return ""
 		}

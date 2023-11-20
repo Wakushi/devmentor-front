@@ -29,7 +29,10 @@ export default function MentorList({ mentors }: MentorTableProps) {
 					{mentors.map((mentor) => (
 						<tr key={mentor.address}>
 							<td>{getShortenedAddress(mentor.address)}</td>
-							<td>{getMentorAverageRating(mentor)}</td>
+							<td>
+								{getMentorAverageRating(mentor)}{" "}
+								<i className="fa-solid fa-star"></i>
+							</td>
 							<td>{mentor.sessionCount}</td>
 							<td>{getLanguageLabel(mentor.language || 0)}</td>
 							<td>{mentor.yearsOfExperience}</td>

@@ -26,7 +26,7 @@ export default function SessionFormPage() {
 			<div className={`${classes.session_form_page} page`}>
 				<h1>Open a session</h1>
 				<div className="flex flex-col items-center gap-5">
-					<h2>You need to register as a mentee first.</h2>
+					<h2>You need to register as a mentee first</h2>
 					<Button
 						onClick={() => {
 							router.push("/signup/mentee-signup")
