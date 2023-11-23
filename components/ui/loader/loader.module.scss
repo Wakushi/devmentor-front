@@ -1,34 +1,36 @@
 @import "../../../styles/variables.scss";
 
 .loader {
-	width: 65px;
-	height: 60px;
-	background: linear-gradient(
-			#0000 calc(1 * 100% / 6),
-			$secondary-color 0 calc(3 * 100% / 6),
-			#0000 0
-		),
-		linear-gradient(
-			#0000 calc(2 * 100% / 6),
-			$secondary-color 0 calc(4 * 100% / 6),
-			#0000 0
-		),
-		linear-gradient(
-			#0000 calc(3 * 100% / 6),
-			$secondary-color 0 calc(5 * 100% / 6),
-			#0000 0
-		);
-	background-size: 8px 400%;
-	background-repeat: no-repeat;
-	animation: matrix 1s infinite linear;
+	display: flex;
+	align-items: center;
 }
 
-@keyframes matrix {
-	0% {
-		background-position: 0% 100%, 50% 100%, 100% 100%;
+.bar {
+	display: inline-block;
+	width: 3px;
+	height: 20px;
+	background-color: $primary-color;
+	border-radius: 10px;
+	animation: scale-up4 1s linear infinite;
+}
+
+.bar:nth-child(2) {
+	height: 35px;
+	margin: 0 5px;
+	animation-delay: 0.25s;
+}
+
+.bar:nth-child(3) {
+	animation-delay: 0.5s;
+}
+
+@keyframes scale-up4 {
+	20% {
+		background-color: #d5faff;
+		transform: scaleY(1.5);
 	}
 
-	100% {
-		background-position: 0% 0%, 50% 0%, 100% 0%;
+	40% {
+		transform: scaleY(1);
 	}
 }

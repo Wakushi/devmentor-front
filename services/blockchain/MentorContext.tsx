@@ -6,7 +6,6 @@ import {
 	Engagement
 } from "../constants"
 import { getEngagement, isAddressZero, replacer } from "../utils"
-import { SnackbarContext } from "../SnackbarContext"
 import { BlockchainContext } from "./BlockchainContext"
 
 interface MentorContextProviderProps {
@@ -15,8 +14,10 @@ interface MentorContextProviderProps {
 
 interface MentorContextProps {
 	getMentorInfo: (mentorAddress: string) => Promise<Mentor | null>
+	getMentorContact: (mentorAddress: string) => Promise<string>
 	getMentorAverageRating: (mentor: Mentor) => number
 	isAccountMentor: (mentorAddress: string) => Promise<boolean>
+	isMentorValidated: (mentorAddress: string) => Promise<boolean>
 	registerAsMentor: (mentorRegistration: MentorRegistration) => void
 	approveMentor: (mentorAddress: string) => void
 	validateSessionAsMentor: (menteeAddress: string) => void
@@ -26,6 +27,7 @@ export interface Mentor {
 	address: string
 	teachingSubjects: string[]
 	mentee: string
+	contact: string
 	yearsOfExperience: number
 	language: number
 	totalRating: number
@@ -40,12 +42,15 @@ export interface MentorRegistration {
 	engagement: number
 	language: number
 	yearsOfExperience: number
+	contact: string
 }
 
 const MentorContext = createContext<MentorContextProps>({
 	getMentorInfo: () => Promise.resolve(null),
+	getMentorContact: () => Promise.resolve(""),
 	getMentorAverageRating: () => 0,
 	isAccountMentor: () => Promise.resolve(false),
+	isMentorValidated: () => Promise.resolve(false),
 	registerAsMentor: () => {},
 	approveMentor: () => {},
 	validateSessionAsMentor: () => {}
@@ -53,7 +58,6 @@ const MentorContext = createContext<MentorContextProps>({
 export default function MentorContextProvider(
 	props: MentorContextProviderProps
 ) {
-	const { openSnackBar } = useContext(SnackbarContext)
 	const { waitForTransaction, errorHandler } = useContext(BlockchainContext)
 
 	///////////////
@@ -85,13 +89,14 @@ export default function MentorContextProvider(
 						JSON.stringify(mentorInfoArray[0], replacer)
 					),
 					mentee: mentorInfoArray[1],
-					yearsOfExperience: parseInt(mentorInfoArray[2]),
-					language: parseInt(mentorInfoArray[3]),
-					totalRating: parseInt(mentorInfoArray[4]),
-					engagement: getEngagement(parseInt(mentorInfoArray[5])),
-					sessionCount: parseInt(mentorInfoArray[6]),
-					registered: mentorInfoArray[7],
-					validated: mentorInfoArray[8]
+					contact: ethers.toUtf8String(mentorInfoArray[2]),
+					yearsOfExperience: parseInt(mentorInfoArray[3]),
+					language: parseInt(mentorInfoArray[4]),
+					totalRating: parseInt(mentorInfoArray[5]),
+					engagement: getEngagement(parseInt(mentorInfoArray[6])),
+					sessionCount: parseInt(mentorInfoArray[7]),
+					registered: mentorInfoArray[8],
+					validated: mentorInfoArray[9]
 				}
 			} catch (error: unknown) {
 				errorHandler(error)
@@ -100,6 +105,25 @@ export default function MentorContextProvider(
 			console.log("Please install MetaMask")
 		}
 		return null
+	}
+
+	async function getMentorContact(mentorAddress: string): Promise<string> {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				provider
+			)
+			try {
+				return await contract.getMentorContact(mentorAddress)
+			} catch (error: unknown) {
+				errorHandler(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+		return ""
 	}
 
 	async function isAccountMentor(mentorAddress: string): Promise<boolean> {
@@ -112,6 +136,25 @@ export default function MentorContextProvider(
 			)
 			try {
 				return await contract.isAccountMentor(mentorAddress)
+			} catch (error: unknown) {
+				errorHandler(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+		return false
+	}
+
+	async function isMentorValidated(mentorAddress: string): Promise<boolean> {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				provider
+			)
+			try {
+				return await contract.isMentorValidated(mentorAddress)
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
@@ -141,7 +184,6 @@ export default function MentorContextProvider(
 				if (registerMentorTx.hash && waitForTransaction) {
 					waitForTransaction(registerMentorTx.hash)
 				}
-				console.log("TX: ", registerMentorTx)
 				await registerMentorTx.wait()
 			} catch (error: unknown) {
 				errorHandler(error)
@@ -205,13 +247,15 @@ export default function MentorContextProvider(
 	///////////////
 
 	function getMentorAverageRating(mentor: Mentor): number {
-		return +mentor.totalRating / +mentor.sessionCount || 0
+		return +mentor.sessionCount ? +mentor.totalRating / +mentor.sessionCount : 0
 	}
 
 	const context: MentorContextProps = {
 		getMentorInfo,
+		getMentorContact,
 		getMentorAverageRating,
 		isAccountMentor,
+		isMentorValidated,
 		registerAsMentor,
 		approveMentor,
 		validateSessionAsMentor

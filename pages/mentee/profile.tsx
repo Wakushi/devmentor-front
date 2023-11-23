@@ -132,7 +132,7 @@ export default function MenteeProfile() {
 	return (
 		<>
 			<div
-				className={`${classes.menteeProfile} page flex items-baseline gap-4 fade-in-bottom `}
+				className={`${classes.menteeProfile} page flex gap-4 fade-in-bottom `}
 			>
 				<div className={classes.profileDetails}>
 					<h2>Profile</h2>

@@ -6,6 +6,7 @@ import { useRouter } from "next/router"
 import { ethers } from "ethers"
 import { useContext, useEffect, useState } from "react"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import { MentorContext } from "@/services/blockchain/MentorContext"
 
 interface SessionProps {
 	session: Session
@@ -29,13 +30,18 @@ export default function SessionCard({
 	} = session
 
 	const [valueLockedInUsd, setValueLockedInUsd] = useState(0)
+	const [mentorContact, setMentorContact] = useState("")
 	const { getEthPriceInUsd } = useContext(BlockchainContext)
+	const { getMentorContact } = useContext(MentorContext)
 
 	useEffect(() => {
 		getEthPriceInUsd().then((price) => {
 			setValueLockedInUsd(
 				+ethers.formatUnits(BigInt(valueLocked), 18) * price
 			)
+		})
+		getMentorContact(mentor).then((contact) => {
+			setMentorContact(contact)
 		})
 	}, [])
 
@@ -85,10 +91,16 @@ export default function SessionCard({
 					<span>Mentee:</span> {getShortenedAddress(mentee)}
 				</div>
 			) : (
-				<div className={classes.sessionDetail}>
-					<span>Mentor: </span>
-					{getShortenedAddress(mentor)}
-				</div>
+				<>
+					<div className={classes.sessionDetail}>
+						<span>Mentor: </span>
+						{getShortenedAddress(mentor)}
+					</div>
+					<div className={classes.sessionDetail}>
+						<span>Contact: </span>
+						{mentorContact}
+					</div>
+				</>
 			)}
 			<div className={classes.sessionDetail}>
 				<span>Started: </span>

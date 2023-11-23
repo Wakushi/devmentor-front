@@ -24,7 +24,7 @@ export const engagements: Engagement[] = [
 ]
 
 export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0xb27fB5D5b96AB8e42603C358A1dbB17AB20A4FbA"
+	"0x28DF80Ad754FcBfEE7e6fBC4851345FD1532CF02"
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
@@ -820,6 +820,25 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				type: "address"
 			}
 		],
+		name: "getMentorContact",
+		outputs: [
+			{
+				internalType: "string",
+				name: "",
+				type: "string"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
 		name: "getMentorInfo",
 		outputs: [
 			{
@@ -833,6 +852,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						internalType: "address",
 						name: "mentee",
 						type: "address"
+					},
+					{
+						internalType: "bytes",
+						name: "contactHash",
+						type: "bytes"
 					},
 					{
 						internalType: "uint8",
@@ -1016,6 +1040,25 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
+		name: "isMentorValidated",
+		outputs: [
+			{
+				internalType: "bool",
+				name: "",
+				type: "bool"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
 				internalType: "uint256",
 				name: "",
 				type: "uint256"
@@ -1178,6 +1221,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						internalType: "uint8",
 						name: "yearsOfExperience",
 						type: "uint8"
+					},
+					{
+						internalType: "string",
+						name: "contact",
+						type: "string"
 					}
 				],
 				internalType: "struct MentorRegistry.MentorRegistration",

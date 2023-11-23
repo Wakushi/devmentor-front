@@ -9,7 +9,7 @@ import {
 import { ethers } from "ethers"
 import { Mentor } from "@/services/blockchain/MentorContext"
 import MentorList from "@/components/mentor-list/mentor-list"
-import MenteeForm, { FormValues } from "@/components/mentee-form/mentee-from"
+import MenteeForm, { FormValues } from "@/components/mentee-form/mentee-form"
 import Loader from "@/components/ui/loader/loader"
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
@@ -179,7 +179,7 @@ export default function MenteeSignupAndRequest({
 	return (
 		<>
 			{submittedForm ? (
-				<div className=" flex flex-col justify-center items-center gap-4 fade-in-bottom">
+				<div className="page flex flex-col justify-center items-center gap-4 fade-in-bottom">
 					{matchingMentors.length > 1 ? (
 						<>
 							<MentorList

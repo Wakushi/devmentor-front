@@ -66,6 +66,34 @@ h4 {
 	}
 }
 
+.basic-form {
+	input,
+	select,
+	textarea {
+		box-shadow: inset 1px 1px 8px #a5a5a556;
+	}
+
+	textarea {
+		resize: none;
+	}
+
+	input:not([type="checkbox"]),
+	select,
+	textarea {
+		width: 100%;
+		padding: 0.4rem;
+		font-size: 1rem;
+		border-radius: 0.3rem;
+		font-weight: 400;
+		border: 1px solid rgba(140, 140, 140, 0.29);
+	}
+
+	input[type="checkbox"] {
+		width: 1.3rem;
+		height: 1.3rem;
+	}
+}
+
 .form_confirmation {
 	position: absolute;
 	top: 50%;
@@ -122,7 +150,7 @@ h4 {
 }
 
 .fade-in-top {
-	animation: fade-in-top 500ms ease-in-out;
+	animation: fade-in-top 500ms 500ms ease-in-out forwards;
 }
 
 @keyframes fade-in-bottom {

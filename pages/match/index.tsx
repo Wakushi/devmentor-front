@@ -6,6 +6,7 @@ import { getShortenedAddress } from "@/services/utils"
 import Button from "@/components/ui/button/button"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import Confetti from "react-confetti"
+import { useRouter } from "next/router"
 
 export default function Match() {
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
@@ -20,6 +21,8 @@ export default function Match() {
 	const { walletAddress } = useContext(UserContext)
 	const { getMenteeInfo } = useContext(MenteeContext)
 	const { getMentorInfo, getMentorAverageRating } = useContext(MentorContext)
+
+	const router = useRouter()
 
 	useEffect(() => {
 		if (!menteeInfo || menteeInfo.hasRequest) {
@@ -92,7 +95,15 @@ export default function Match() {
 										: ""}{" "}
 									of experience
 								</p>
-								<Button onClick={() => {}}>Connect</Button>
+								<h3>Contact</h3>
+								<p> {mentorInfo.contact} </p>
+								<Button
+									onClick={() => {
+										router.push("/mentee/profile")
+									}}
+								>
+									Return to profile
+								</Button>
 							</div>
 						)}
 					</div>

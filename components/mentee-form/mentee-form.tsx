@@ -44,7 +44,7 @@ export default function MenteeForm({
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className={`basic-card flex flex-col gap-2 p-4`}
+			className={`basic-card basic-form flex flex-col gap-2 p-4`}
 		>
 			<label htmlFor="language">Select your language:</label>
 			<select

@@ -23,6 +23,7 @@ interface FormValues {
 	engagement: number
 	yearsOfExperience: number
 	selfIntroduction: string
+	contact: string
 }
 
 interface FormErrors {
@@ -30,6 +31,7 @@ interface FormErrors {
 	engagement?: string
 	yearsOfExperience?: string
 	selfIntroduction?: string
+	contact?: string
 }
 
 export default function MentorSignup() {
@@ -48,7 +50,8 @@ export default function MentorSignup() {
 		teachingSubjects: [],
 		engagement: 0,
 		yearsOfExperience: 1,
-		selfIntroduction: ""
+		selfIntroduction: "",
+		contact: ""
 	})
 
 	const [formErrors, setFormErrors] = useState<FormErrors>({})
@@ -74,6 +77,7 @@ export default function MentorSignup() {
 					  )
 			})
 		} else {
+			setFormErrors({ ...formErrors, contact: "" })
 			setFormValues({
 				...formValues,
 				[event.target.name]: event.target.value
@@ -114,6 +118,10 @@ export default function MentorSignup() {
 		if (formValues.selfIntroduction.trim() === "") {
 			errors.selfIntroduction = "Please introduce yourself."
 		}
+		if (formValues.contact.trim() === "") {
+			errors.contact =
+				"Please add one way for your mentee to contact you."
+		}
 
 		setFormErrors(errors)
 		return Object.keys(errors).length === 0
@@ -126,14 +134,16 @@ export default function MentorSignup() {
 				language,
 				teachingSubjects,
 				engagement,
-				yearsOfExperience
+				yearsOfExperience,
+				contact
 			} = formValues
 			setSubmittedForm(true)
 			const mentorRegistration: MentorRegistration = {
 				teachingSubjects,
 				engagement,
 				language,
-				yearsOfExperience
+				yearsOfExperience,
+				contact
 			}
 			registerAsMentor(mentorRegistration)
 		}
@@ -147,7 +157,7 @@ export default function MentorSignup() {
 		<>
 			{isRegistered ? (
 				<div
-					className={`page form_confirmation flex flex-col justify-center items-center gap-4 fade-in-bottom`}
+					className={`form_confirmation flex flex-col justify-center items-center gap-4 fade-in-bottom`}
 				>
 					<h4>
 						Your application will be reviewed and if everything is
@@ -161,7 +171,7 @@ export default function MentorSignup() {
 				<div className="page fade-in-bottom">
 					<form
 						onSubmit={handleSubmit}
-						className={`basic-card flex flex-col gap-2 p-4`}
+						className={`basic-card basic-form flex flex-col gap-2 p-4`}
 					>
 						<label htmlFor="language">Select your language:</label>
 						<select
@@ -244,6 +254,23 @@ export default function MentorSignup() {
 							</div>
 						)}
 						<br />
+						<br />
+						<label htmlFor="contact">
+							How will your mentee contact you ? (Example :
+							'Discord' + 'username')
+						</label>
+						<input
+							type="text"
+							id="contact"
+							name="contact"
+							value={formValues.contact}
+							onChange={handleInputChange}
+						/>
+						{formErrors.contact && (
+							<div className={`form_error`}>
+								{formErrors.contact}
+							</div>
+						)}
 						<label htmlFor="selfIntroduction">
 							Present yourself and tell us why you want to be a
 							mentor ? (share articles, twitter or github if
