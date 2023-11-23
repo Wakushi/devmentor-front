@@ -80,7 +80,7 @@ export default function MenteeContextProvider({
 	children
 }: MenteeContextProviderProps) {
 	const { getMentorInfo } = useContext(MentorContext)
-	const { waitForTransaction, getEthPriceInUsd } =
+	const { waitForTransaction, getEthPriceInUsd, errorHandler } =
 		useContext(BlockchainContext)
 
 	///////////////
@@ -101,7 +101,7 @@ export default function MenteeContextProvider({
 			provider
 		)
 		try {
-			if(!menteeAddress || isAddressZero(menteeAddress)) return null
+			if (!menteeAddress || isAddressZero(menteeAddress)) return null
 			const menteeInfoArray = await contract.getMenteeInfo(menteeAddress)
 			return {
 				language: parseInt(menteeInfoArray[0]),
@@ -110,8 +110,8 @@ export default function MenteeContextProvider({
 				registered: menteeInfoArray[3],
 				hasRequest: menteeInfoArray[4]
 			}
-		} catch (error) {
-			console.error("Error in getMenteeInfo:", error)
+		} catch (error: unknown) {
+			errorHandler(error)
 		}
 		return null
 	}
@@ -136,8 +136,8 @@ export default function MenteeContextProvider({
 				engagement: getEngagement(parseInt(menteeRequestArray[3])),
 				valueLocked: menteeRequestArray[4]
 			}
-		} catch (error) {
-			console.error("Error in getMenteeRequest:", error)
+		} catch (error: unknown) {
+			errorHandler(error)
 		}
 		return null
 	}
@@ -168,8 +168,8 @@ export default function MenteeContextProvider({
 				if (mentor) matchingMentors.push(mentor)
 			}
 			return matchingMentors
-		} catch (error) {
-			console.error("Error in getMatchingMentors:", error)
+		} catch (error: unknown) {
+			errorHandler(error)
 		}
 		return []
 	}
@@ -184,8 +184,8 @@ export default function MenteeContextProvider({
 			)
 			try {
 				return await contract.isAccountMentee(menteeAddress)
-			} catch (error) {
-				console.log(error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -211,21 +211,27 @@ export default function MenteeContextProvider({
 				signer
 			)
 			try {
-				const transaction =
-					await contract.registerAsMenteeAndMakeRequestForSession(
-						menteeRegistrationAndRequest,
-						{ value: ethers.parseEther(valueLocked) }
+				let price
+				let valueLockedInEth = ethers.parseUnits("0", "ether")
+				if (+valueLocked > 0) {
+					price = await getEthPriceInUsd()
+					valueLockedInEth = ethers.parseUnits(
+						(+valueLocked / price).toFixed(4),
+						"ether"
 					)
+				}
+				
+				const transaction = await contract.registerAsMenteeAndMakeRequestForSession(
+					menteeRegistrationAndRequest,
+					{ value: valueLockedInEth }
+				)
 				if (expectedMatching && waitForTransaction) {
 					waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
 				console.log("Mentee registered and request made!")
-			} catch (error) {
-				console.error(
-					"Error in registerAsMenteeAndMakeRequestForSession:",
-					error
-				)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -246,17 +252,27 @@ export default function MenteeContextProvider({
 				signer
 			)
 			try {
+				let price
+				let valueLockedInEth = ethers.parseUnits("0", "ether")
+				if (+valueLocked > 0) {
+					price = await getEthPriceInUsd()
+					valueLockedInEth = ethers.parseUnits(
+						(+valueLocked / price).toFixed(4),
+						"ether"
+					)
+				}
+				
 				const transaction = await contract.openRequestForSession(
 					menteeRequestForSession,
-					{ value: ethers.parseEther(valueLocked) }
+					{ value: valueLockedInEth }
 				)
 				if (expectedMatching && waitForTransaction) {
 					waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
 				console.log("Session request opened!")
-			} catch (error) {
-				console.error("Error in openRequestForSession:", error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -276,25 +292,31 @@ export default function MenteeContextProvider({
 				DEVMENTOR_CONTRACT_ABI,
 				signer
 			)
-			try {
-				getEthPriceInUsd().then(async (price) => {
-					const tipAmountInEth = tipAmountInUSD
-						? (+tipAmountInUSD / price).toFixed(4)
-						: "0"
 
-					const transaction = await contract.validateSessionAsMentee(
-						mentorAddress,
-						rating,
-						{ value: ethers.parseEther(tipAmountInEth) }
+			try {
+				let price
+				let tipAmountInEth = ethers.parseUnits("0", "ether")
+				if (+tipAmountInUSD > 0) {
+					price = await getEthPriceInUsd()
+					tipAmountInEth = ethers.parseUnits(
+						(+tipAmountInUSD / price).toFixed(4),
+						"ether"
 					)
-					if (waitForTransaction) {
-						waitForTransaction(transaction.hash)
-					}
-					await transaction.wait()
-				})
+				}
+
+				const transaction = await contract.validateSessionAsMentee(
+					mentorAddress,
+					rating,
+					{ value: tipAmountInEth }
+				)
+
+				if (waitForTransaction) {
+					await waitForTransaction(transaction.hash)
+				}
+				await transaction.wait()
 				console.log("Session validated and rated by mentee!")
-			} catch (error) {
-				console.error("Error in validateSessionAsMentee:", error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -316,8 +338,8 @@ export default function MenteeContextProvider({
 					waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
-			} catch (error) {
-				console.error("Error in cancelRequestForSession:", error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")

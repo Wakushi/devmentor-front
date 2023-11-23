@@ -32,6 +32,11 @@
 
 		tr {
 			transition: background-color 0.3s ease;
+			background-color: #fff;
+
+			&.selected {
+				background-color: rgb(171, 255, 185) !important;
+			}
 		}
 
 		tr:nth-child(even) {
@@ -39,7 +44,7 @@
 		}
 
 		tr:hover {
-			background-color: #f1f1f1;
+			background-color: #e6e4e4;
 		}
 
 		td {

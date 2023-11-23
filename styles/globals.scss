@@ -34,8 +34,19 @@ h4 {
 	margin: 2rem;
 }
 
+.brand-color {
+	color: #0077ff;
+}
+
 .page {
 	padding: 10rem 0 2rem 0;
+}
+
+.loading-page {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh;
 }
 
 .basic-card {
@@ -44,6 +55,7 @@ h4 {
 	margin: 0 auto;
 	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 	padding: 20px;
+	min-width: 400px;
 	max-width: 600px;
 	display: flex;
 	flex-direction: column;
@@ -67,7 +79,7 @@ h4 {
 }
 
 .form_error {
-	color: red;
+	color: red !important;
 }
 
 .dark-input {
@@ -77,6 +89,8 @@ h4 {
 	border-radius: 0.3rem;
 	box-shadow: inset 1px 1px 8px #000000;
 	width: 100%;
+	max-width: 200px;
+	align-self: center;
 
 	input {
 		background: transparent;
@@ -107,10 +121,25 @@ h4 {
 	animation: fade-in-bottom 500ms ease-in-out;
 }
 
+.fade-in-top {
+	animation: fade-in-top 500ms ease-in-out;
+}
+
 @keyframes fade-in-bottom {
 	0% {
 		opacity: 0;
 		transform: translateY(10px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes fade-in-top {
+	0% {
+		opacity: 0;
+		transform: translateY(-10px);
 	}
 	100% {
 		opacity: 1;

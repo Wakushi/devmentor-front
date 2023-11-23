@@ -52,7 +52,7 @@ export default function MenteeProfile() {
 	const inputErrorStyle = "1px solid rgba(140, 140, 140, 0.29)"
 
 	useEffect(() => {
-		if (!menteeInfo || menteeInfo.hasRequest) {
+		if (!menteeInfo || menteeInfo.hasRequest || !isWaitingForTransaction) {
 			getMenteeInfo(walletAddress).then((mentee) => {
 				setMenteeInfo(mentee)
 				if (!mentee) return
@@ -112,6 +112,7 @@ export default function MenteeProfile() {
 			tipFormField.current.style.border = "1px solid red"
 			return
 		}
+		setIsConfirmationModalOpen(false)
 		setWaitingModalMessage("Validating session...")
 		validateSessionAsMentee(
 			menteeInfo.mentor,
@@ -120,7 +121,15 @@ export default function MenteeProfile() {
 		)
 	}
 
-	return isLoaded && menteeInfo ? (
+	if (!isLoaded || !menteeInfo) {
+		return (
+			<div className="loading-page">
+				<Loader />
+			</div>
+		)
+	}
+
+	return (
 		<>
 			<div
 				className={`${classes.menteeProfile} page flex items-baseline gap-4 fade-in-bottom `}
@@ -254,7 +263,5 @@ export default function MenteeProfile() {
 				</ConfirmationModal>
 			)}
 		</>
-	) : (
-		<Loader />
 	)
 }

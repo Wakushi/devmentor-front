@@ -26,7 +26,7 @@ export default function MentorProfile() {
 		useContext(BlockchainContext)
 
 	useEffect(() => {
-		if (!mentorInfo) {
+		if (!mentorInfo || !isWaitingForTransaction) {
 			getMentorInfo(walletAddress).then((mentor) => {
 				setMentorInfo(mentor)
 				if (!mentor) return
@@ -36,7 +36,7 @@ export default function MentorProfile() {
 				})
 			})
 		}
-	}, [walletAddress])
+	}, [walletAddress, isWaitingForTransaction])
 
 	function onConfirmSession() {
 		setIsConfirmationModalOpen(true)
@@ -44,11 +44,16 @@ export default function MentorProfile() {
 
 	function validateSession() {
 		if (!mentorInfo) return
+		setIsConfirmationModalOpen(false)
 		validateSessionAsMentor(mentorInfo?.mentee)
 	}
 
 	if (!isLoaded || !mentorInfo) {
-		return <Loader />
+		return (
+			<div className="loading-page">
+				<Loader />
+			</div>
+		)
 	}
 
 	return (
@@ -79,7 +84,11 @@ export default function MentorProfile() {
 					</div>
 
 					<div className={classes.profileSection}>
-						<h3>Rating : {getMentorAverageRating(mentorInfo)} </h3>
+						<h3>
+							Rating :{" "}
+							{getMentorAverageRating(mentorInfo).toFixed(2)}{" "}
+							<i className="fa-solid fa-star brand-color"></i>{" "}
+						</h3>
 					</div>
 					<div className={classes.profileSection}>
 						<h3>

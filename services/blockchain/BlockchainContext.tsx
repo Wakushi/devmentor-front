@@ -29,6 +29,7 @@ interface BlockchainContextProps {
 	getLanguageById: (languageId: number) => Promise<string>
 	getLanguageLabel: (languageId: number) => string
 	getEthPriceInUsd: () => Promise<number>
+	errorHandler: (error: any) => void
 }
 
 export interface Language {
@@ -53,7 +54,8 @@ const BlockchainContext = createContext<BlockchainContextProps>({
 	},
 	getEthPriceInUsd: async () => {
 		return 0
-	}
+	},
+	errorHandler: (error: any) => {}
 })
 
 const ETH_PRICE_MULTIPLIER = 100000000
@@ -147,6 +149,28 @@ export default function BlockchainContextProvider({
 		return languages[languageId]?.label
 	}
 
+	function errorHandler(error: any) {
+		let errorMessage = "An unknown error occurred. Please try again later."
+
+		if (typeof error === "object" && error !== null) {
+			const errorObj = error as { data?: { message?: string } }
+
+			if (errorObj.data && typeof errorObj.data.message === "string") {
+				errorMessage = extractRevertReason(errorObj.data.message)
+			}
+		} else if (typeof error === "string") {
+			errorMessage = error
+		}
+
+		alert(errorMessage)
+		console.error(error)
+	}
+
+	function extractRevertReason(message: any) {
+		const matches = message.match(/reverted with reason string '(.*)'/)
+		return matches && matches[1] ? matches[1] : message
+	}
+
 	///////////////
 	// Write
 	///////////////
@@ -198,6 +222,12 @@ export default function BlockchainContextProvider({
 			openSnackBar("menteeConfirmedSession")
 		})
 
+		contract.on("MentorConfirmedSession", (mentee, mentor) => {
+			console.log("MentorConfirmedSession event:", mentee, mentor)
+			setIsWaitingForTransaction(false)
+			openSnackBar("mentorConfirmedSession")
+		})
+
 		contract.on("RequestCancelled", (mentee) => {
 			console.log("RequestCancelled event:", mentee)
 			openSnackBar("cancelledRequest")
@@ -244,7 +274,8 @@ export default function BlockchainContextProvider({
 		getAllLanguages,
 		getLanguageById,
 		getLanguageLabel,
-		getEthPriceInUsd
+		getEthPriceInUsd,
+		errorHandler
 	}
 
 	return (

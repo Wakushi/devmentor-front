@@ -1,8 +1,11 @@
-import { getReadableDate } from "@/services/utils"
+import { getReadableDate, getShortenedAddress } from "@/services/utils"
 import classes from "./session.module.scss"
 import Button from "../ui/button/button"
 import { Session } from "@/services/blockchain/SessionContext"
 import { useRouter } from "next/router"
+import { ethers } from "ethers"
+import { useContext, useEffect, useState } from "react"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 
 interface SessionProps {
 	session: Session
@@ -24,6 +27,17 @@ export default function SessionCard({
 		mentorConfirmed,
 		menteeConfirmed
 	} = session
+
+	const [valueLockedInUsd, setValueLockedInUsd] = useState(0)
+	const { getEthPriceInUsd } = useContext(BlockchainContext)
+
+	useEffect(() => {
+		getEthPriceInUsd().then((price) => {
+			setValueLockedInUsd(
+				+ethers.formatUnits(BigInt(valueLocked), 18) * price
+			)
+		})
+	}, [])
 
 	const router = useRouter()
 
@@ -68,13 +82,12 @@ export default function SessionCard({
 			<h3>Session</h3>
 			{mentorView ? (
 				<div className={classes.sessionDetail}>
-					<span>Mentee: </span>
-					{mentee}
+					<span>Mentee:</span> {getShortenedAddress(mentee)}
 				</div>
 			) : (
 				<div className={classes.sessionDetail}>
 					<span>Mentor: </span>
-					{mentor}
+					{getShortenedAddress(mentor)}
 				</div>
 			)}
 			<div className={classes.sessionDetail}>
@@ -87,7 +100,8 @@ export default function SessionCard({
 			</div>
 			<div className={classes.sessionDetail}>
 				<span>Value locked: </span>
-				{valueLocked}
+				{ethers.formatUnits(BigInt(valueLocked), 18)} ETH /{" "}
+				{valueLockedInUsd.toFixed(2)}$
 			</div>
 			<ConfirmationStatus
 				isConfirmed={mentorConfirmed}
@@ -97,9 +111,16 @@ export default function SessionCard({
 				isConfirmed={menteeConfirmed}
 				label={mentorView ? "Mentee" : "You"}
 			/>
-			<Button onClick={confirmSession} filled={true}>
-				Confirm session
-			</Button>
+			{mentorView && !session.mentorConfirmed && (
+				<Button onClick={confirmSession} filled={true}>
+					Confirm session
+				</Button>
+			)}
+			{!mentorView && !session.menteeConfirmed && (
+				<Button onClick={confirmSession} filled={true}>
+					Confirm session
+				</Button>
+			)}
 		</div>
 	)
 }

@@ -5,7 +5,7 @@ import {
 	DEVMENTOR_CONTRACT_ABI,
 	Engagement
 } from "../constants"
-import { getEngagement, replacer } from "../utils"
+import { getEngagement, isAddressZero, replacer } from "../utils"
 import { SnackbarContext } from "../SnackbarContext"
 import { BlockchainContext } from "./BlockchainContext"
 
@@ -54,7 +54,7 @@ export default function MentorContextProvider(
 	props: MentorContextProviderProps
 ) {
 	const { openSnackBar } = useContext(SnackbarContext)
-	const { waitForTransaction } = useContext(BlockchainContext)
+	const { waitForTransaction, errorHandler } = useContext(BlockchainContext)
 
 	///////////////
 	// State
@@ -75,6 +75,7 @@ export default function MentorContextProvider(
 				provider
 			)
 			try {
+				if (!mentorAddress || isAddressZero(mentorAddress)) return null
 				const mentorInfoArray = await contract.getMentorInfo(
 					mentorAddress
 				)
@@ -92,8 +93,8 @@ export default function MentorContextProvider(
 					registered: mentorInfoArray[7],
 					validated: mentorInfoArray[8]
 				}
-			} catch (error) {
-				console.log(error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -111,8 +112,8 @@ export default function MentorContextProvider(
 			)
 			try {
 				return await contract.isAccountMentor(mentorAddress)
-			} catch (error) {
-				console.log(error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -142,9 +143,8 @@ export default function MentorContextProvider(
 				}
 				console.log("TX: ", registerMentorTx)
 				await registerMentorTx.wait()
-			} catch (error) {
-				openSnackBar("error")
-				console.error(error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -166,9 +166,8 @@ export default function MentorContextProvider(
 				)
 				await approveMentorTx.wait()
 				console.log("Mentor approved!")
-			} catch (error) {
-				openSnackBar("error")
-				console.error(error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -185,14 +184,16 @@ export default function MentorContextProvider(
 				signer
 			)
 			try {
-				waitForTransaction
-				const validateSessionAsMentorTx =
-					await contract.validateSessionAsMentor(menteeAddress)
-				await validateSessionAsMentorTx.wait()
+				const transaction = await contract.validateSessionAsMentor(
+					menteeAddress
+				)
+				if (waitForTransaction) {
+					await waitForTransaction(transaction.hash)
+				}
+				await transaction.wait()
 				console.log("Session validated !")
-			} catch (error) {
-				openSnackBar("error")
-				console.error(error)
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")

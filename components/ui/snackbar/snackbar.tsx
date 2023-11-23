@@ -24,6 +24,9 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "menteeConfirmedSession":
 				return "Session confirmed !"
 
+			case "mentorConfirmedSession":
+				return "Session confirmed !"
+
 			default:
 				return ""
 		}

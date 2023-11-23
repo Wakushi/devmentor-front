@@ -1,6 +1,6 @@
 import classes from "./header.module.scss"
 import Button from "@/components/ui/button/button"
-import { useContext, useEffect, useRef } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { UserContext } from "@/services/UserContext"
 import Image from "next/image"
 import metamask from "@/assets/images/logo/metamask-logo.png"
@@ -17,7 +17,21 @@ export default function Header() {
 		? getShortenedAddress(walletAddress)
 		: null
 	const headerRef = useRef<HTMLHeadElement | null>(null)
+
+	const [isMentee, setIsMentee] = useState(false)
+	const [isMentor, setIsMentor] = useState(false)
 	const router = useRouter()
+
+	useEffect(() => {
+		if (walletAddress) {
+			isAccountMentee(walletAddress).then((isMentee) => {
+				setIsMentee(isMentee)
+			})
+			isAccountMentor(walletAddress).then((isMentor) => {
+				setIsMentor(isMentor)
+			})
+		}
+	}, [walletAddress])
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -48,23 +62,11 @@ export default function Header() {
 	}
 
 	function goToProfile() {
-		if (walletAddress) {
-			isAccountMentee(walletAddress).then((isMentee) => {
-				if (isMentee) {
-					router.push("/mentee/profile")
-				} else {
-					isAccountMentor(walletAddress).then((isMentor) => {
-						if (isMentor) {
-							router.push("/mentor/profile")
-						}
-					})
-				}
-			})
-		}
+		router.push(isMentee ? "/mentee/profile" : "/mentor/profile")
 	}
 
 	return (
-		<header className={classes.header} ref={headerRef}>
+		<header className={`${classes.header} fade-in-top`} ref={headerRef}>
 			<div
 				className={`${classes.logo_container} flex items-center cursor-pointer`}
 				onClick={() => {
@@ -87,44 +89,54 @@ export default function Header() {
 			</div>
 			<nav className={`${classes.nav_bar} flex items-center gap-4`}>
 				<ul className="flex items-center gap-14">
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={() =>
-							handleConnectionPriorRouting(
-								"/signup/mentee-signup"
-							)
-						}
-					>
-						Register as mentee
-					</li>
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={() =>
-							handleConnectionPriorRouting(
-								"/signup/mentor-signup"
-							)
-						}
-					>
-						Register as mentor
-					</li>
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={() =>
-							handleConnectionPriorRouting("/mentee/session-form")
-						}
-					>
-						Open session
-					</li>
-					<li
-						className={classes.nav_link}
-						tabIndex={0}
-						onClick={goToProfile}
-					>
-						Profile
-					</li>
+					{!isMentee && !isMentor && (
+						<li
+							className={classes.nav_link}
+							tabIndex={0}
+							onClick={() =>
+								handleConnectionPriorRouting(
+									"/signup/mentee-signup"
+								)
+							}
+						>
+							Register as mentee
+						</li>
+					)}
+					{!isMentor && (
+						<li
+							className={classes.nav_link}
+							tabIndex={0}
+							onClick={() =>
+								handleConnectionPriorRouting(
+									"/signup/mentor-signup"
+								)
+							}
+						>
+							Register as mentor
+						</li>
+					)}
+					{!isMentor && isMentee && (
+						<li
+							className={classes.nav_link}
+							tabIndex={0}
+							onClick={() =>
+								handleConnectionPriorRouting(
+									"/mentee/session-form"
+								)
+							}
+						>
+							Open session
+						</li>
+					)}
+					{(isMentee || isMentor) && (
+						<li
+							className={classes.nav_link}
+							tabIndex={0}
+							onClick={goToProfile}
+						>
+							Profile
+						</li>
+					)}
 					<li>
 						<Button onClick={connectWallet} filled={true}>
 							{walletAddress ? (

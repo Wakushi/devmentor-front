@@ -73,7 +73,10 @@ export default function Match() {
 									{getShortenedAddress(menteeInfo?.mentor)}
 								</h2>
 								<p className={classes.mentor_info}>
-									{getMentorAverageRating(mentorInfo)} ★
+									{getMentorAverageRating(mentorInfo).toFixed(
+										2
+									)}{" "}
+									<i className="fa-solid fa-star"></i>
 								</p>
 								<p className={classes.mentor_info}>
 									{mentorInfo.sessionCount} session

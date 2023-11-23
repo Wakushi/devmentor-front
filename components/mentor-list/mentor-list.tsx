@@ -6,11 +6,23 @@ import classes from "./mentor-list.module.scss"
 
 interface MentorTableProps {
 	mentors: Mentor[]
+	selectMode?: boolean
+	selectedMentor?: string
+	setSelectedMentor?: (address: string) => void
 }
 
-export default function MentorList({ mentors }: MentorTableProps) {
+export default function MentorList({
+	mentors,
+	selectMode,
+	selectedMentor,
+	setSelectedMentor
+}: MentorTableProps) {
 	const { getMentorAverageRating } = useContext(MentorContext)
 	const { getLanguageLabel } = useContext(BlockchainContext)
+
+	const tableStyles = {
+		cursor: selectMode ? "pointer" : "default"
+	}
 
 	return (
 		<div className={classes.mentor_list_container}>
@@ -27,7 +39,20 @@ export default function MentorList({ mentors }: MentorTableProps) {
 				</thead>
 				<tbody>
 					{mentors.map((mentor) => (
-						<tr key={mentor.address}>
+						<tr
+							key={mentor.address}
+							onClick={() => {
+								if (selectMode && setSelectedMentor) {
+									setSelectedMentor(mentor.address)
+								}
+							}}
+							style={tableStyles}
+							className={
+								selectedMentor === mentor.address
+									? classes.selected
+									: ""
+							}
+						>
 							<td>{getShortenedAddress(mentor.address)}</td>
 							<td>
 								{getMentorAverageRating(mentor)}{" "}

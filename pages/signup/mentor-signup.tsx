@@ -147,7 +147,7 @@ export default function MentorSignup() {
 		<>
 			{isRegistered ? (
 				<div
-					className={`page form_confirmation flex flex-col justify-center items-center gap-4`}
+					className={`page form_confirmation flex flex-col justify-center items-center gap-4 fade-in-bottom`}
 				>
 					<h4>
 						Your application will be reviewed and if everything is
@@ -158,7 +158,7 @@ export default function MentorSignup() {
 					</Button>
 				</div>
 			) : (
-				<div className="page">
+				<div className="page fade-in-bottom">
 					<form
 						onSubmit={handleSubmit}
 						className={`basic-card flex flex-col gap-2 p-4`}

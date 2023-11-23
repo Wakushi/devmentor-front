@@ -5,7 +5,8 @@ import { SessionContext } from "@/services/blockchain/SessionContext"
 
 export default function Landing() {
 	const { approveMentor } = useContext(MentorContext)
-	const { adminCompleteSession } = useContext(SessionContext)
+	const { adminCompleteSession, adminUpdateSessionEngagement } =
+		useContext(SessionContext)
 
 	const [formValues, setFormValues] = useState<any>({
 		mentorAddress: "",
@@ -28,6 +29,14 @@ export default function Landing() {
 			formValues.mentorAddress,
 			formValues.menteeAddress,
 			"0"
+		)
+	}
+
+	function onUpdateEngagement() {
+		adminUpdateSessionEngagement(
+			formValues.menteeAddress,
+			formValues.mentorAddress,
+			10
 		)
 	}
 
@@ -66,6 +75,9 @@ export default function Landing() {
 					/>
 					<Button onClick={onCompleteSession} filled={true}>
 						Complete session
+					</Button>
+					<Button onClick={onUpdateEngagement} filled={true}>
+						Update engagement
 					</Button>
 				</div>
 			</div>

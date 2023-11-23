@@ -24,6 +24,7 @@ export interface FormValues {
 	teachingSubject: number
 	engagement: number
 	level: number
+	lockedAmount: number
 }
 
 export default function MenteeForm({

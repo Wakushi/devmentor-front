@@ -6,8 +6,10 @@ import { useRouter } from "next/router"
 import classes from "./session-form.module.scss"
 import { isAddressZero } from "@/services/utils"
 import MenteeSignupAndRequest from "../signup/mentee-signup"
+import Loader from "@/components/ui/loader/loader"
 
 export default function SessionFormPage() {
+	const [isLoaded, setIsLoaded] = useState(false)
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
 	const { walletAddress } = useContext(UserContext)
 	const { getMenteeInfo } = useContext(MenteeContext)
@@ -17,13 +19,22 @@ export default function SessionFormPage() {
 		if (!menteeInfo) {
 			getMenteeInfo(walletAddress).then((mentee) => {
 				setMenteeInfo(mentee)
+				setIsLoaded(true)
 			})
 		}
 	}, [walletAddress])
 
+	if (!isLoaded || !menteeInfo) {
+		return (
+			<div className="loading-page">
+				<Loader />
+			</div>
+		)
+	}
+
 	if (!menteeInfo?.registered) {
 		return (
-			<div className={`${classes.session_form_page} page`}>
+			<div className={`${classes.session_form_page} page fade-in-bottom`}>
 				<h1>Open a session</h1>
 				<div className="flex flex-col items-center gap-5">
 					<h2>You need to register as a mentee first</h2>
@@ -41,7 +52,7 @@ export default function SessionFormPage() {
 	}
 
 	return (
-		<div className={`${classes.session_form_page} page`}>
+		<div className={`${classes.session_form_page} page fade-in-bottom`}>
 			<h1>Open a session</h1>
 			{menteeInfo?.hasRequest ||
 			(menteeInfo && !isAddressZero(menteeInfo?.mentor)) ? (

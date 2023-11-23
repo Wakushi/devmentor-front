@@ -28,11 +28,17 @@ interface SessionContextProps {
 		mentorAddress: string,
 		valueLocked: string
 	) => Promise<void>
+	adminUpdateSessionEngagement: (
+		menteeAddress: string,
+		mentorAddress: string,
+		newEngagementDuration: number
+	) => Promise<void>
 }
 
 const SessionContext = createContext<SessionContextProps>({
 	getMenteeSession: async () => Promise.resolve(null),
-	adminCompleteSession: async () => Promise.resolve()
+	adminCompleteSession: async () => Promise.resolve(),
+	adminUpdateSessionEngagement: async () => Promise.resolve()
 })
 
 export default function SessionContextProvider({
@@ -108,9 +114,40 @@ export default function SessionContextProvider({
 		}
 	}
 
+	async function adminUpdateSessionEngagement(
+		menteeAddress: string,
+		mentorAddress: string,
+		newEngagementDuration: number
+	) {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const signer = await provider.getSigner()
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				signer
+			)
+			try {
+				const transaction = await contract.updateSessionEngagement(
+					menteeAddress,
+					mentorAddress,
+					newEngagementDuration
+				)
+				await transaction.wait()
+				console.log("Updated session engagement")
+				alert("Updated session engagement")
+			} catch (error) {
+				console.error("Error in adminCompleteSession:", error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+	}
+
 	const context: SessionContextProps = {
 		getMenteeSession,
-		adminCompleteSession
+		adminCompleteSession,
+		adminUpdateSessionEngagement
 	}
 
 	return (

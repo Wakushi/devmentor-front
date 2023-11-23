@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react"
+import { MouseEvent, useContext, useEffect, useRef, useState } from "react"
 import { engagements } from "../../services/constants"
 import classes from "./mentee-signup.module.scss"
 import {
@@ -16,6 +16,7 @@ import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import { UserContext } from "@/services/UserContext"
 import { useRouter } from "next/router"
 import Button from "@/components/ui/button/button"
+import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
 
 interface MenteeSignupAndRequestProps {
 	registered?: boolean
@@ -45,14 +46,20 @@ export default function MenteeSignupAndRequest({
 	const [matchingMentors, setMatchingMentors] = useState<Mentor[]>([])
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
 	const [waitingModalMessage, setWaitingModalMessage] = useState("")
+	const [mentorSelectionModalOpen, setMentorSelectionModalOpen] =
+		useState(false)
+	const [selectedMentor, setSelectedMentor] = useState<string>("")
+	const [lockedValueFormError, setLockedValueFormError] = useState<string>("")
 	const [formValues, setFormValues] = useState<FormValues>({
 		language: 0,
 		teachingSubject: 0,
 		engagement: engagements[0].durationInSeconds,
-		level: 0
+		level: 0,
+		lockedAmount: 0
 	})
 
 	const router = useRouter()
+	const lockedAmountFormField = useRef<HTMLDivElement | null>(null)
 
 	useEffect(() => {
 		if (!menteeInfo) {
@@ -62,6 +69,21 @@ export default function MenteeSignupAndRequest({
 		}
 	}, [walletAddress])
 
+	useEffect(() => {
+		setLockedValueFormError("")
+	}, [selectedMentor, formValues.lockedAmount, mentorSelectionModalOpen])
+
+	useEffect(() => {
+		setSelectedMentor("")
+	}, [mentorSelectionModalOpen])
+
+	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
+		setFormValues({
+			...formValues,
+			[event.target.name]: event.target.value
+		})
+	}
+
 	async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
 		event.preventDefault()
 		setIsLoading(true)
@@ -70,7 +92,7 @@ export default function MenteeSignupAndRequest({
 			(mentors: Mentor[]) => {
 				if (!mentors.length) {
 					setWaitingModalMessage("Opening request. Please wait...")
-					matchWithRandomMentor(mentors, false)
+					matchWithRandomMentor(mentors, "", false)
 					setSubmittedForm(true)
 					return
 				}
@@ -79,7 +101,7 @@ export default function MenteeSignupAndRequest({
 				)
 				if (mentors.length === 1) {
 					setMatchingMentors(mentors)
-					matchWithRandomMentor(mentors, true)
+					matchWithRandomMentor(mentors, "", true)
 					setSubmittedForm(true)
 					return
 				}
@@ -89,8 +111,25 @@ export default function MenteeSignupAndRequest({
 		)
 	}
 
+	function isMentorSelectionValid(): boolean {
+		if (!selectedMentor || !formValues.lockedAmount) {
+			setLockedValueFormError(
+				"You have to select a mentor and lock some value."
+			)
+			return false
+		}
+
+		if (formValues.lockedAmount < 5) {
+			setLockedValueFormError("You have to lock at least 5$ USD.")
+			return false
+		}
+
+		return true
+	}
+
 	function matchWithRandomMentor(
 		mentors: Mentor[],
+		chosenMentor: string,
 		expectedMatching: boolean
 	) {
 		const { language, teachingSubject, engagement, level } = formValues
@@ -103,18 +142,19 @@ export default function MenteeSignupAndRequest({
 			language,
 			engagement,
 			matchingMentors: matchingMentorsAddresses,
-			chosenMentor: ethers.ZeroAddress
+			chosenMentor: chosenMentor || ethers.ZeroAddress
 		}
+
 		if (!registered) {
 			registerAsMenteeAndMakeRequestForSession(
 				menteeRegistrationAndRequest,
-				"0",
+				formValues.lockedAmount.toString(),
 				expectedMatching
 			)
 		} else {
 			openRequestForSession(
 				menteeRegistrationAndRequest,
-				"0",
+				formValues.lockedAmount.toString(),
 				expectedMatching
 			)
 		}
@@ -139,15 +179,21 @@ export default function MenteeSignupAndRequest({
 	return (
 		<>
 			{submittedForm ? (
-				<div className=" flex flex-col justify-center items-center gap-4">
+				<div className=" flex flex-col justify-center items-center gap-4 fade-in-bottom">
 					{matchingMentors.length > 1 ? (
 						<>
-							<MentorList mentors={matchingMentors} />
+							<MentorList
+								mentors={matchingMentors}
+								selectMode={false}
+								selectedMentor={selectedMentor}
+								setSelectedMentor={setSelectedMentor}
+							/>
 							<div className="flex justify-center items-center gap-4">
 								<button
 									onClick={() =>
 										matchWithRandomMentor(
 											matchingMentors,
+											"",
 											true
 										)
 									}
@@ -155,7 +201,12 @@ export default function MenteeSignupAndRequest({
 								>
 									Match with a random mentor
 								</button>
-								<button className={`${classes.big_button}`}>
+								<button
+									className={`${classes.big_button}`}
+									onClick={() =>
+										setMentorSelectionModalOpen(true)
+									}
+								>
 									Lock asset and choose a mentor
 								</button>
 							</div>
@@ -174,9 +225,75 @@ export default function MenteeSignupAndRequest({
 							<Loader />
 						</div>
 					)}
+
+					{mentorSelectionModalOpen && (
+						<ConfirmationModal
+							outsideClickHandler={(
+								event: MouseEvent<HTMLElement>
+							) => {
+								if (
+									event.target instanceof HTMLElement &&
+									event.target.id !== "modal-container"
+								)
+									return
+								setMentorSelectionModalOpen(false)
+							}}
+						>
+							<MentorList
+								mentors={matchingMentors}
+								selectMode={true}
+								selectedMentor={selectedMentor}
+								setSelectedMentor={setSelectedMentor}
+							/>
+							<div className="flex flex-col gap-2">
+								<h4>Lock value to choose a mentor</h4>
+								<p>(Amount in USD will be converted to ETH)</p>
+								<p>
+									(You can also get a random mentor without
+									locking value)
+								</p>
+								<div
+									ref={lockedAmountFormField}
+									className="dark-input"
+								>
+									<input
+										type="number"
+										name="lockedAmount"
+										placeholder="5"
+										min={5}
+										onChange={handleInputChange}
+									/>
+									<span className="dollar-symbol">$</span>
+								</div>
+								<p className="form_error">
+									{lockedValueFormError}
+								</p>
+								<div className="flex justify-center gap-2">
+									<Button
+										onClick={() => {
+											if (isMentorSelectionValid()) {
+												matchWithRandomMentor(
+													matchingMentors,
+													selectedMentor,
+													true
+												)
+											}
+										}}
+										filled={true}
+									>
+										Connect with mentor
+									</Button>
+								</div>
+							</div>
+						</ConfirmationModal>
+					)}
 				</div>
 			) : (
-				<div className={registered ? "" : "page"}>
+				<div
+					className={
+						registered ? "fade-in-bottom" : "page fade-in-bottom"
+					}
+				>
 					<MenteeForm
 						handleSubmit={handleSubmit}
 						formValues={formValues}
