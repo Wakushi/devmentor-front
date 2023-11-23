@@ -149,6 +149,10 @@ h4 {
 	animation: fade-in-bottom 500ms ease-in-out;
 }
 
+.fade-in-bottom-shape {
+	animation: fade-in-bottom-shape 1s ease-in-out forwards;
+}
+
 .fade-in-top {
 	animation: fade-in-top 500ms 500ms ease-in-out forwards;
 }
@@ -161,6 +165,17 @@ h4 {
 	100% {
 		opacity: 1;
 		transform: translateY(0);
+	}
+}
+
+@keyframes fade-in-bottom-shape {
+	0% {
+		opacity: 0.3;
+		transform: translateY(10px) rotate(180deg) scaleX(-1);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0) rotate(180deg) scaleX(-1);
 	}
 }
 

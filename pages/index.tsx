@@ -2,6 +2,7 @@ import Button from "@/components/ui/button/button"
 import { useContext, useState } from "react"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import { SessionContext } from "@/services/blockchain/SessionContext"
+import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 
 export default function Landing() {
 	const { approveMentor } = useContext(MentorContext)
@@ -81,6 +82,7 @@ export default function Landing() {
 					</Button>
 				</div>
 			</div>
+			<WavesBackground />
 		</div>
 	)
 }

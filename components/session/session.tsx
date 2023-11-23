@@ -110,6 +110,12 @@ export default function SessionCard({
 				<span>Duration: </span>
 				{engagement?.label}
 			</div>
+			{!!engagement?.durationInSeconds && (
+				<div className={classes.sessionDetail}>
+					<span>Session end: </span>
+					{getReadableDate(startTime + engagement?.durationInSeconds)}
+				</div>
+			)}
 			<div className={classes.sessionDetail}>
 				<span>Value locked: </span>
 				{ethers.formatUnits(BigInt(valueLocked), 18)} ETH /{" "}

@@ -16,6 +16,7 @@ import {
 } from "@/services/blockchain/BlockchainContext"
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import { getShortenedAddress } from "@/services/utils"
+import TriangleBackground from "@/components/ui/backgrounds/triangle/triangle-bg"
 
 interface FormValues {
 	language: number
@@ -173,6 +174,7 @@ export default function MentorSignup() {
 						onSubmit={handleSubmit}
 						className={`basic-card basic-form flex flex-col gap-2 p-4`}
 					>
+						<h2>Register as a mentor</h2>
 						<label htmlFor="language">Select your language:</label>
 						<select
 							id="language"
@@ -318,6 +320,7 @@ export default function MentorSignup() {
 					</div>
 				</WaitingModal>
 			)}
+			<TriangleBackground />
 		</>
 	)
 }

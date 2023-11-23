@@ -8,15 +8,16 @@ import {
 	levels,
 	teachingSubjects
 } from "@/services/constants"
-import { useContext } from "react"
+import { FormEvent, useContext } from "react"
 import Button from "../ui/button/button"
 import Loader from "../ui/loader/loader"
 
 interface MenteeFormProps {
-	handleSubmit: (event: React.FormEvent<HTMLFormElement>) => void
+	handleSubmit: (event: FormEvent<HTMLFormElement>) => void
 	formValues: FormValues
 	setFormValues: (formValues: FormValues) => void
 	isLoading?: boolean
+	registered?: boolean
 }
 
 export interface FormValues {
@@ -31,7 +32,8 @@ export default function MenteeForm({
 	handleSubmit,
 	formValues,
 	setFormValues,
-	isLoading
+	isLoading,
+	registered
 }: MenteeFormProps) {
 	const { languages } = useContext(BlockchainContext)
 
@@ -46,6 +48,7 @@ export default function MenteeForm({
 			onSubmit={handleSubmit}
 			className={`basic-card basic-form flex flex-col gap-2 p-4`}
 		>
+			{!registered && <h2>Start your mentee journey</h2>}
 			<label htmlFor="language">Select your language:</label>
 			<select
 				id="language"

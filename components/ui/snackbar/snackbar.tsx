@@ -12,6 +12,9 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "installMetamask":
 				return "Please install Metamask"
 
+			case "transactionRejected":
+				return "Transaction rejected"
+
 			case "error":
 				return "Something went wrong"
 
@@ -26,6 +29,12 @@ export default function Snackbar({ snackbarMessageType }: any) {
 
 			case "mentorConfirmedSession":
 				return "Session confirmed !"
+
+			case "sessionNotFinished":
+				return "Session engagement not finished yet !"
+
+			case "requestOpened":
+				return "Session request opened !"
 
 			default:
 				return ""

@@ -1,3 +1,4 @@
+import { Session } from "./blockchain/SessionContext"
 import { Engagement, engagements, levels, teachingSubjects } from "./constants"
 
 function getShortenedAddress(address: string): string {
@@ -38,6 +39,14 @@ function getReadableDate(durationInSeconds: number): string {
 function isAddressZero(address: string) {
 	return address === "0x0000000000000000000000000000000000000000"
 }
+
+function isSessionOver(currentTimestamp: number, session: Session) {
+	return (
+		session?.engagement?.durationInSeconds &&
+		session?.startTime + session?.engagement?.durationInSeconds <
+			currentTimestamp
+	)
+}
 export {
 	getShortenedAddress,
 	replacer,
@@ -46,5 +55,6 @@ export {
 	convertProxyResult,
 	getReadableDate,
 	isAddressZero,
-	getLevelLabel
+	getLevelLabel,
+	isSessionOver
 }

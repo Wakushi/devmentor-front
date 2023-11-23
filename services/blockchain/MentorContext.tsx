@@ -247,7 +247,11 @@ export default function MentorContextProvider(
 	///////////////
 
 	function getMentorAverageRating(mentor: Mentor): number {
-		return +mentor.sessionCount ? +mentor.totalRating / +mentor.sessionCount : 0
+		const averageRate = +mentor.sessionCount
+			? +mentor.totalRating / +mentor.sessionCount
+			: 0
+		if (averageRate > 5) return averageRate / 2
+		return averageRate
 	}
 
 	const context: MentorContextProps = {

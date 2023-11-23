@@ -210,6 +210,9 @@ export default function MenteeContextProvider({
 				DEVMENTOR_CONTRACT_ABI,
 				signer
 			)
+			if (waitForTransaction) {
+				waitForTransaction("")
+			}
 			try {
 				let price
 				let valueLockedInEth = ethers.parseUnits("0", "ether")
@@ -220,11 +223,12 @@ export default function MenteeContextProvider({
 						"ether"
 					)
 				}
-				
-				const transaction = await contract.registerAsMenteeAndMakeRequestForSession(
-					menteeRegistrationAndRequest,
-					{ value: valueLockedInEth }
-				)
+
+				const transaction =
+					await contract.registerAsMenteeAndMakeRequestForSession(
+						menteeRegistrationAndRequest,
+						{ value: valueLockedInEth }
+					)
 				if (expectedMatching && waitForTransaction) {
 					waitForTransaction(transaction.hash)
 				}
@@ -251,6 +255,9 @@ export default function MenteeContextProvider({
 				DEVMENTOR_CONTRACT_ABI,
 				signer
 			)
+			if (waitForTransaction) {
+				waitForTransaction("")
+			}
 			try {
 				let price
 				let valueLockedInEth = ethers.parseUnits("0", "ether")
@@ -261,7 +268,7 @@ export default function MenteeContextProvider({
 						"ether"
 					)
 				}
-				
+
 				const transaction = await contract.openRequestForSession(
 					menteeRequestForSession,
 					{ value: valueLockedInEth }

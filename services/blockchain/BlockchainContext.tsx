@@ -29,6 +29,7 @@ interface BlockchainContextProps {
 	getLanguageById: (languageId: number) => Promise<string>
 	getLanguageLabel: (languageId: number) => string
 	getEthPriceInUsd: () => Promise<number>
+	getCurrentBlockTimestamp: () => Promise<number>
 	errorHandler: (error: any) => void
 }
 
@@ -53,6 +54,9 @@ const BlockchainContext = createContext<BlockchainContextProps>({
 		return ""
 	},
 	getEthPriceInUsd: async () => {
+		return 0
+	},
+	getCurrentBlockTimestamp: async () => {
 		return 0
 	},
 	errorHandler: (error: any) => {}
@@ -136,6 +140,17 @@ export default function BlockchainContextProvider({
 		}
 	}
 
+	async function getCurrentBlockTimestamp(): Promise<number> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		try {
+			const block = await provider.getBlock("latest")
+			return block ? block.timestamp : 0
+		} catch (error) {
+			console.error(error)
+			return 0
+		}
+	}
+
 	///////////////
 	// Utils
 	///////////////
@@ -150,6 +165,12 @@ export default function BlockchainContextProvider({
 	}
 
 	function errorHandler(error: any) {
+		if (error.code === "ACTION_REJECTED") {
+			openSnackBar("transactionRejected")
+			setIsWaitingForTransaction(false)
+			return
+		}
+
 		let errorMessage = "An unknown error occurred. Please try again later."
 
 		if (typeof error === "object" && error !== null) {
@@ -187,8 +208,6 @@ export default function BlockchainContextProvider({
 			provider
 		)
 
-		console.log("Listening to events...")
-
 		contract.on("MentorSelectionRequestSent", (mentee, requestId) => {
 			console.log("MentorSelectionRequestSent event:", mentee, requestId)
 		})
@@ -213,6 +232,8 @@ export default function BlockchainContextProvider({
 
 		contract.on("MenteeOpenedRequest", (mentee) => {
 			console.log("MenteeOpenedRequest event:", mentee)
+			setIsWaitingForTransaction(false)
+			openSnackBar("requestOpened")
 			router.push("/mentee/profile")
 		})
 
@@ -275,6 +296,7 @@ export default function BlockchainContextProvider({
 		getLanguageById,
 		getLanguageLabel,
 		getEthPriceInUsd,
+		getCurrentBlockTimestamp,
 		errorHandler
 	}
 

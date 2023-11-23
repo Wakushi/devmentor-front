@@ -17,6 +17,7 @@ import { UserContext } from "@/services/UserContext"
 import { useRouter } from "next/router"
 import Button from "@/components/ui/button/button"
 import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
+import TriangleBackground from "@/components/ui/backgrounds/triangle/triangle-bg"
 
 interface MenteeSignupAndRequestProps {
 	registered?: boolean
@@ -41,6 +42,7 @@ export default function MenteeSignupAndRequest({
 	/////////////
 	//  STATE  //
 	/////////////
+
 	const [submittedForm, setSubmittedForm] = useState(false)
 	const [isLoading, setIsLoading] = useState(false)
 	const [matchingMentors, setMatchingMentors] = useState<Mentor[]>([])
@@ -61,6 +63,10 @@ export default function MenteeSignupAndRequest({
 	const router = useRouter()
 	const lockedAmountFormField = useRef<HTMLDivElement | null>(null)
 
+	//////////////////
+	//  USE EFFECT  //
+	//////////////////
+
 	useEffect(() => {
 		if (!menteeInfo) {
 			getMenteeInfo(walletAddress).then((mentee) => {
@@ -70,12 +76,21 @@ export default function MenteeSignupAndRequest({
 	}, [walletAddress])
 
 	useEffect(() => {
+		setSubmittedForm(false)
+		setIsLoading(false)
+	}, [isWaitingForTransaction])
+
+	useEffect(() => {
 		setLockedValueFormError("")
 	}, [selectedMentor, formValues.lockedAmount, mentorSelectionModalOpen])
 
 	useEffect(() => {
 		setSelectedMentor("")
 	}, [mentorSelectionModalOpen])
+
+	//////////////
+	// METHODS  //
+	//////////////
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
 		setFormValues({
@@ -179,7 +194,11 @@ export default function MenteeSignupAndRequest({
 	return (
 		<>
 			{submittedForm ? (
-				<div className="page flex flex-col justify-center items-center gap-4 fade-in-bottom">
+				<div
+					className={`${
+						registered ? "fade-in-bottom" : "page fade-in-bottom"
+					}  flex flex-col justify-center items-center gap-4 `}
+				>
 					{matchingMentors.length > 1 ? (
 						<>
 							<MentorList
@@ -299,6 +318,7 @@ export default function MenteeSignupAndRequest({
 						formValues={formValues}
 						setFormValues={setFormValues}
 						isLoading={isLoading}
+						registered={registered}
 					/>
 				</div>
 			)}
@@ -309,6 +329,7 @@ export default function MenteeSignupAndRequest({
 					</div>
 				</WaitingModal>
 			)}
+			{!registered && <TriangleBackground />}
 		</>
 	)
 }

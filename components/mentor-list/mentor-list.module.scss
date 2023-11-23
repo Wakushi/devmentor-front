@@ -35,7 +35,11 @@
 			background-color: #fff;
 
 			&.selected {
-				background-color: rgb(171, 255, 185) !important;
+				background-color: rgb(193, 224, 253) !important;
+				border: 1px double $primary-color !important;
+				box-shadow: inset 0px 0px 10px 1px #3030309d !important;
+				font-weight: 600;
+				color: $primary-color;
 			}
 		}
 

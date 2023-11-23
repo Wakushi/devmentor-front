@@ -8,11 +8,13 @@ import { useRouter } from "next/router"
 import { getShortenedAddress } from "@/services/utils"
 import { MenteeContext } from "@/services/blockchain/MenteeContext"
 import { MentorContext } from "@/services/blockchain/MentorContext"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 
 export default function Header() {
 	const { walletAddress, connectWallet } = useContext(UserContext)
 	const { isAccountMentee } = useContext(MenteeContext)
 	const { isAccountMentor } = useContext(MentorContext)
+	const { isWaitingForTransaction } = useContext(BlockchainContext)
 	const shortenWalletAddress = walletAddress
 		? getShortenedAddress(walletAddress)
 		: null
@@ -31,7 +33,7 @@ export default function Header() {
 				setIsMentor(isMentor)
 			})
 		}
-	}, [walletAddress])
+	}, [walletAddress, isWaitingForTransaction])
 
 	useEffect(() => {
 		const handleScroll = () => {
@@ -81,11 +83,7 @@ export default function Header() {
 						height={40}
 					/> */}
 				</div>
-				<div className={classes.logo_text}>
-					<span>D</span>
-					<span className={classes.logo_special}>EVM</span>
-					<span>entor</span>
-				</div>
+				<div className={classes.logo_text}>DEVMentor</div>
 			</div>
 			<nav className={`${classes.nav_bar} flex items-center gap-4`}>
 				<ul className="flex items-center gap-14">
@@ -102,7 +100,7 @@ export default function Header() {
 							Register as mentee
 						</li>
 					)}
-					{!isMentor && (
+					{!isMentor && !isMentee && (
 						<li
 							className={classes.nav_link}
 							tabIndex={0}

@@ -13,11 +13,15 @@ import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import {
 	getLevelLabel,
 	getTeachingSubjectLabel,
-	isAddressZero
+	isAddressZero,
+	isSessionOver
 } from "@/services/utils"
 import Button from "@/components/ui/button/button"
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
+import RatingSystem from "@/components/ui/rating/rating"
+import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
+import { SnackbarContext } from "@/services/SnackbarContext"
 
 export default function MenteeProfile() {
 	const [isLoaded, setIsLoaded] = useState(false)
@@ -30,10 +34,10 @@ export default function MenteeProfile() {
 		useState(false)
 	const [hasRated, setHasRated] = useState(false)
 	const [formValues, setFormValues] = useState<any>({
-		rate: null,
 		tipAmount: 0
 	})
 	const [waitingModalMessage, setWaitingModalMessage] = useState("")
+	const [rating, setRating] = useState<number>(0)
 
 	const { walletAddress } = useContext(UserContext)
 	const {
@@ -43,10 +47,13 @@ export default function MenteeProfile() {
 		validateSessionAsMentee
 	} = useContext(MenteeContext)
 	const { getMenteeSession } = useContext(SessionContext)
-	const { getLanguageLabel, isWaitingForTransaction } =
-		useContext(BlockchainContext)
+	const {
+		getLanguageLabel,
+		isWaitingForTransaction,
+		getCurrentBlockTimestamp
+	} = useContext(BlockchainContext)
+	const { openSnackBar } = useContext(SnackbarContext)
 
-	const rateFormField = useRef<HTMLDivElement | null>(null)
 	const tipFormField = useRef<HTMLDivElement | null>(null)
 
 	const inputErrorStyle = "1px solid rgba(140, 140, 140, 0.29)"
@@ -69,16 +76,13 @@ export default function MenteeProfile() {
 
 	useEffect(() => {
 		setHasRated(false)
+		setRating(0)
 		setFormValues({
-			rate: null,
 			tipAmount: 0
 		})
 	}, [isConfirmationModalOpen])
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
-		if (event.target.name === "rate" && rateFormField.current) {
-			rateFormField.current.style.border = inputErrorStyle
-		}
 		if (event.target.name === "tipAmount" && tipFormField.current) {
 			tipFormField.current.style.border = inputErrorStyle
 		}
@@ -94,13 +98,17 @@ export default function MenteeProfile() {
 	}
 
 	function onConfirmSession() {
-		setIsConfirmationModalOpen(true)
+		getCurrentBlockTimestamp().then((timestamp: number) => {
+			if (menteeSession && !isSessionOver(timestamp, menteeSession)) {
+				openSnackBar("sessionNotFinished")
+			} else {
+				setIsConfirmationModalOpen(true)
+			}
+		})
 	}
 
 	function onRateSession() {
-		const rate = formValues.rate
-		if ((rate === null || rate < 0 || rate > 5) && rateFormField.current) {
-			rateFormField.current.style.border = "1px solid red"
+		if (rating === null || rating < 0 || rating > 5) {
 			return
 		}
 		setHasRated(true)
@@ -116,7 +124,7 @@ export default function MenteeProfile() {
 		setWaitingModalMessage("Validating session...")
 		validateSessionAsMentee(
 			menteeInfo.mentor,
-			formValues.rate,
+			rating,
 			tipped ? formValues.tipAmount : "0"
 		)
 	}
@@ -129,10 +137,20 @@ export default function MenteeProfile() {
 		)
 	}
 
+	if (!menteeInfo.registered) {
+		return (
+			<div className="page fade-in-bottom">
+				<h2 className="text-center">
+					You are not registered as a mentee.
+				</h2>
+			</div>
+		)
+	}
+
 	return (
 		<>
 			<div
-				className={`${classes.menteeProfile} page flex gap-4 fade-in-bottom `}
+				className={`${classes.menteeProfile} page flex gap-4 fade-in-bottom items-baseline`}
 			>
 				<div className={classes.profileDetails}>
 					<h2>Profile</h2>
@@ -162,14 +180,14 @@ export default function MenteeProfile() {
 					<div className={`basic-card ${classes.request}`}>
 						<h2>Opened request</h2>
 						<ul>
-							<li>
+							<li className={classes.requestSection}>
 								Engagement: {menteeRequest.engagement?.label}{" "}
 							</li>
-							<li>
+							<li className={classes.requestSection}>
 								Level: {getLevelLabel(menteeRequest.level)}{" "}
 							</li>
-							<li>
-								Subjet :{" "}
+							<li className={classes.requestSection}>
+								Subject :{" "}
 								{getTeachingSubjectLabel(menteeRequest.subject)}{" "}
 							</li>
 						</ul>
@@ -178,7 +196,7 @@ export default function MenteeProfile() {
 						</Button>
 					</div>
 				)}
-				{!!menteeSession && walletAddress && (
+				{!!menteeSession && walletAddress && !menteeInfo.hasRequest && (
 					<SessionCard
 						session={menteeSession}
 						mentorView={false}
@@ -207,16 +225,10 @@ export default function MenteeProfile() {
 					{!hasRated ? (
 						<div className="flex flex-col gap-2">
 							<h4>Please rate your session :</h4>
-							<div ref={rateFormField} className="dark-input">
-								<input
-									type="number"
-									name="rate"
-									placeholder="5"
-									min={0}
-									max={5}
-									onChange={handleInputChange}
-								/>
-							</div>
+							<RatingSystem
+								rating={rating}
+								setRating={setRating}
+							/>
 							<div className="flex justify-center gap-2">
 								<Button onClick={onRateSession} filled={true}>
 									Rate
@@ -262,6 +274,7 @@ export default function MenteeProfile() {
 					)}
 				</ConfirmationModal>
 			)}
+			<WavesBackground />
 		</>
 	)
 }
