@@ -5,7 +5,12 @@ import {
 	DEVMENTOR_CONTRACT_ABI,
 	Engagement
 } from "../constants"
-import { getEngagement, isAddressZero, replacer } from "../utils"
+import {
+	convertProxyResult,
+	getEngagement,
+	isAddressZero,
+	replacer
+} from "../utils"
 import { BlockchainContext } from "./BlockchainContext"
 
 interface MentorContextProviderProps {
@@ -21,6 +26,7 @@ interface MentorContextProps {
 	registerAsMentor: (mentorRegistration: MentorRegistration) => void
 	approveMentor: (mentorAddress: string) => void
 	validateSessionAsMentor: (menteeAddress: string) => void
+	getAllMentors: () => Promise<Mentor[]>
 }
 
 export interface Mentor {
@@ -53,7 +59,8 @@ const MentorContext = createContext<MentorContextProps>({
 	isMentorValidated: () => Promise.resolve(false),
 	registerAsMentor: () => {},
 	approveMentor: () => {},
-	validateSessionAsMentor: () => {}
+	validateSessionAsMentor: () => {},
+	getAllMentors: () => Promise.resolve([])
 })
 export default function MentorContextProvider(
 	props: MentorContextProviderProps
@@ -164,6 +171,34 @@ export default function MentorContextProvider(
 		return false
 	}
 
+	async function getAllMentors(): Promise<Mentor[]> {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				provider
+			)
+			try {
+				const allMentorsArray = await contract.getMentors()
+				const allMentors = convertProxyResult(allMentorsArray)
+				const mentorPromises = allMentors.map(
+					async (mentorAddress: string) => {
+						return await getMentorInfo(mentorAddress)
+					}
+				)
+				return Promise.all(mentorPromises).then((resolvedMentors) => {
+					return resolvedMentors
+				})
+			} catch (error: unknown) {
+				errorHandler(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+		return []
+	}
+
 	///////////////
 	// Write
 	///////////////
@@ -262,7 +297,8 @@ export default function MentorContextProvider(
 		isMentorValidated,
 		registerAsMentor,
 		approveMentor,
-		validateSessionAsMentor
+		validateSessionAsMentor,
+		getAllMentors
 	}
 
 	return (

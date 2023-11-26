@@ -9,13 +9,15 @@ interface MentorTableProps {
 	selectMode?: boolean
 	selectedMentor?: string
 	setSelectedMentor?: (address: string) => void
+	leaderboardView?: boolean
 }
 
 export default function MentorList({
 	mentors,
 	selectMode,
 	selectedMentor,
-	setSelectedMentor
+	setSelectedMentor,
+	leaderboardView
 }: MentorTableProps) {
 	const { getMentorAverageRating } = useContext(MentorContext)
 	const { getLanguageLabel } = useContext(BlockchainContext)
@@ -25,8 +27,10 @@ export default function MentorList({
 	}
 
 	return (
-		<div className={classes.mentor_list_container}>
-			<h2>List of Matching Mentors</h2>
+		<div className={`${classes.mentor_list_container} fade-in-bottom`}>
+			<h2>
+				{leaderboardView ? "Leaderboard" : "List of Matching Mentors"}
+			</h2>
 			<table className={classes.mentor_table}>
 				<thead>
 					<tr>

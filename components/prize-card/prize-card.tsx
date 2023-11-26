@@ -53,13 +53,15 @@ export default function PrizeCard({
 			/>
 			<h3 className={classes.prizeName}>{prizeInfo.name}</h3>
 			<p className={classes.prizeDescription}>{prizeInfo.description}</p>
-			<div className={classes.prizeCost}>{price} Tokens</div>
+			<div className={classes.prizeCost}>{price} Mentor Tokens</div>
 			<p className={classes.prizeDescription}>
 				{remainingSupply}/{totalSupply} left
 			</p>
-			<Button onClick={onClaim} filled={true}>
-				Claim
-			</Button>
+			{!!remainingSupply && (
+				<Button onClick={onClaim} filled={true}>
+					Claim
+				</Button>
+			)}
 		</div>
 	)
 }

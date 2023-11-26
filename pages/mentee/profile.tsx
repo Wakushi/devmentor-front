@@ -130,7 +130,6 @@ export default function MenteeProfile() {
 									description,
 									cost: nextBadgeUri.badgeXpCost
 								})
-								console.log(menteeNextBadge)
 							})
 					}
 				)

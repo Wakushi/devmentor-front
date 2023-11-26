@@ -24,7 +24,7 @@ export const engagements: Engagement[] = [
 ]
 
 export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0x33BDb1951C95E1Dd877EAc9EDF94A6C47F111810"
+	"0x51e87CD78B620315838e376f8917d81DFc98e2FF"
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
@@ -95,6 +95,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "DEVMentor__AlreadyRegisteredAsMentor",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "DEVMentor__CancellationTimeNotReached",
 		type: "error"
 	},
 	{
@@ -182,6 +187,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "DEVMentor__NotEnoughXP",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "DEVMentor__NotYourSession",
 		type: "error"
 	},
 	{
@@ -370,6 +380,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "OwnableUnauthorizedAccount",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "ReentrancyGuardReentrantCall",
 		type: "error"
 	},
 	{
@@ -719,6 +734,38 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				indexed: true,
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			}
+		],
+		name: "RewardSoldOut",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			}
+		],
+		name: "SessionCancelled",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
 				internalType: "address",
 				name: "mentee",
 				type: "address"
@@ -762,6 +809,31 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "SessionRated",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentee",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "mentor",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "amount",
+				type: "uint256"
+			}
+		],
+		name: "SessionRefunded",
 		type: "event"
 	},
 	{
@@ -1447,6 +1519,32 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
+		name: "cancelSessionAsMentee",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			}
+		],
+		name: "cancelSessionAsMentor",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
 				internalType: "uint256",
 				name: "_engagement",
 				type: "uint256"
@@ -1898,7 +1996,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						type: "string"
 					}
 				],
-				internalType: "struct RewardManager.Reward",
+				internalType: "struct IRewardManager.Reward",
 				name: "",
 				type: "tuple"
 			}
@@ -2255,7 +2353,7 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				type: "tuple"
 			}
 		],
-		name: "registerAsMenteeAndMakeRequestForSession",
+		name: "registerAsMenteeAndOpenSession",
 		outputs: [],
 		stateMutability: "payable",
 		type: "function"

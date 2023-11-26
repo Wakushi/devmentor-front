@@ -221,7 +221,7 @@ export default function MenteeContextProvider({
 				}
 
 				const transaction =
-					await contract.registerAsMenteeAndMakeRequestForSession(
+					await contract.registerAsMenteeAndOpenSession(
 						menteeRegistrationAndRequest,
 						{ value: valueLockedInEth }
 					)

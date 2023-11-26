@@ -1,3 +1,4 @@
+import { Mentor } from "./blockchain/MentorContext"
 import { Session } from "./blockchain/SessionContext"
 import { Engagement, engagements, levels, teachingSubjects } from "./constants"
 
@@ -47,6 +48,23 @@ function isSessionOver(currentTimestamp: number, session: Session) {
 			currentTimestamp
 	)
 }
+
+function rankMentors(mentors: Mentor[]): Mentor[] {
+	const sortedMentors = mentors.sort((a: Mentor, b: Mentor) => {
+		const avgRatingA =
+			a.sessionCount > 0 ? a.totalRating / a.sessionCount : 0
+		const avgRatingB =
+			b.sessionCount > 0 ? b.totalRating / b.sessionCount : 0
+
+		const experienceWeight = 0.1
+
+		const scoreA = avgRatingA + experienceWeight * a.yearsOfExperience
+		const scoreB = avgRatingB + experienceWeight * b.yearsOfExperience
+
+		return scoreB - scoreA
+	})
+	return sortedMentors
+}
 export {
 	getShortenedAddress,
 	replacer,
@@ -56,5 +74,6 @@ export {
 	getReadableDate,
 	isAddressZero,
 	getLevelLabel,
-	isSessionOver
+	isSessionOver,
+	rankMentors
 }

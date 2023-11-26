@@ -1,20 +1,27 @@
 import Button from "@/components/ui/button/button"
-import { useContext, useState } from "react"
-import { MentorContext } from "@/services/blockchain/MentorContext"
+import { useContext, useEffect, useState } from "react"
+import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import { SessionContext } from "@/services/blockchain/SessionContext"
 import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
-import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import MentorList from "@/components/mentor-list/mentor-list"
+import { rankMentors } from "@/services/utils"
 
 export default function Landing() {
-	const { approveMentor } = useContext(MentorContext)
+	const { approveMentor, getAllMentors } = useContext(MentorContext)
 	const { adminCompleteSession, adminUpdateSessionEngagement } =
 		useContext(SessionContext)
-	const { fulfillPendingRequests } = useContext(BlockchainContext)
 
 	const [formValues, setFormValues] = useState<any>({
 		mentorAddress: "",
 		menteeAddress: ""
 	})
+	const [mentors, setMentors] = useState<Mentor[]>([])
+
+	useEffect(() => {
+		getAllMentors().then((mentors) => {
+			setMentors(rankMentors(mentors))
+		})
+	}, [])
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
 		setFormValues({
@@ -43,13 +50,9 @@ export default function Landing() {
 		)
 	}
 
-	function onFulfillPendingRequests() {
-		fulfillPendingRequests()
-	}
-
 	return (
 		<div className="page flex flex-col gap-4">
-			<div className="flex gap-4 p-4">
+			<div className="flex gap-20 p-4">
 				<div className="flex flex-col items-center gap-2">
 					<input
 						id="mentorToValidate"
@@ -87,9 +90,9 @@ export default function Landing() {
 						Update engagement
 					</Button>
 				</div>
-				<Button onClick={onFulfillPendingRequests} filled={true}>
-					Fulfill pending requests
-				</Button>
+				{!!mentors.length && (
+					<MentorList mentors={mentors} leaderboardView={true} />
+				)}
 			</div>
 			<WavesBackground />
 		</div>

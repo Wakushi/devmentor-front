@@ -9,17 +9,15 @@ export default function ShopPage() {
 	const { getAvailableRewardIds, getRewardById, claimMentorReward } =
 		useContext(RewardContext)
 	const [rewards, setRewards] = useState<Reward[]>([])
-	const [waitingModalMessage, setWaitingModalMessage] = useState("")
 
 	const { isWaitingForTransaction } = useContext(BlockchainContext)
 
 	useEffect(() => {
-		if (rewards.length) return
 		setRewards([])
 
 		getAvailableRewardIds().then((rewardIds) => {
 			const rewardPromises = rewardIds.map((rewardId: string) => {
-				return getRewardById((+rewardId - 1).toString())
+				return getRewardById(rewardId)
 			})
 
 			Promise.all(rewardPromises).then((resolvedRewards) => {
