@@ -36,6 +36,15 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "requestOpened":
 				return "Session request opened !"
 
+			case "xpGained":
+				return "XP gained !"
+
+			case "badgeMinted":
+				return "New badge minted !"
+
+			case "rewardClaimed":
+				return "Reward claimed !"
+
 			default:
 				return ""
 		}

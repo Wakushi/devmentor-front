@@ -135,6 +135,17 @@ export default function Header() {
 							Profile
 						</li>
 					)}
+					{isMentor && (
+						<li
+							className={classes.nav_link}
+							tabIndex={0}
+							onClick={() =>
+								handleConnectionPriorRouting("/shop")
+							}
+						>
+							Rewards
+						</li>
+					)}
 					<li>
 						<Button onClick={connectWallet} filled={true}>
 							{walletAddress ? (

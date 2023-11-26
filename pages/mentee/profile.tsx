@@ -22,8 +22,13 @@ import ConfirmationModal from "@/components/confirmation-modal/confirmation-moda
 import RatingSystem from "@/components/ui/rating/rating"
 import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 import { SnackbarContext } from "@/services/SnackbarContext"
+import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
+import ExperienceBar from "@/components/xp-bar/xp-bar"
 
 export default function MenteeProfile() {
+	///////////////
+	// State
+	///////////////
 	const [isLoaded, setIsLoaded] = useState(false)
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
 	const [menteeSession, setMenteeSession] = useState<Session | null>(null)
@@ -38,6 +43,25 @@ export default function MenteeProfile() {
 	})
 	const [waitingModalMessage, setWaitingModalMessage] = useState("")
 	const [rating, setRating] = useState<number>(0)
+	const [menteeXp, setMenteeXp] = useState<number>(0)
+	const [menteeBadge, setMenteeBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
+	const [menteeNextBadge, setMenteeNextBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
+
+	///////////////
+	// Contexts
+	///////////////
 
 	const { walletAddress } = useContext(UserContext)
 	const {
@@ -53,16 +77,63 @@ export default function MenteeProfile() {
 		getCurrentBlockTimestamp
 	} = useContext(BlockchainContext)
 	const { openSnackBar } = useContext(SnackbarContext)
+	const { getUserXp, getUserBadgeUri, getUserNextBadgeUri } =
+		useContext(RewardContext)
+
+	///////////////
+	// DOM & Style
+	///////////////
 
 	const tipFormField = useRef<HTMLDivElement | null>(null)
-
 	const inputErrorStyle = "1px solid rgba(140, 140, 140, 0.29)"
+
+	///////////////
+	// Effects
+	///////////////
 
 	useEffect(() => {
 		if (!menteeInfo || menteeInfo.hasRequest || !isWaitingForTransaction) {
 			getMenteeInfo(walletAddress).then((mentee) => {
 				setMenteeInfo(mentee)
 				if (!mentee) return
+				getUserXp(walletAddress).then((xp) => {
+					setMenteeXp(parseInt(xp))
+				})
+				getUserBadgeUri(walletAddress).then((badgeUri) => {
+					if (!badgeUri) return
+					fetch(badgeUri)
+						.then((response) => {
+							return response.json()
+						})
+						.then(({ id, name, image, description }) => {
+							setMenteeBadge({
+								id,
+								name: name,
+								image: image,
+								description: description,
+								cost: 0
+							})
+						})
+				})
+				getUserNextBadgeUri(walletAddress, "mentee").then(
+					(nextBadgeUri) => {
+						if (!nextBadgeUri) return
+						fetch(nextBadgeUri.tokenUri)
+							.then((response) => {
+								return response.json()
+							})
+							.then(({ id, name, image, description }) => {
+								setMenteeNextBadge({
+									id,
+									name,
+									image,
+									description,
+									cost: nextBadgeUri.badgeXpCost
+								})
+								console.log(menteeNextBadge)
+							})
+					}
+				)
 				getMenteeSession(walletAddress).then((session) => {
 					setMenteeSession(session)
 					setIsLoaded(true)
@@ -81,6 +152,10 @@ export default function MenteeProfile() {
 			tipAmount: 0
 		})
 	}, [isConfirmationModalOpen])
+
+	///////////////
+	// Functions
+	///////////////
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
 		if (event.target.name === "tipAmount" && tipFormField.current) {
@@ -150,8 +225,17 @@ export default function MenteeProfile() {
 	return (
 		<>
 			<div
-				className={`${classes.menteeProfile} page flex gap-4 fade-in-bottom items-baseline`}
+				className={`${classes.menteeProfile} page flex flex-wrap gap-4 fade-in-bottom items-baseline`}
 			>
+				{!!menteeNextBadge.cost && (
+					<ExperienceBar
+						currentExp={menteeXp}
+						maxExp={menteeNextBadge.cost}
+						currentBadge={menteeBadge}
+						nextBadge={menteeNextBadge}
+						setWaitingModalMessage={setWaitingModalMessage}
+					/>
+				)}
 				<div className={classes.profileDetails}>
 					<h2>Profile</h2>
 					<div className={classes.profileSection}>

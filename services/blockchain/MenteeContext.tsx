@@ -60,9 +60,7 @@ export interface MenteeRegistrationAndRequest {
 export interface MenteeRequest {
 	level: number
 	subject: number
-	accepted: boolean
 	engagement: Engagement | undefined
-	valueLocked: string
 }
 
 const MenteeContext = createContext<MenteeContextProps>({
@@ -132,9 +130,7 @@ export default function MenteeContextProvider({
 			return {
 				level: parseInt(menteeRequestArray[0]),
 				subject: parseInt(menteeRequestArray[1]),
-				accepted: menteeRequestArray[2],
-				engagement: getEngagement(parseInt(menteeRequestArray[3])),
-				valueLocked: menteeRequestArray[4]
+				engagement: getEngagement(parseInt(menteeRequestArray[2]))
 			}
 		} catch (error: unknown) {
 			errorHandler(error)

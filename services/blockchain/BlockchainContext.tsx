@@ -31,6 +31,7 @@ interface BlockchainContextProps {
 	getEthPriceInUsd: () => Promise<number>
 	getCurrentBlockTimestamp: () => Promise<number>
 	errorHandler: (error: any) => void
+	fulfillPendingRequests: () => void
 }
 
 export interface Language {
@@ -59,7 +60,8 @@ const BlockchainContext = createContext<BlockchainContextProps>({
 	getCurrentBlockTimestamp: async () => {
 		return 0
 	},
-	errorHandler: (error: any) => {}
+	errorHandler: (error: any) => {},
+	fulfillPendingRequests: () => {}
 })
 
 const ETH_PRICE_MULTIPLIER = 100000000
@@ -148,6 +150,26 @@ export default function BlockchainContextProvider({
 		} catch (error) {
 			console.error(error)
 			return 0
+		}
+	}
+
+	///////////////
+	// Write
+	///////////////
+
+	async function fulfillPendingRequests() {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const signer = await provider.getSigner()
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			signer
+		)
+		try {
+			const transactionResponse = await contract.fulfillPendingRequests()
+			await listenForTransactionMine(transactionResponse, provider)
+		} catch (error) {
+			errorHandler(error)
 		}
 	}
 
@@ -260,6 +282,23 @@ export default function BlockchainContextProvider({
 			openSnackBar("tipSent")
 		})
 
+		contract.on("XPGained", (to, xpAmount) => {
+			console.log("Xp gained: ", to, xpAmount)
+			openSnackBar("xpGained")
+		})
+
+		contract.on("BadgeMinted", (to, badgeId) => {
+			console.log("Badge minted: ", to, badgeId)
+			openSnackBar("badgeMinted")
+			setIsWaitingForTransaction(false)
+		})
+
+		contract.on("RewardClaimed", (to, rewardId) => {
+			console.log("Reward claimed : ", to, rewardId)
+			openSnackBar("rewardClaimed")
+			setIsWaitingForTransaction(false)
+		})
+
 		contract.on(
 			"SessionCreated",
 			(mentee, mentor, engagement, valueLocked) => {
@@ -297,7 +336,8 @@ export default function BlockchainContextProvider({
 		getLanguageLabel,
 		getEthPriceInUsd,
 		getCurrentBlockTimestamp,
-		errorHandler
+		errorHandler,
+		fulfillPendingRequests
 	}
 
 	return (

@@ -16,24 +16,59 @@ import Button from "@/components/ui/button/button"
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 import { SnackbarContext } from "@/services/SnackbarContext"
+import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
+import ExperienceBar from "@/components/xp-bar/xp-bar"
 
 export default function MentorProfile() {
+	///////////////
+	// State
+	///////////////
 	const [isLoaded, setIsLoaded] = useState(true)
 	const [mentorInfo, setMentorInfo] = useState<Mentor | null>(null)
 	const [menteeSession, setMenteeSession] = useState<Session | null>(null)
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
 		useState(false)
+	const [waitingModalMessage, setWaitingModalMessage] = useState("")
+	const [mentorXp, setMentorXp] = useState<number>(0)
+	const [mentorTokens, setMentorTokens] = useState<number>(0)
+	const [mentorBadge, setMentorBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
+	const [mentorNextBadge, setMentorNextBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
 
+	///////////////
+	// Contexts
+	///////////////
 	const { walletAddress } = useContext(UserContext)
+	const { openSnackBar } = useContext(SnackbarContext)
+	const { getMenteeSession } = useContext(SessionContext)
 	const { getMentorInfo, getMentorAverageRating, validateSessionAsMentor } =
 		useContext(MentorContext)
-	const { getMenteeSession } = useContext(SessionContext)
 	const {
 		getLanguageLabel,
 		isWaitingForTransaction,
 		getCurrentBlockTimestamp
 	} = useContext(BlockchainContext)
-	const { openSnackBar } = useContext(SnackbarContext)
+	const {
+		getUserXp,
+		getUserBadgeUri,
+		getUserNextBadgeUri,
+		getMentorTokenAmount
+	} = useContext(RewardContext)
+
+	///////////////
+	// Effects
+	///////////////
 
 	useEffect(() => {
 		if (!mentorInfo || !isWaitingForTransaction) {
@@ -44,9 +79,53 @@ export default function MentorProfile() {
 					setMenteeSession(session)
 					setIsLoaded(true)
 				})
+				getUserXp(walletAddress).then((xp) => {
+					setMentorXp(parseInt(xp))
+				})
+				getMentorTokenAmount(walletAddress).then((tokens) => {
+					setMentorTokens(tokens)
+				})
+				getUserBadgeUri(walletAddress).then((badgeUri) => {
+					if (!badgeUri) return
+					fetch(badgeUri)
+						.then((response) => {
+							return response.json()
+						})
+						.then(({ id, name, image, description }) => {
+							setMentorBadge({
+								id,
+								name: name,
+								image: image,
+								description: description,
+								cost: 0
+							})
+						})
+				})
+				getUserNextBadgeUri(walletAddress, "mentor").then(
+					(nextBadgeUri) => {
+						if (!nextBadgeUri) return
+						fetch(nextBadgeUri.tokenUri)
+							.then((response) => {
+								return response.json()
+							})
+							.then(({ id, name, image, description }) => {
+								setMentorNextBadge({
+									id,
+									name,
+									image,
+									description,
+									cost: nextBadgeUri.badgeXpCost
+								})
+							})
+					}
+				)
 			})
 		}
 	}, [walletAddress, isWaitingForTransaction])
+
+	///////////////
+	// Functions
+	///////////////
 
 	function onConfirmSession() {
 		getCurrentBlockTimestamp().then((timestamp: number) => {
@@ -60,6 +139,7 @@ export default function MentorProfile() {
 
 	function validateSession() {
 		if (!mentorInfo) return
+		setWaitingModalMessage("Validating session...")
 		setIsConfirmationModalOpen(false)
 		validateSessionAsMentor(mentorInfo?.mentee)
 	}
@@ -85,8 +165,17 @@ export default function MentorProfile() {
 	return (
 		<>
 			<div
-				className={`${classes.mentorProfile} page flex items-center gap-4 fade-in-bottom `}
+				className={`${classes.mentorProfile} page flex flex-col items-center gap-4 fade-in-bottom `}
 			>
+				{!!mentorNextBadge.cost && (
+					<ExperienceBar
+						currentExp={mentorXp}
+						maxExp={mentorNextBadge.cost}
+						currentBadge={mentorBadge}
+						nextBadge={mentorNextBadge}
+						setWaitingModalMessage={setWaitingModalMessage}
+					/>
+				)}
 				{mentorInfo.registered && !mentorInfo.validated ? (
 					<div className="flex flex-col gap-2">
 						<div className={classes.reviewMessage}>
@@ -94,58 +183,71 @@ export default function MentorProfile() {
 						</div>
 					</div>
 				) : (
-					<div className={classes.profileDetails}>
-						<h2>Profile</h2>
-						<div className={classes.profileSection}>
-							<h3>Your subjects</h3>
-							{mentorInfo.teachingSubjects?.map((subject) => (
-								<div key={subject}>
-									{getTeachingSubjectLabel(+subject)}
-								</div>
-							))}
-							<button onClick={() => {}}>Update subjects</button>
-						</div>
-						<div className={classes.profileSection}>
-							<h3>Engagement : {mentorInfo.engagement?.label}</h3>
-							<button>Update engagement</button>
-						</div>
+					<div className="flex gap-4 items-baseline">
+						<div className={classes.profileDetails}>
+							<h2>Profile</h2>
+							<div className={classes.profileSection}>
+								<h3>Your subjects</h3>
+								{mentorInfo.teachingSubjects?.map((subject) => (
+									<div key={subject}>
+										{getTeachingSubjectLabel(+subject)}
+									</div>
+								))}
+								<button onClick={() => {}}>
+									Update subjects
+								</button>
+							</div>
+							<div className={classes.profileSection}>
+								<h3> {mentorTokens} MNT (Mentor tokens) </h3>
+							</div>
+							<div className={classes.profileSection}>
+								<h3>
+									Engagement : {mentorInfo.engagement?.label}
+								</h3>
+								<button>Update engagement</button>
+							</div>
 
-						<div className={classes.profileSection}>
-							<h3>
-								Rating :{" "}
-								{getMentorAverageRating(mentorInfo).toFixed(2)}{" "}
-								<i className="fa-solid fa-star brand-color"></i>{" "}
-								({mentorInfo.sessionCount} session
-								{mentorInfo.sessionCount > 1 ? "s" : ""})
-							</h3>
+							<div className={classes.profileSection}>
+								<h3>
+									Rating :{" "}
+									{getMentorAverageRating(mentorInfo).toFixed(
+										2
+									)}{" "}
+									<i className="fa-solid fa-star brand-color"></i>{" "}
+									({mentorInfo.sessionCount} session
+									{mentorInfo.sessionCount > 1 ? "s" : ""})
+								</h3>
+							</div>
+							<div className={classes.profileSection}>
+								<h3>
+									Preferred Language :{" "}
+									{getLanguageLabel(
+										mentorInfo?.language || 0
+									)}
+								</h3>
+							</div>
+							<div className={classes.profileSection}>
+								<h3>
+									Current mentee :{" "}
+									{isAddressZero(mentorInfo.mentee)
+										? "You don't have a mentee."
+										: mentorInfo.mentee}
+								</h3>
+							</div>
 						</div>
-						<div className={classes.profileSection}>
-							<h3>
-								Preferred Language :{" "}
-								{getLanguageLabel(mentorInfo?.language || 0)}
-							</h3>
-						</div>
-						<div className={classes.profileSection}>
-							<h3>
-								Current mentee :{" "}
-								{isAddressZero(mentorInfo.mentee)
-									? "You don't have a mentee."
-									: mentorInfo.mentee}
-							</h3>
-						</div>
+						{!!menteeSession && (
+							<SessionCard
+								session={menteeSession}
+								mentorView={true}
+								confirmSession={onConfirmSession}
+							/>
+						)}
 					</div>
-				)}
-				{!!menteeSession && (
-					<SessionCard
-						session={menteeSession}
-						mentorView={true}
-						confirmSession={onConfirmSession}
-					/>
 				)}
 				{isWaitingForTransaction && (
 					<WaitingModal>
 						<div className="flex flex-col gap-2">
-							<h4>Validating session...</h4>
+							<h4>{waitingModalMessage}</h4>
 						</div>
 					</WaitingModal>
 				)}

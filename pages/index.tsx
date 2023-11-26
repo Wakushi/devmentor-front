@@ -3,11 +3,13 @@ import { useContext, useState } from "react"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import { SessionContext } from "@/services/blockchain/SessionContext"
 import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
+import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 
 export default function Landing() {
 	const { approveMentor } = useContext(MentorContext)
 	const { adminCompleteSession, adminUpdateSessionEngagement } =
 		useContext(SessionContext)
+	const { fulfillPendingRequests } = useContext(BlockchainContext)
 
 	const [formValues, setFormValues] = useState<any>({
 		mentorAddress: "",
@@ -39,6 +41,10 @@ export default function Landing() {
 			formValues.mentorAddress,
 			10
 		)
+	}
+
+	function onFulfillPendingRequests() {
+		fulfillPendingRequests()
 	}
 
 	return (
@@ -81,6 +87,9 @@ export default function Landing() {
 						Update engagement
 					</Button>
 				</div>
+				<Button onClick={onFulfillPendingRequests} filled={true}>
+					Fulfill pending requests
+				</Button>
 			</div>
 			<WavesBackground />
 		</div>
