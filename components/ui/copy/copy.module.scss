@@ -1,0 +1,12 @@
+@import "../../../styles/variables.scss";
+
+.copy_icon {
+	cursor: pointer;
+	opacity: 0.5;
+	transition: opacity 0.2s ease-in-out;
+
+	&:hover {
+		opacity: 1;
+		color: $primary-color;
+	}
+}

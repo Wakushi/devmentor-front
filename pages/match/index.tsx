@@ -7,6 +7,7 @@ import Button from "@/components/ui/button/button"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import Confetti from "react-confetti"
 import { useRouter } from "next/router"
+import Copy from "@/components/ui/copy/copy"
 
 export default function Match() {
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
@@ -39,7 +40,7 @@ export default function Match() {
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setConfetti(false)
-		}, 10000)
+		}, 1000000)
 
 		return () => clearTimeout(timer)
 	}, [])
@@ -72,9 +73,14 @@ export default function Match() {
 						</div>
 						{!!menteeInfo && !!mentorInfo && (
 							<div className={`${classes.cardBack} gap-6`}>
-								<h2>
-									{getShortenedAddress(menteeInfo?.mentor)}
-								</h2>
+								<span className="flex items-center gap-2">
+									<h2>
+										{getShortenedAddress(
+											menteeInfo?.mentor
+										)}
+									</h2>
+									<Copy contentToCopy={menteeInfo?.mentor} />
+								</span>
 								<p className={classes.mentor_info}>
 									{getMentorAverageRating(mentorInfo).toFixed(
 										2
@@ -96,7 +102,10 @@ export default function Match() {
 									of experience
 								</p>
 								<h3>Contact</h3>
-								<p> {mentorInfo.contact} </p>
+								<span className="flex items-center gap-2">
+									<p> {mentorInfo.contact} </p>
+									<Copy contentToCopy={mentorInfo.contact} />
+								</span>
 								<Button
 									onClick={() => {
 										router.push("/mentee/profile")

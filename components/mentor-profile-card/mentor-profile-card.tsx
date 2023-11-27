@@ -1,4 +1,8 @@
-import { getTeachingSubjectLabel, isAddressZero } from "@/services/utils"
+import {
+	getShortenedAddress,
+	getTeachingSubjectLabel,
+	isAddressZero
+} from "@/services/utils"
 import classes from "./mentor-profile-card.module.scss"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import { useContext, useState } from "react"
@@ -6,6 +10,7 @@ import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import ConfirmationModal from "../confirmation-modal/confirmation-modal"
 import Button from "../ui/button/button"
 import { Engagement, engagements } from "@/services/constants"
+import Copy from "../ui/copy/copy"
 
 interface MentorProfileCardProps {
 	mentorInfo: Mentor
@@ -63,8 +68,11 @@ export default function MentorProfileCard({
 			<div className={classes.profileDetails}>
 				<h2>Profile</h2>
 				<div className={classes.profileSection}>
-					<h3>Contact : {mentorInfo.contact}</h3>
-					<Button onClick={() => onProfileUpdate("contact")}>
+					<span className="flex items-center gap-2">
+						<h3>Contact : {mentorInfo.contact}</h3>
+						<Copy contentToCopy={mentorInfo.contact} />
+					</span>
+					<Button filled onClick={() => onProfileUpdate("contact")}>
 						Update contact
 					</Button>
 				</div>
@@ -81,7 +89,10 @@ export default function MentorProfileCard({
 				</div>
 				<div className={classes.profileSection}>
 					<h3>Engagement : {mentorInfo.engagement?.label}</h3>
-					<Button onClick={() => onProfileUpdate("engagement")}>
+					<Button
+						filled
+						onClick={() => onProfileUpdate("engagement")}
+					>
 						Update engagement
 					</Button>
 				</div>
@@ -100,13 +111,16 @@ export default function MentorProfileCard({
 						{getLanguageLabel(mentorInfo?.language || 0)}
 					</h3>
 				</div>
-				<div className={classes.profileSection}>
+				<div
+					className={`${classes.profileSection} flex items-center gap-2`}
+				>
 					<h3>
 						Current mentee :{" "}
 						{isAddressZero(mentorInfo.mentee)
 							? "You don't have a mentee."
-							: mentorInfo.mentee}
+							: getShortenedAddress(mentorInfo.mentee)}
 					</h3>
+					<Copy contentToCopy={mentorInfo.mentee} />
 				</div>
 			</div>
 			{isConfirmationModalOpen && (

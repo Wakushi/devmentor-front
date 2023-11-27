@@ -123,11 +123,11 @@ export default function MenteeProfile() {
 									cost: nextBadgeUri.badgeXpCost
 								})
 							})
+						setIsLoaded(true)
 					}
 				)
 				getMenteeSession(walletAddress).then((session) => {
 					setMenteeSession(session)
-					setIsLoaded(true)
 				})
 				getMenteeRequest(walletAddress).then((request) => {
 					setMenteeRequest(request)

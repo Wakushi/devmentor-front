@@ -1,8 +1,10 @@
+@import "../../styles/variables.scss";
+
 .session {
 	h3 {
 		font-size: 1.8rem;
 		font-weight: 600;
-		color: #0077ff;
+		color: $primary-color;
 	}
 
 	button {
@@ -20,7 +22,7 @@
 			border-bottom: none;
 		}
 
-		span {
+		.sessionLabel {
 			font-weight: 600;
 			color: #333333;
 		}

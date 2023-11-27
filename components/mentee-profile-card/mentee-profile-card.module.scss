@@ -1,10 +1,12 @@
+@import "../../styles/variables.scss";
+
 .profileDetails {
 	min-width: 500px;
 	background: #ffffff;
-	border-left: 4px solid #0077ff;
+	border-left: 4px solid $primary-color;
 	padding: 20px;
 	border-radius: 12px;
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	box-shadow: $box-shadow;
 	margin-bottom: 30px;
 
 	.profileSection {

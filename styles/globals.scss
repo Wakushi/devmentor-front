@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./variables.scss";
+
 body {
 	background-color: rgb(247, 247, 247);
 	height: 100%;
@@ -9,21 +11,24 @@ body {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	font-family: $primary-font;
 }
 
 h1,
 h2,
 h4 {
-	font-weight: 600;
-	color: #0077ff;
+	font-weight: 400;
+	text-transform: uppercase;
+	color: $primary-color;
+	font-family: $secondary-font;
 }
 
 h1 {
-	font-size: 2.4em;
+	font-size: 2.5em;
 }
 
 h2 {
-	font-size: 1.8rem;
+	font-size: 2.3rem;
 }
 
 h4 {
@@ -35,11 +40,11 @@ h4 {
 }
 
 .brand-color {
-	color: #0077ff;
+	color: $primary-color;
 }
 
 .page {
-	padding: 10rem 0 2rem 0;
+	padding: 8rem 0 2rem 0;
 }
 
 .loading-page {
@@ -53,14 +58,14 @@ h4 {
 	background-color: #ffffff;
 	border-radius: 12px;
 	margin: 0 auto;
-	box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+	box-shadow: $box-shadow;
 	padding: 20px;
 	min-width: 400px;
 	max-width: 600px;
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-	border-left: 4px solid #0077ff;
+	border-left: 4px solid $primary-color;
 	button {
 		align-self: center;
 	}

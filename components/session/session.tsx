@@ -13,6 +13,7 @@ import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import ConfirmationModal from "../confirmation-modal/confirmation-modal"
 import { SnackbarContext } from "@/services/SnackbarContext"
+import Copy from "../ui/copy/copy"
 
 interface SessionProps {
 	session: Session
@@ -109,41 +110,57 @@ export default function SessionCard({
 	return (
 		<>
 			<div className={`${classes.session} basic-card`}>
-				<h3>Session</h3>
+				<h2>Session</h2>
 				{mentorView ? (
 					<div className={classes.sessionDetail}>
-						<span>Mentee:</span> {getShortenedAddress(mentee)}
+						<span className={classes.sessionLabel}>Mentee:</span>{" "}
+						<span className="flex items-center gap-2">
+							{getShortenedAddress(mentee)}{" "}
+							<Copy contentToCopy={mentee} />
+						</span>
 					</div>
 				) : (
 					<>
 						<div className={classes.sessionDetail}>
-							<span>Mentor: </span>
-							{getShortenedAddress(mentor)}
+							<span className={classes.sessionLabel}>
+								Mentor:{" "}
+							</span>
+							<span className="flex items-center gap-2">
+								{getShortenedAddress(mentor)}
+								<Copy contentToCopy={mentor} />
+							</span>
 						</div>
 						<div className={classes.sessionDetail}>
-							<span>Contact: </span>
-							{mentorContact}
+							<span className={classes.sessionLabel}>
+								Contact:{" "}
+							</span>
+							<span className="flex items-center gap-2">
+								{mentorContact}
+								<Copy contentToCopy={mentorContact} />
+							</span>
 						</div>
 					</>
 				)}
 				<div className={classes.sessionDetail}>
-					<span>Started: </span>
+					<span className={classes.sessionLabel}>Started: </span>
 					{getReadableDate(startTime)}
 				</div>
 				<div className={classes.sessionDetail}>
-					<span>Duration: </span>
+					<span className={classes.sessionLabel}>Duration: </span>
 					{engagement?.label}
 				</div>
 				{!!engagement?.durationInSeconds && (
 					<div className={classes.sessionDetail}>
-						<span>Session end: </span>
+						<span className={classes.sessionLabel}>
+							Session end:{" "}
+						</span>
 						{getReadableDate(
 							startTime + engagement?.durationInSeconds
 						)}
 					</div>
 				)}
 				<div className={classes.sessionDetail}>
-					<span>Value locked: </span>
+					<span className={classes.sessionLabel}>Value locked: </span>
 					{ethers.formatUnits(BigInt(valueLocked), 18)} ETH /{" "}
 					{valueLockedInUsd.toFixed(2)}$
 				</div>

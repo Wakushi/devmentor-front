@@ -70,7 +70,6 @@ export default function MentorProfile() {
 				if (!mentor) return
 				getMenteeSession(mentor?.mentee).then((session) => {
 					setMenteeSession(session)
-					setIsLoaded(true)
 				})
 				getUserXp(walletAddress).then((xp) => {
 					setMentorXp(parseInt(xp))
@@ -110,6 +109,7 @@ export default function MentorProfile() {
 									cost: nextBadgeUri.badgeXpCost
 								})
 							})
+						setIsLoaded(true)
 					}
 				)
 			})

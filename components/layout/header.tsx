@@ -9,6 +9,7 @@ import { getShortenedAddress } from "@/services/utils"
 import { MenteeContext } from "@/services/blockchain/MenteeContext"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import logo from "@/assets/images/logo/logo.png"
 
 export default function Header() {
 	const { walletAddress, connectWallet } = useContext(UserContext)
@@ -75,15 +76,11 @@ export default function Header() {
 					router.push("/")
 				}}
 			>
-				<div className="logo-img-container">
-					{/* <Image
-						src={together}
-						alt="TogEther Logo"
-						width={40}
-						height={40}
-					/> */}
+				<Image src={logo} alt="logo" width={50} height={50} />
+
+				<div className={classes.logo_text}>
+					D<span className={classes.logo_special}>EVM</span>entor
 				</div>
-				<div className={classes.logo_text}>DEVMentor</div>
 			</div>
 			<nav className={`${classes.nav_bar} flex items-center gap-4`}>
 				<ul className="flex items-center gap-14">

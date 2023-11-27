@@ -1,3 +1,5 @@
+@import "../../../../styles/variables.scss";
+
 .background_container {
 	position: absolute;
 	bottom: 0;
@@ -24,6 +26,6 @@
 	}
 
 	.custom_shape_divider_bottom_1700748689 .shape_fill {
-		fill: #0077ff;
+		fill: $primary-color;
 	}
 }

@@ -1,15 +1,11 @@
 @import "../../styles/variables.scss";
 
 .mentor_list_container {
-	h2 {
-		font-size: 2rem;
-	}
-
 	.mentor_table {
 		width: 100%;
 		min-width: 800px;
 		border-collapse: collapse;
-		box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1);
+		box-shadow: $box-shadow;
 		margin-top: 20px;
 		border-radius: 8px;
 		overflow: hidden;

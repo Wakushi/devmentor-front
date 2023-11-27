@@ -1,3 +1,5 @@
+@import "../../styles/variables.scss";
+
 .matchContainer {
 	display: flex;
 	justify-content: center;
@@ -32,7 +34,7 @@
 	align-items: center;
 	flex-direction: column;
 	border-radius: 10px;
-	box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	box-shadow: $box-shadow;
 }
 
 .cardFront {
@@ -40,7 +42,7 @@
 }
 
 .cardBack {
-	background: #007bff;
+	background: #007bffa4;
 	color: white;
 	transform: rotateY(180deg);
 	h2,
