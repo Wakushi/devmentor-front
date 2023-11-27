@@ -58,14 +58,7 @@ export default function ExperienceBar({
 			</div>
 			{isConfirmationModalOpen && (
 				<ConfirmationModal
-					outsideClickHandler={(event: MouseEvent<HTMLElement>) => {
-						if (
-							event.target instanceof HTMLElement &&
-							event.target.id !== "modal-container"
-						)
-							return
-						setIsConfirmationModalOpen(false)
-					}}
+					setIsConfirmationModalOpen={setIsConfirmationModalOpen}
 				>
 					<div className="flex flex-col items-center justify-center">
 						<h2 className="text-2xl font-bold mb-4">

@@ -45,6 +45,15 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "rewardClaimed":
 				return "Reward claimed !"
 
+			case "contactUpdate":
+				return "Contact will be updated shortly !"
+
+			case "engagementUpdate":
+				return "Engagement will be updated shortly !"
+
+			case "sessionCantBeCancelled":
+				return "You can't cancel this session yet !"
+
 			default:
 				return ""
 		}

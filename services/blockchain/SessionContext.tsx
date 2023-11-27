@@ -1,4 +1,4 @@
-import { ReactNode, createContext } from "react"
+import { ReactNode, createContext, useContext } from "react"
 import { ethers } from "ethers"
 import {
 	DEVMENTOR_CONTRACT_ADDRESS,
@@ -6,6 +6,7 @@ import {
 	Engagement
 } from "../constants"
 import { getEngagement } from "../utils"
+import { BlockchainContext } from "./BlockchainContext"
 
 interface SessionContextProviderProps {
 	children: ReactNode
@@ -23,27 +24,28 @@ export interface Session {
 
 interface SessionContextProps {
 	getMenteeSession: (menteeAddress: string) => Promise<Session | null>
-	adminCompleteSession: (
-		menteeAddress: string,
-		mentorAddress: string,
-		valueLocked: string
-	) => Promise<void>
 	adminUpdateSessionEngagement: (
 		menteeAddress: string,
 		mentorAddress: string,
 		newEngagementDuration: number
 	) => Promise<void>
+	cancelSession: (
+		menteeAddress: string,
+		mentorAddress: string,
+		as: "mentee" | "mentor"
+	) => Promise<void>
 }
 
 const SessionContext = createContext<SessionContextProps>({
 	getMenteeSession: async () => Promise.resolve(null),
-	adminCompleteSession: async () => Promise.resolve(),
-	adminUpdateSessionEngagement: async () => Promise.resolve()
+	adminUpdateSessionEngagement: async () => Promise.resolve(),
+	cancelSession: async () => Promise.resolve()
 })
 
 export default function SessionContextProvider({
 	children
 }: SessionContextProviderProps) {
+	const { errorHandler } = useContext(BlockchainContext)
 	///////////////
 	// State
 	///////////////
@@ -75,8 +77,8 @@ export default function SessionContextProvider({
 				menteeConfirmed: menteeSessionArray[6]
 			}
 			return menteeSession
-		} catch (error) {
-			console.error("Error in getMenteeSession:", error)
+		} catch (error: unknown) {
+			errorHandler(error)
 		}
 		return null
 	}
@@ -84,35 +86,6 @@ export default function SessionContextProvider({
 	///////////////
 	// Write
 	///////////////
-
-	async function adminCompleteSession(
-		mentorAddress: string,
-		menteeAddress: string,
-		valueLocked: string
-	) {
-		if (typeof window.ethereum !== "undefined") {
-			const provider = new ethers.BrowserProvider(window.ethereum)
-			const signer = await provider.getSigner()
-			const contract = new ethers.Contract(
-				DEVMENTOR_CONTRACT_ADDRESS,
-				DEVMENTOR_CONTRACT_ABI,
-				signer
-			)
-			try {
-				const transaction = await contract.adminCompleteSession(
-					mentorAddress,
-					menteeAddress,
-					valueLocked
-				)
-				await transaction.wait()
-				console.log("Completed session")
-			} catch (error) {
-				console.error("Error in adminCompleteSession:", error)
-			}
-		} else {
-			console.log("Please install MetaMask")
-		}
-	}
 
 	async function adminUpdateSessionEngagement(
 		menteeAddress: string,
@@ -136,8 +109,39 @@ export default function SessionContextProvider({
 				await transaction.wait()
 				console.log("Updated session engagement")
 				alert("Updated session engagement")
-			} catch (error) {
-				console.error("Error in adminCompleteSession:", error)
+			} catch (error: unknown) {
+				errorHandler(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+	}
+
+	async function cancelSession(
+		menteeAddress: string,
+		mentorAddress: string,
+		as: "mentee" | "mentor"
+	) {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const signer = await provider.getSigner()
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				signer
+			)
+			try {
+				if (as === "mentee") {
+					const menteeTransaction =
+						await contract.cancelSessionAsMentee(mentorAddress)
+					await menteeTransaction.wait()
+				} else {
+					const mentorTransaction =
+						await contract.cancelSessionAsMentor(menteeAddress)
+					await mentorTransaction.wait()
+				}
+			} catch (error: unknown) {
+				errorHandler(error)
 			}
 		} else {
 			console.log("Please install MetaMask")
@@ -146,8 +150,8 @@ export default function SessionContextProvider({
 
 	const context: SessionContextProps = {
 		getMenteeSession,
-		adminCompleteSession,
-		adminUpdateSessionEngagement
+		adminUpdateSessionEngagement,
+		cancelSession
 	}
 
 	return (

@@ -1,12 +1,18 @@
-import { getReadableDate, getShortenedAddress } from "@/services/utils"
+import {
+	getReadableDate,
+	getShortenedAddress,
+	isSessionOver
+} from "@/services/utils"
 import classes from "./session.module.scss"
 import Button from "../ui/button/button"
-import { Session } from "@/services/blockchain/SessionContext"
+import { Session, SessionContext } from "@/services/blockchain/SessionContext"
 import { useRouter } from "next/router"
 import { ethers } from "ethers"
 import { useContext, useEffect, useState } from "react"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import { MentorContext } from "@/services/blockchain/MentorContext"
+import ConfirmationModal from "../confirmation-modal/confirmation-modal"
+import { SnackbarContext } from "@/services/SnackbarContext"
 
 interface SessionProps {
 	session: Session
@@ -31,8 +37,14 @@ export default function SessionCard({
 
 	const [valueLockedInUsd, setValueLockedInUsd] = useState(0)
 	const [mentorContact, setMentorContact] = useState("")
-	const { getEthPriceInUsd } = useContext(BlockchainContext)
+	const { getEthPriceInUsd, getCurrentBlockTimestamp } =
+		useContext(BlockchainContext)
 	const { getMentorContact } = useContext(MentorContext)
+	const { cancelSession } = useContext(SessionContext)
+	const { openSnackBar } = useContext(SnackbarContext)
+
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+		useState(false)
 
 	useEffect(() => {
 		getEthPriceInUsd().then((price) => {
@@ -49,6 +61,17 @@ export default function SessionCard({
 
 	function openRequest() {
 		router.push("/mentee/session-form")
+	}
+
+	function onCancelSession() {
+		getCurrentBlockTimestamp().then((timestamp: number) => {
+			if (!isSessionOver(timestamp, session)) {
+				openSnackBar("sessionCantBeCancelled")
+			} else {
+				cancelSession(mentee, mentor, mentorView ? "mentor" : "mentee")
+			}
+			setIsConfirmationModalOpen(false)
+		})
 	}
 
 	const ConfirmationStatus = ({
@@ -84,61 +107,101 @@ export default function SessionCard({
 	}
 
 	return (
-		<div className={`${classes.session} basic-card`}>
-			<h3>Session</h3>
-			{mentorView ? (
-				<div className={classes.sessionDetail}>
-					<span>Mentee:</span> {getShortenedAddress(mentee)}
-				</div>
-			) : (
-				<>
+		<>
+			<div className={`${classes.session} basic-card`}>
+				<h3>Session</h3>
+				{mentorView ? (
 					<div className={classes.sessionDetail}>
-						<span>Mentor: </span>
-						{getShortenedAddress(mentor)}
+						<span>Mentee:</span> {getShortenedAddress(mentee)}
 					</div>
-					<div className={classes.sessionDetail}>
-						<span>Contact: </span>
-						{mentorContact}
-					</div>
-				</>
-			)}
-			<div className={classes.sessionDetail}>
-				<span>Started: </span>
-				{getReadableDate(startTime)}
-			</div>
-			<div className={classes.sessionDetail}>
-				<span>Duration: </span>
-				{engagement?.label}
-			</div>
-			{!!engagement?.durationInSeconds && (
+				) : (
+					<>
+						<div className={classes.sessionDetail}>
+							<span>Mentor: </span>
+							{getShortenedAddress(mentor)}
+						</div>
+						<div className={classes.sessionDetail}>
+							<span>Contact: </span>
+							{mentorContact}
+						</div>
+					</>
+				)}
 				<div className={classes.sessionDetail}>
-					<span>Session end: </span>
-					{getReadableDate(startTime + engagement?.durationInSeconds)}
+					<span>Started: </span>
+					{getReadableDate(startTime)}
 				</div>
-			)}
-			<div className={classes.sessionDetail}>
-				<span>Value locked: </span>
-				{ethers.formatUnits(BigInt(valueLocked), 18)} ETH /{" "}
-				{valueLockedInUsd.toFixed(2)}$
+				<div className={classes.sessionDetail}>
+					<span>Duration: </span>
+					{engagement?.label}
+				</div>
+				{!!engagement?.durationInSeconds && (
+					<div className={classes.sessionDetail}>
+						<span>Session end: </span>
+						{getReadableDate(
+							startTime + engagement?.durationInSeconds
+						)}
+					</div>
+				)}
+				<div className={classes.sessionDetail}>
+					<span>Value locked: </span>
+					{ethers.formatUnits(BigInt(valueLocked), 18)} ETH /{" "}
+					{valueLockedInUsd.toFixed(2)}$
+				</div>
+				<ConfirmationStatus
+					isConfirmed={mentorConfirmed}
+					label={mentorView ? "You" : "Mentor"}
+				/>
+				<ConfirmationStatus
+					isConfirmed={menteeConfirmed}
+					label={mentorView ? "Mentee" : "You"}
+				/>
+				<div className="flex gap-4">
+					<Button
+						onClick={() => setIsConfirmationModalOpen(true)}
+						cancel={true}
+					>
+						Cancel session
+					</Button>
+					{mentorView && !session.mentorConfirmed && (
+						<Button onClick={confirmSession} filled={true}>
+							Confirm session
+						</Button>
+					)}
+					{!mentorView && !session.menteeConfirmed && (
+						<Button onClick={confirmSession} filled={true}>
+							Confirm session
+						</Button>
+					)}
+				</div>
 			</div>
-			<ConfirmationStatus
-				isConfirmed={mentorConfirmed}
-				label={mentorView ? "You" : "Mentor"}
-			/>
-			<ConfirmationStatus
-				isConfirmed={menteeConfirmed}
-				label={mentorView ? "Mentee" : "You"}
-			/>
-			{mentorView && !session.mentorConfirmed && (
-				<Button onClick={confirmSession} filled={true}>
-					Confirm session
-				</Button>
+			{isConfirmationModalOpen && (
+				<ConfirmationModal
+					setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+				>
+					<div className="flex flex-col items-center gap-10 max-w-xl text-center">
+						<h2>Do you want to cancel this session?</h2>
+						<p>
+							You can only cancel if your{" "}
+							{mentorView ? "mentee" : "mentor"} has not confirmed
+							within one week following the anticipated session
+							conclusion.
+						</p>
+						<div className="flex gap-4">
+							<Button onClick={onCancelSession} cancel={true}>
+								Yes
+							</Button>
+							<Button
+								onClick={() =>
+									setIsConfirmationModalOpen(false)
+								}
+								filled={true}
+							>
+								No
+							</Button>
+						</div>
+					</div>
+				</ConfirmationModal>
 			)}
-			{!mentorView && !session.menteeConfirmed && (
-				<Button onClick={confirmSession} filled={true}>
-					Confirm session
-				</Button>
-			)}
-		</div>
+		</>
 	)
 }

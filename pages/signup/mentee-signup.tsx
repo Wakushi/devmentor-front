@@ -247,16 +247,9 @@ export default function MenteeSignupAndRequest({
 
 					{mentorSelectionModalOpen && (
 						<ConfirmationModal
-							outsideClickHandler={(
-								event: MouseEvent<HTMLElement>
-							) => {
-								if (
-									event.target instanceof HTMLElement &&
-									event.target.id !== "modal-container"
-								)
-									return
-								setMentorSelectionModalOpen(false)
-							}}
+							setIsConfirmationModalOpen={
+								setMentorSelectionModalOpen
+							}
 						>
 							<MentorList
 								mentors={matchingMentors}

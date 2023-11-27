@@ -1,0 +1,18 @@
+.requestSection {
+	border-bottom: 1px solid #eaecef;
+	padding: 10px 0;
+
+	&:last-child {
+		border-bottom: none;
+	}
+
+	h3 {
+		font-size: 1.25rem;
+		color: #333;
+		margin: 0;
+		font-weight: 400;
+		span {
+			font-weight: 600;
+		}
+	}
+}

@@ -1,0 +1,28 @@
+.profileDetails {
+	min-width: 500px;
+	background: #ffffff;
+	border-left: 4px solid #0077ff;
+	padding: 20px;
+	border-radius: 12px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+	margin-bottom: 30px;
+
+	.profileSection {
+		border-bottom: 1px solid #eaecef;
+		padding: 10px 0;
+
+		&:last-child {
+			border-bottom: none;
+		}
+
+		h3 {
+			font-size: 1.25rem;
+			color: #333;
+			margin: 0;
+			font-weight: 400;
+			span {
+				font-weight: 600;
+			}
+		}
+	}
+}

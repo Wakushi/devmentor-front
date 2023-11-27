@@ -1,8 +1,9 @@
-import { useContext } from "react"
+import { useContext, useEffect, useState } from "react"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import { getShortenedAddress } from "@/services/utils"
 import classes from "./mentor-list.module.scss"
+import { UserContext } from "@/services/UserContext"
 
 interface MentorTableProps {
 	mentors: Mentor[]
@@ -19,8 +20,21 @@ export default function MentorList({
 	setSelectedMentor,
 	leaderboardView
 }: MentorTableProps) {
-	const { getMentorAverageRating } = useContext(MentorContext)
+	const { walletAddress } = useContext(UserContext)
+	const { getMentorAverageRating, getMentorInfo } = useContext(MentorContext)
 	const { getLanguageLabel } = useContext(BlockchainContext)
+	const [mentorUser, setMentorUser] = useState<Mentor | null>(null)
+	const [isLoaded, setIsLoaded] = useState<boolean>(false)
+
+	useEffect(() => {
+		getMentorInfo(walletAddress).then((mentor) => {
+			if (mentor?.validated) {
+				console.log("mentor", mentor)
+				setMentorUser(mentor)
+			}
+			setIsLoaded(true)
+		})
+	}, [walletAddress])
 
 	const tableStyles = {
 		cursor: selectMode ? "pointer" : "default"
@@ -34,6 +48,7 @@ export default function MentorList({
 			<table className={classes.mentor_table}>
 				<thead>
 					<tr>
+						{leaderboardView && <th>Rank</th>}
 						<th>Address</th>
 						<th>Average Rating</th>
 						<th>Session Count</th>
@@ -41,33 +56,42 @@ export default function MentorList({
 						<th>Years of Experience</th>
 					</tr>
 				</thead>
-				<tbody>
-					{mentors.map((mentor) => (
-						<tr
-							key={mentor.address}
-							onClick={() => {
-								if (selectMode && setSelectedMentor) {
-									setSelectedMentor(mentor.address)
-								}
-							}}
-							style={tableStyles}
-							className={
-								selectedMentor === mentor.address
-									? classes.selected
-									: ""
-							}
-						>
-							<td>{getShortenedAddress(mentor.address)}</td>
-							<td>
-								{getMentorAverageRating(mentor)}{" "}
-								<i className="fa-solid fa-star"></i>
-							</td>
-							<td>{mentor.sessionCount}</td>
-							<td>{getLanguageLabel(mentor.language || 0)}</td>
-							<td>{mentor.yearsOfExperience}</td>
-						</tr>
-					))}
-				</tbody>
+				{isLoaded && (
+					<tbody>
+						{mentors.map((mentor, index) => (
+							<tr
+								key={mentor.address}
+								onClick={() => {
+									if (selectMode && setSelectedMentor) {
+										setSelectedMentor(mentor.address)
+									}
+								}}
+								style={tableStyles}
+								className={`${
+									selectedMentor === mentor.address
+										? classes.selected
+										: ""
+								} ${
+									mentorUser?.address === mentor.address
+										? classes.own_address
+										: ""
+								}`}
+							>
+								{leaderboardView && <td>{index + 1}</td>}
+								<td>{getShortenedAddress(mentor.address)}</td>
+								<td>
+									{getMentorAverageRating(mentor)}{" "}
+									<i className="fa-solid fa-star"></i>
+								</td>
+								<td>{mentor.sessionCount}</td>
+								<td>
+									{getLanguageLabel(mentor.language || 0)}
+								</td>
+								<td>{mentor.yearsOfExperience}</td>
+							</tr>
+						))}
+					</tbody>
+				)}
 			</table>
 		</div>
 	)

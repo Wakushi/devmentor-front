@@ -1,11 +1,7 @@
-import { MouseEvent, useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import { Session, SessionContext } from "@/services/blockchain/SessionContext"
-import {
-	getTeachingSubjectLabel,
-	isAddressZero,
-	isSessionOver
-} from "@/services/utils"
+import { isSessionOver } from "@/services/utils"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import { UserContext } from "@/services/UserContext"
 import SessionCard from "@/components/session/session"
@@ -18,6 +14,7 @@ import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 import { SnackbarContext } from "@/services/SnackbarContext"
 import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
 import ExperienceBar from "@/components/xp-bar/xp-bar"
+import MentorProfileCard from "@/components/mentor-profile-card/mentor-profile-card"
 
 export default function MentorProfile() {
 	///////////////
@@ -52,13 +49,9 @@ export default function MentorProfile() {
 	const { walletAddress } = useContext(UserContext)
 	const { openSnackBar } = useContext(SnackbarContext)
 	const { getMenteeSession } = useContext(SessionContext)
-	const { getMentorInfo, getMentorAverageRating, validateSessionAsMentor } =
-		useContext(MentorContext)
-	const {
-		getLanguageLabel,
-		isWaitingForTransaction,
-		getCurrentBlockTimestamp
-	} = useContext(BlockchainContext)
+	const { getMentorInfo, validateSessionAsMentor } = useContext(MentorContext)
+	const { isWaitingForTransaction, getCurrentBlockTimestamp } =
+		useContext(BlockchainContext)
 	const {
 		getUserXp,
 		getUserBadgeUri,
@@ -184,57 +177,10 @@ export default function MentorProfile() {
 					</div>
 				) : (
 					<div className="flex gap-4 items-baseline">
-						<div className={classes.profileDetails}>
-							<h2>Profile</h2>
-							<div className={classes.profileSection}>
-								<h3>Your subjects</h3>
-								{mentorInfo.teachingSubjects?.map((subject) => (
-									<div key={subject}>
-										{getTeachingSubjectLabel(+subject)}
-									</div>
-								))}
-								<button onClick={() => {}}>
-									Update subjects
-								</button>
-							</div>
-							<div className={classes.profileSection}>
-								<h3> {mentorTokens} MNT (Mentor tokens) </h3>
-							</div>
-							<div className={classes.profileSection}>
-								<h3>
-									Engagement : {mentorInfo.engagement?.label}
-								</h3>
-								<button>Update engagement</button>
-							</div>
-
-							<div className={classes.profileSection}>
-								<h3>
-									Rating :{" "}
-									{getMentorAverageRating(mentorInfo).toFixed(
-										2
-									)}{" "}
-									<i className="fa-solid fa-star brand-color"></i>{" "}
-									({mentorInfo.sessionCount} session
-									{mentorInfo.sessionCount > 1 ? "s" : ""})
-								</h3>
-							</div>
-							<div className={classes.profileSection}>
-								<h3>
-									Preferred Language :{" "}
-									{getLanguageLabel(
-										mentorInfo?.language || 0
-									)}
-								</h3>
-							</div>
-							<div className={classes.profileSection}>
-								<h3>
-									Current mentee :{" "}
-									{isAddressZero(mentorInfo.mentee)
-										? "You don't have a mentee."
-										: mentorInfo.mentee}
-								</h3>
-							</div>
-						</div>
+						<MentorProfileCard
+							mentorInfo={mentorInfo}
+							mentorTokens={mentorTokens}
+						/>
 						{!!menteeSession && (
 							<SessionCard
 								session={menteeSession}
@@ -253,16 +199,7 @@ export default function MentorProfile() {
 				)}
 				{isConfirmationModalOpen && (
 					<ConfirmationModal
-						outsideClickHandler={(
-							event: MouseEvent<HTMLElement>
-						) => {
-							if (
-								event.target instanceof HTMLElement &&
-								event.target.id !== "modal-container"
-							)
-								return
-							setIsConfirmationModalOpen(false)
-						}}
+						setIsConfirmationModalOpen={setIsConfirmationModalOpen}
 					>
 						<div className="flex flex-col gap-2">
 							<h4>Validate your session</h4>

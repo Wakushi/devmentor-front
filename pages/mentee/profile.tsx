@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { UserContext } from "@/services/UserContext"
 import {
 	Mentee,
@@ -10,20 +10,15 @@ import Loader from "@/components/ui/loader/loader"
 import SessionCard from "@/components/session/session"
 import { Session, SessionContext } from "@/services/blockchain/SessionContext"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
-import {
-	getLevelLabel,
-	getTeachingSubjectLabel,
-	isAddressZero,
-	isSessionOver
-} from "@/services/utils"
-import Button from "@/components/ui/button/button"
+import { isSessionOver } from "@/services/utils"
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
-import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
-import RatingSystem from "@/components/ui/rating/rating"
 import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 import { SnackbarContext } from "@/services/SnackbarContext"
 import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
 import ExperienceBar from "@/components/xp-bar/xp-bar"
+import MenteeProfileCard from "@/components/mentee-profile-card/mentee-profile-card"
+import RequestCard from "@/components/request-card/request-card"
+import SessionConfirmationModal from "@/components/session-confirmation-modal/session-confirmation"
 
 export default function MenteeProfile() {
 	///////////////
@@ -71,11 +66,8 @@ export default function MenteeProfile() {
 		validateSessionAsMentee
 	} = useContext(MenteeContext)
 	const { getMenteeSession } = useContext(SessionContext)
-	const {
-		getLanguageLabel,
-		isWaitingForTransaction,
-		getCurrentBlockTimestamp
-	} = useContext(BlockchainContext)
+	const { isWaitingForTransaction, getCurrentBlockTimestamp } =
+		useContext(BlockchainContext)
 	const { openSnackBar } = useContext(SnackbarContext)
 	const { getUserXp, getUserBadgeUri, getUserNextBadgeUri } =
 		useContext(RewardContext)
@@ -235,49 +227,12 @@ export default function MenteeProfile() {
 						setWaitingModalMessage={setWaitingModalMessage}
 					/>
 				)}
-				<div className={classes.profileDetails}>
-					<h2>Profile</h2>
-					<div className={classes.profileSection}>
-						<h3>
-							Preferred Language:{" "}
-							<span>
-								{getLanguageLabel(menteeInfo?.language || 0)}
-							</span>
-						</h3>
-					</div>
-					<div className={classes.profileSection}>
-						<h3>
-							Sessions: <span>{menteeInfo?.sessionCount}</span>
-						</h3>
-					</div>
-					<div className={classes.profileSection}>
-						<h3>
-							Current mentor :{" "}
-							{isAddressZero(menteeInfo.mentor)
-								? "You don't have a mentor yet."
-								: menteeInfo.mentor}
-						</h3>
-					</div>
-				</div>
+				<MenteeProfileCard menteeInfo={menteeInfo} />
 				{menteeInfo?.hasRequest && !!menteeRequest && (
-					<div className={`basic-card ${classes.request}`}>
-						<h2>Opened request</h2>
-						<ul>
-							<li className={classes.requestSection}>
-								Engagement: {menteeRequest.engagement?.label}{" "}
-							</li>
-							<li className={classes.requestSection}>
-								Level: {getLevelLabel(menteeRequest.level)}{" "}
-							</li>
-							<li className={classes.requestSection}>
-								Subject :{" "}
-								{getTeachingSubjectLabel(menteeRequest.subject)}{" "}
-							</li>
-						</ul>
-						<Button onClick={cancelRequest} filled={true}>
-							Cancel
-						</Button>
-					</div>
+					<RequestCard
+						menteeRequest={menteeRequest}
+						cancelRequest={cancelRequest}
+					/>
 				)}
 				{!!menteeSession && walletAddress && !menteeInfo.hasRequest && (
 					<SessionCard
@@ -295,67 +250,16 @@ export default function MenteeProfile() {
 				</WaitingModal>
 			)}
 			{isConfirmationModalOpen && (
-				<ConfirmationModal
-					outsideClickHandler={(event: MouseEvent<HTMLElement>) => {
-						if (
-							event.target instanceof HTMLElement &&
-							event.target.id !== "modal-container"
-						)
-							return
-						setIsConfirmationModalOpen(false)
-					}}
-				>
-					{!hasRated ? (
-						<div className="flex flex-col gap-2">
-							<h4>Please rate your session :</h4>
-							<RatingSystem
-								rating={rating}
-								setRating={setRating}
-							/>
-							<div className="flex justify-center gap-2">
-								<Button onClick={onRateSession} filled={true}>
-									Rate
-								</Button>
-							</div>
-						</div>
-					) : (
-						<div className="flex flex-col gap-2">
-							<h4>Thank your mentor with a tip !</h4>
-							<p>(Amount in USD will be converted to ETH)</p>
-							<div
-								ref={tipFormField}
-								className="dark-input flex items-center"
-							>
-								<input
-									type="number"
-									name="tipAmount"
-									placeholder="5"
-									min={0}
-									onChange={handleInputChange}
-								/>
-								<span className="dollar-symbol">$</span>
-							</div>
-							<div className="flex justify-center gap-2">
-								<Button
-									onClick={() => {
-										validateSession(false)
-									}}
-									filled={true}
-								>
-									Confirm
-								</Button>
-								<Button
-									onClick={() => {
-										validateSession(true)
-									}}
-									filled={true}
-								>
-									Tip and confirm
-								</Button>
-							</div>
-						</div>
-					)}
-				</ConfirmationModal>
+				<SessionConfirmationModal
+					setIsConfirmationModalOpen={setIsConfirmationModalOpen}
+					hasRated={hasRated}
+					rating={rating}
+					setRating={setRating}
+					onRateSession={onRateSession}
+					tipFormField={tipFormField}
+					handleInputChange={handleInputChange}
+					validateSession={validateSession}
+				/>
 			)}
 			<WavesBackground />
 		</>

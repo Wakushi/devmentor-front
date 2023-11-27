@@ -49,6 +49,16 @@ function isSessionOver(currentTimestamp: number, session: Session) {
 	)
 }
 
+function canCancelSession(currentTimestamp: number, session: Session) {
+	return (
+		session?.engagement?.durationInSeconds &&
+		session?.startTime +
+			session?.engagement?.durationInSeconds +
+			engagements[0].durationInSeconds <
+			currentTimestamp
+	)
+}
+
 function rankMentors(mentors: Mentor[]): Mentor[] {
 	const sortedMentors = mentors.sort((a: Mentor, b: Mentor) => {
 		const avgRatingA =
@@ -75,5 +85,6 @@ export {
 	isAddressZero,
 	getLevelLabel,
 	isSessionOver,
-	rankMentors
+	rankMentors,
+	canCancelSession
 }

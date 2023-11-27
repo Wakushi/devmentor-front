@@ -8,8 +8,7 @@ import { rankMentors } from "@/services/utils"
 
 export default function Landing() {
 	const { approveMentor, getAllMentors } = useContext(MentorContext)
-	const { adminCompleteSession, adminUpdateSessionEngagement } =
-		useContext(SessionContext)
+	const { adminUpdateSessionEngagement } = useContext(SessionContext)
 
 	const [formValues, setFormValues] = useState<any>({
 		mentorAddress: "",
@@ -32,14 +31,6 @@ export default function Landing() {
 
 	function onApproveMentor() {
 		approveMentor(formValues.mentorAddress)
-	}
-
-	function onCompleteSession() {
-		adminCompleteSession(
-			formValues.mentorAddress,
-			formValues.menteeAddress,
-			"0"
-		)
 	}
 
 	function onUpdateEngagement() {
@@ -83,9 +74,6 @@ export default function Landing() {
 						value={formValues.mentorAddress}
 						onChange={handleInputChange}
 					/>
-					<Button onClick={onCompleteSession} filled={true}>
-						Complete session
-					</Button>
 					<Button onClick={onUpdateEngagement} filled={true}>
 						Update engagement
 					</Button>

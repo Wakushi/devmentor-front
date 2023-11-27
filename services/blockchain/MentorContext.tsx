@@ -12,6 +12,7 @@ import {
 	replacer
 } from "../utils"
 import { BlockchainContext } from "./BlockchainContext"
+import { SnackbarContext } from "../SnackbarContext"
 
 interface MentorContextProviderProps {
 	children: ReactNode
@@ -27,6 +28,8 @@ interface MentorContextProps {
 	approveMentor: (mentorAddress: string) => void
 	validateSessionAsMentor: (menteeAddress: string) => void
 	getAllMentors: () => Promise<Mentor[]>
+	updateContact: (newContact: string) => void
+	changeMentorEngagement: (engagement: number) => void
 }
 
 export interface Mentor {
@@ -60,12 +63,15 @@ const MentorContext = createContext<MentorContextProps>({
 	registerAsMentor: () => {},
 	approveMentor: () => {},
 	validateSessionAsMentor: () => {},
-	getAllMentors: () => Promise.resolve([])
+	getAllMentors: () => Promise.resolve([]),
+	updateContact: () => {},
+	changeMentorEngagement: () => {}
 })
 export default function MentorContextProvider(
 	props: MentorContextProviderProps
 ) {
 	const { waitForTransaction, errorHandler } = useContext(BlockchainContext)
+	const { openSnackBar } = useContext(SnackbarContext)
 
 	///////////////
 	// State
@@ -268,7 +274,50 @@ export default function MentorContextProvider(
 					await waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
-				console.log("Session validated !")
+			} catch (error: unknown) {
+				errorHandler(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+	}
+
+	async function updateContact(newContact: string) {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const signer = await provider.getSigner()
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				signer
+			)
+			try {
+				const transaction = await contract.updateContact(newContact)
+				openSnackBar("contactUpdate")
+				await transaction.wait()
+			} catch (error: unknown) {
+				errorHandler(error)
+			}
+		} else {
+			console.log("Please install MetaMask")
+		}
+	}
+
+	async function changeMentorEngagement(engagement: number) {
+		if (typeof window.ethereum !== "undefined") {
+			const provider = new ethers.BrowserProvider(window.ethereum)
+			const signer = await provider.getSigner()
+			const contract = new ethers.Contract(
+				DEVMENTOR_CONTRACT_ADDRESS,
+				DEVMENTOR_CONTRACT_ABI,
+				signer
+			)
+			try {
+				const transaction = await contract.changeMentorEngagement(
+					engagement
+				)
+				openSnackBar("engagementUpdate")
+				await transaction.wait()
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
@@ -298,7 +347,9 @@ export default function MentorContextProvider(
 		registerAsMentor,
 		approveMentor,
 		validateSessionAsMentor,
-		getAllMentors
+		getAllMentors,
+		updateContact,
+		changeMentorEngagement
 	}
 
 	return (
