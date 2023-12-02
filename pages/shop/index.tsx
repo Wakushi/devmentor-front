@@ -5,17 +5,28 @@ import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import { Reward, RewardContext } from "@/services/blockchain/RewardContext"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
+import { UserContext } from "@/services/UserContext"
+import { SnackbarContext } from "@/services/SnackbarContext"
 
 export default function ShopPage() {
-	const { getAvailableRewardIds, getRewardById, claimMentorReward } =
-		useContext(RewardContext)
-	const [rewards, setRewards] = useState<Reward[]>([])
-
+	const {
+		getAvailableRewardIds,
+		getRewardById,
+		claimMentorReward,
+		getMentorTokenAmount
+	} = useContext(RewardContext)
+	const { walletAddress } = useContext(UserContext)
 	const { isWaitingForTransaction } = useContext(BlockchainContext)
+	const { openSnackBar } = useContext(SnackbarContext)
+	const [rewards, setRewards] = useState<Reward[]>([])
+	const [mentorTokens, setMentorTokens] = useState<number>(0)
 
 	useEffect(() => {
+		if (!walletAddress) return
 		setRewards([])
-
+		getMentorTokenAmount(walletAddress).then((tokens) => {
+			setMentorTokens(tokens)
+		})
 		getAvailableRewardIds().then((rewardIds) => {
 			const rewardPromises = rewardIds.map((rewardId: string) => {
 				return getRewardById(rewardId)
@@ -25,9 +36,13 @@ export default function ShopPage() {
 				setRewards(resolvedRewards)
 			})
 		})
-	}, [isWaitingForTransaction])
+	}, [walletAddress, isWaitingForTransaction])
 
-	function handleClaim(rewardId: number) {
+	function handleClaim(rewardId: number, price: number) {
+		if (mentorTokens < price) {
+			openSnackBar("notEnoughTokens")
+			return
+		}
 		claimMentorReward(rewardId)
 	}
 
@@ -43,7 +58,7 @@ export default function ShopPage() {
 							totalSupply={prize.totalSupply}
 							remainingSupply={prize.remainingSupply}
 							metaDataUri={prize.metadataURI}
-							onClaim={() => handleClaim(prize.id)}
+							onClaim={() => handleClaim(prize.id, prize.price)}
 							claimedView={false}
 						/>
 					))}

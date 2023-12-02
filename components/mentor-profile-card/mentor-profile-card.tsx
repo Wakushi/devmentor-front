@@ -85,7 +85,7 @@ export default function MentorProfileCard({
 					))}
 				</div>
 				<div className={classes.profileSection}>
-					<h3> {mentorTokens} MNT (Mentor tokens) </h3>
+					<h3> {mentorTokens} MTR (Mentor tokens) </h3>
 				</div>
 				<div className={classes.profileSection}>
 					<h3>Engagement : {mentorInfo.engagement?.label}</h3>

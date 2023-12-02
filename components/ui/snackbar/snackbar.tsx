@@ -57,6 +57,9 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "sessionCantBeCancelled":
 				return "You can't cancel this session yet !"
 
+			case "notEnoughTokens":
+				return "You don't have enough tokens to claim this reward"
+
 			default:
 				return ""
 		}

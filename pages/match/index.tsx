@@ -10,6 +10,7 @@ import { useRouter } from "next/router"
 import Copy from "@/components/ui/copy/copy"
 import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
 import HoverComponent from "@/components/ui/hover-text/hover-text"
+import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 
 export default function Match() {
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
@@ -154,6 +155,7 @@ export default function Match() {
 						)}
 					</div>
 				</div>
+				<WavesBackground />
 			</div>
 		</>
 	)

@@ -135,7 +135,6 @@ export default function MentorProfile() {
 					}
 				)
 				getUserRewards(walletAddress).then((rewards) => {
-					console.log(rewards)
 					setClaimedRewards(rewards)
 				})
 			})
@@ -228,6 +227,7 @@ export default function MentorProfile() {
 						currentBadge={mentorBadge}
 						nextBadge={mentorNextBadge}
 						setWaitingModalMessage={setWaitingModalMessage}
+						mentorView
 					/>
 				)}
 				{mentorInfo.registered && !mentorInfo.validated ? (

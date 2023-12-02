@@ -225,6 +225,7 @@ export default function MenteeProfile() {
 						currentBadge={menteeBadge}
 						nextBadge={menteeNextBadge}
 						setWaitingModalMessage={setWaitingModalMessage}
+						mentorView={false}
 					/>
 				)}
 				<MenteeProfileCard menteeInfo={menteeInfo} />

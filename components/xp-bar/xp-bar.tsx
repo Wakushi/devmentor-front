@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useState } from "react"
+import { useContext, useState } from "react"
 import classes from "./xp-bar.module.scss"
 import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
 import ConfirmationModal from "../confirmation-modal/confirmation-modal"
@@ -11,6 +11,7 @@ interface ExperienceBarProps {
 	currentBadge?: Badge
 	nextBadge?: Badge
 	setWaitingModalMessage?: (message: string) => void
+	mentorView: boolean
 }
 
 export default function ExperienceBar({
@@ -18,17 +19,23 @@ export default function ExperienceBar({
 	maxExp,
 	currentBadge,
 	nextBadge,
-	setWaitingModalMessage
+	setWaitingModalMessage,
+	mentorView
 }: ExperienceBarProps) {
 	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
 		useState<boolean>(false)
 
 	const { burnXpForBadge } = useContext(RewardContext)
-
 	const fillWidth = Math.min(100, (currentExp / maxExp) * 100)
 
 	function openBadgeModal() {
 		setIsConfirmationModalOpen(true)
+	}
+
+	function hasLastBadge(): boolean {
+		if (mentorView && currentBadge?.id === 11) return true
+		if (!mentorView && currentBadge?.id === 6) return true
+		return false
 	}
 
 	return (
@@ -47,18 +54,20 @@ export default function ExperienceBar({
 						style={{ width: `${fillWidth}%` }}
 					></div>
 				</div>
-				<HoverComponent title={`Next badge: ${nextBadge?.name}`}>
-					<div
-						className={`${classes.badgeContainer} ${
-							currentExp < maxExp ? classes.locked : ""
-						}`}
-						onClick={openBadgeModal}
-					>
-						<img src={nextBadge?.image} alt="" />
-					</div>
-				</HoverComponent>
+				{!hasLastBadge() && (
+					<HoverComponent title={`Next badge: ${nextBadge?.name}`}>
+						<div
+							className={`${classes.badgeContainer} ${
+								currentExp < maxExp ? classes.locked : ""
+							}`}
+							onClick={openBadgeModal}
+						>
+							<img src={nextBadge?.image} alt="" />
+						</div>
+					</HoverComponent>
+				)}
 				<p className={classes.xpCounter}>
-					{currentExp} / {maxExp} XP
+					{currentExp} {hasLastBadge() ? "" : `/ ${maxExp}`} XP
 				</p>
 			</div>
 			{isConfirmationModalOpen && (
