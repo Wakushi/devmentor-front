@@ -3,19 +3,27 @@ import Button from "@/components/ui/button/button"
 import { useContext, useEffect, useRef, useState } from "react"
 import { UserContext } from "@/services/UserContext"
 import Image from "next/image"
-import metamask from "@/assets/images/logo/metamask-logo.png"
 import { useRouter } from "next/router"
 import { getShortenedAddress } from "@/services/utils"
 import { MenteeContext } from "@/services/blockchain/MenteeContext"
 import { MentorContext } from "@/services/blockchain/MentorContext"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
 import logo from "@/assets/images/logo/logo.png"
+import ProfileCard from "../profile-card/profile-card"
+import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
+import metamask from "@/assets/images/logo/metamask-logo.png"
 
 export default function Header() {
 	const { walletAddress, connectWallet } = useContext(UserContext)
 	const { isAccountMentee } = useContext(MenteeContext)
 	const { isAccountMentor } = useContext(MentorContext)
 	const { isWaitingForTransaction } = useContext(BlockchainContext)
+	const {
+		getUserXp,
+		getMentorTokenAmount,
+		getUserBadgeUri,
+		getUserNextBadgeUri
+	} = useContext(RewardContext)
 	const shortenWalletAddress = walletAddress
 		? getShortenedAddress(walletAddress)
 		: null
@@ -23,15 +31,72 @@ export default function Header() {
 
 	const [isMentee, setIsMentee] = useState(false)
 	const [isMentor, setIsMentor] = useState(false)
+	const [userXp, setUserXp] = useState<number>(0)
+	const [mentorTokens, setMentorTokens] = useState<number>(0)
+	const [userBadge, setUserBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
+	const [userNextBadge, setUserNextBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
 	const router = useRouter()
 
 	useEffect(() => {
 		if (walletAddress) {
 			isAccountMentee(walletAddress).then((isMentee) => {
 				setIsMentee(isMentee)
-			})
-			isAccountMentor(walletAddress).then((isMentor) => {
-				setIsMentor(isMentor)
+				isAccountMentor(walletAddress).then((isMentor) => {
+					setIsMentor(isMentor)
+					getUserXp(walletAddress).then((xp) => {
+						setUserXp(parseInt(xp))
+					})
+					getMentorTokenAmount(walletAddress).then((tokens) => {
+						setMentorTokens(tokens)
+					})
+					getUserBadgeUri(walletAddress).then((badgeUri) => {
+						if (!badgeUri) return
+						fetch(badgeUri)
+							.then((response) => {
+								return response.json()
+							})
+							.then(({ id, name, image, description }) => {
+								setUserBadge({
+									id,
+									name: name,
+									image: image,
+									description: description,
+									cost: 0
+								})
+							})
+					})
+					getUserNextBadgeUri(
+						walletAddress,
+						isMentor ? "mentor" : "mentee"
+					).then((nextBadgeUri) => {
+						if (!nextBadgeUri) return
+						fetch(nextBadgeUri.tokenUri)
+							.then((response) => {
+								return response.json()
+							})
+							.then(({ id, name, image, description }) => {
+								setUserNextBadge({
+									id,
+									name,
+									image,
+									description,
+									cost: nextBadgeUri.badgeXpCost
+								})
+							})
+					})
+				})
 			})
 		}
 	}, [walletAddress, isWaitingForTransaction])
@@ -123,15 +188,6 @@ export default function Header() {
 							Open session
 						</li>
 					)}
-					{(isMentee || isMentor) && (
-						<li
-							className={classes.nav_link}
-							tabIndex={0}
-							onClick={goToProfile}
-						>
-							Profile
-						</li>
-					)}
 					{isMentor && (
 						<li
 							className={classes.nav_link}
@@ -144,21 +200,33 @@ export default function Header() {
 						</li>
 					)}
 					<li>
-						<Button onClick={connectWallet} filled={true}>
-							{walletAddress ? (
-								<>
-									<Image
-										src={metamask}
-										alt="Metamask Logo"
-										width={40}
-										height={40}
-									/>{" "}
-									{shortenWalletAddress}
-								</>
-							) : (
-								"Connect wallet"
-							)}
-						</Button>
+						{walletAddress && (isMentee || isMentor) ? (
+							<ProfileCard
+								userAddress={walletAddress}
+								badge={userBadge}
+								nextBadge={userNextBadge}
+								xp={userXp}
+								mentorTokens={mentorTokens}
+								mentorView={isMentor}
+								onClick={goToProfile}
+							/>
+						) : (
+							<Button onClick={connectWallet} filled={true}>
+								{walletAddress ? (
+									<>
+										<Image
+											src={metamask}
+											alt="Metamask Logo"
+											width={40}
+											height={40}
+										/>{" "}
+										{shortenWalletAddress}
+									</>
+								) : (
+									"Connect wallet"
+								)}
+							</Button>
+						)}
 					</li>
 				</ul>
 			</nav>

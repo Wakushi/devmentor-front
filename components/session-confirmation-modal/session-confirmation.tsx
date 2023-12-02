@@ -44,7 +44,7 @@ export default function SessionConfirmationModal({
 					<p>(Amount in USD will be converted to ETH)</p>
 					<div
 						ref={tipFormField}
-						className="dark-input flex items-center"
+						className="dark-input short flex items-center"
 					>
 						<input
 							type="number"

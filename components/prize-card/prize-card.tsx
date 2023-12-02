@@ -9,6 +9,7 @@ interface PrizeCardProps {
 	remainingSupply: number
 	metaDataUri: string
 	onClaim: () => void
+	claimedView: boolean
 }
 
 interface PrizeInfo {
@@ -22,7 +23,8 @@ export default function PrizeCard({
 	totalSupply,
 	remainingSupply,
 	metaDataUri,
-	onClaim
+	onClaim,
+	claimedView
 }: PrizeCardProps) {
 	const [prizeInfo, setPrizeInfo] = useState<PrizeInfo>({
 		image: "",
@@ -53,15 +55,20 @@ export default function PrizeCard({
 			/>
 			<h3 className={classes.prizeName}>{prizeInfo.name}</h3>
 			<p className={classes.prizeDescription}>{prizeInfo.description}</p>
-			<div className={classes.prizeCost}>{price} Mentor Tokens</div>
-			<p className={classes.prizeDescription}>
-				{remainingSupply}/{totalSupply} left
-			</p>
-			{!!remainingSupply && (
-				<Button onClick={onClaim} filled={true}>
-					Claim
-				</Button>
+			{!claimedView && (
+				<>
+					<div className={classes.prizeCost}>
+						{price} Mentor Tokens
+					</div>
+					<p className={classes.prizeDescription}>
+						{remainingSupply}/{totalSupply} left
+					</p>
+				</>
 			)}
+
+			<Button onClick={onClaim} filled={true}>
+				{claimedView ? "Redeem" : "Claim"}
+			</Button>
 		</div>
 	)
 }

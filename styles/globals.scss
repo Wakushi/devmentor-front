@@ -45,6 +45,7 @@ h4 {
 
 .page {
 	padding: 8rem 0 2rem 0;
+	height: 100%;
 }
 
 .loading-page {
@@ -99,6 +100,13 @@ h4 {
 	}
 }
 
+.modal-form-label {
+	text-align: center;
+	font-size: 1.2rem;
+	font-weight: 400;
+	color: #fff;
+}
+
 .form_confirmation {
 	position: absolute;
 	top: 50%;
@@ -122,8 +130,11 @@ h4 {
 	border-radius: 0.3rem;
 	box-shadow: inset 1px 1px 8px #000000;
 	width: 100%;
-	max-width: 200px;
 	align-self: center;
+
+	&.short {
+		max-width: 200px;
+	}
 
 	input {
 		background: transparent;
@@ -150,6 +161,10 @@ h4 {
 // KEYFRAMES ANIMATIONS //
 //////////////////////////
 
+.fade-in-slight {
+	animation: fade-in-slight 300ms ease-in-out;
+}
+
 .fade-in-bottom {
 	animation: fade-in-bottom 500ms ease-in-out;
 }
@@ -160,6 +175,15 @@ h4 {
 
 .fade-in-top {
 	animation: fade-in-top 500ms 500ms ease-in-out forwards;
+}
+
+@keyframes fade-in-slight {
+	0% {
+		opacity: 0;
+	}
+	100% {
+		opacity: 0.7;
+	}
 }
 
 @keyframes fade-in-bottom {

@@ -3,6 +3,7 @@ import classes from "./xp-bar.module.scss"
 import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
 import ConfirmationModal from "../confirmation-modal/confirmation-modal"
 import Button from "../ui/button/button"
+import HoverComponent from "../ui/hover-text/hover-text"
 
 interface ExperienceBarProps {
 	currentExp: number
@@ -35,23 +36,27 @@ export default function ExperienceBar({
 			<div
 				className={`${classes.experienceBarContainer} flex items-center justify-center`}
 			>
-				<div className={classes.badgeContainer}>
-					<img src={currentBadge?.image} alt="" />
-				</div>
+				<HoverComponent title={`Current badge: ${currentBadge?.name}`}>
+					<div className={classes.badgeContainer}>
+						<img src={currentBadge?.image} alt="" />
+					</div>
+				</HoverComponent>
 				<div className={classes.experienceBar}>
 					<div
 						className={classes.experienceBarFill}
 						style={{ width: `${fillWidth}%` }}
 					></div>
 				</div>
-				<div
-					className={`${classes.badgeContainer} ${
-						currentExp < maxExp ? classes.locked : ""
-					}`}
-					onClick={openBadgeModal}
-				>
-					<img src={nextBadge?.image} alt="" />
-				</div>
+				<HoverComponent title={`Next badge: ${nextBadge?.name}`}>
+					<div
+						className={`${classes.badgeContainer} ${
+							currentExp < maxExp ? classes.locked : ""
+						}`}
+						onClick={openBadgeModal}
+					>
+						<img src={nextBadge?.image} alt="" />
+					</div>
+				</HoverComponent>
 				<p className={classes.xpCounter}>
 					{currentExp} / {maxExp} XP
 				</p>

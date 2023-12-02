@@ -115,7 +115,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 		return null
 	}
@@ -134,7 +134,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 		return ""
 	}
@@ -153,7 +153,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 		return false
 	}
@@ -172,7 +172,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 		return false
 	}
@@ -200,7 +200,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 		return []
 	}
@@ -230,7 +230,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -248,12 +248,11 @@ export default function MentorContextProvider(
 					mentorAddress
 				)
 				await approveMentorTx.wait()
-				console.log("Mentor approved!")
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -278,7 +277,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -299,7 +298,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -322,7 +321,7 @@ export default function MentorContextProvider(
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 

@@ -184,7 +184,7 @@ export default function MenteeContextProvider({
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 		return false
 	}
@@ -229,12 +229,11 @@ export default function MenteeContextProvider({
 					waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
-				console.log("Mentee registered and request made!")
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -273,12 +272,11 @@ export default function MenteeContextProvider({
 					waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
-				console.log("Session request opened!")
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -317,12 +315,11 @@ export default function MenteeContextProvider({
 					await waitForTransaction(transaction.hash)
 				}
 				await transaction.wait()
-				console.log("Session validated and rated by mentee!")
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -345,7 +342,7 @@ export default function MenteeContextProvider({
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 

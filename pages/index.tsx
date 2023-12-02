@@ -43,7 +43,7 @@ export default function Landing() {
 
 	return (
 		<div className="page flex flex-col gap-4">
-			<div className="flex gap-20 p-4">
+			<div className="flex justify-center gap-20 p-4">
 				<div className="flex flex-col items-center gap-2">
 					<input
 						id="mentorToValidate"

@@ -68,6 +68,11 @@
 	text-align: center;
 }
 
+.badge {
+	width: 60px;
+	height: 60px;
+}
+
 @keyframes turn-around {
 	0% {
 		transform: rotateY(0deg);

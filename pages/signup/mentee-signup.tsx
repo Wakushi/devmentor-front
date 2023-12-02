@@ -18,6 +18,7 @@ import { useRouter } from "next/router"
 import Button from "@/components/ui/button/button"
 import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
 import TriangleBackground from "@/components/ui/backgrounds/triangle/triangle-bg"
+import { rankMentors } from "@/services/utils"
 
 interface MenteeSignupAndRequestProps {
 	registered?: boolean
@@ -115,12 +116,12 @@ export default function MenteeSignupAndRequest({
 					"Matching you with a mentor. Please wait..."
 				)
 				if (mentors.length === 1) {
-					setMatchingMentors(mentors)
+					setMatchingMentors(rankMentors(mentors))
 					matchWithRandomMentor(mentors, "", true)
 					setSubmittedForm(true)
 					return
 				}
-				setMatchingMentors(mentors)
+				setMatchingMentors(rankMentors(mentors))
 				setSubmittedForm(true)
 			}
 		)
@@ -266,7 +267,7 @@ export default function MenteeSignupAndRequest({
 								</p>
 								<div
 									ref={lockedAmountFormField}
-									className="dark-input"
+									className="dark-input short"
 								>
 									<input
 										type="number"

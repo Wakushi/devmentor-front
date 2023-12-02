@@ -4,6 +4,7 @@ import classes from "./shop.module.scss"
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import { Reward, RewardContext } from "@/services/blockchain/RewardContext"
 import { BlockchainContext } from "@/services/blockchain/BlockchainContext"
+import WavesBackground from "@/components/ui/backgrounds/waves/waves-bg"
 
 export default function ShopPage() {
 	const { getAvailableRewardIds, getRewardById, claimMentorReward } =
@@ -33,8 +34,8 @@ export default function ShopPage() {
 	return (
 		<div className={`${classes.shopPage} page flex flex-col`}>
 			<div className="p-5">
-				<h1>Rewards shop</h1>
-				<div className="flex flex-wrap gap-5 justify-center p-5">
+				<h1 className="p-10">Rewards shop</h1>
+				<div className="flex flex-wrap gap-5 justify-center p-5 items-start">
 					{rewards.map((prize: Reward) => (
 						<PrizeCard
 							key={prize.id}
@@ -43,6 +44,7 @@ export default function ShopPage() {
 							remainingSupply={prize.remainingSupply}
 							metaDataUri={prize.metadataURI}
 							onClaim={() => handleClaim(prize.id)}
+							claimedView={false}
 						/>
 					))}
 				</div>
@@ -54,6 +56,7 @@ export default function ShopPage() {
 					</div>
 				</WaitingModal>
 			)}
+			<WavesBackground />
 		</div>
 	)
 }

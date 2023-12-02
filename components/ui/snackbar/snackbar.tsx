@@ -45,6 +45,9 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "rewardClaimed":
 				return "Reward claimed !"
 
+			case "rewardRedeemed":
+				return "Reward redeemed !"
+
 			case "contactUpdate":
 				return "Contact will be updated shortly !"
 

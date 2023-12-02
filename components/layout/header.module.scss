@@ -39,6 +39,8 @@
 
 	.nav_bar {
 		li {
+			text-transform: uppercase;
+			color: $primary-color;
 			@media (width < 900px) {
 				display: none;
 			}

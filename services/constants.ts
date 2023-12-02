@@ -24,7 +24,10 @@ export const engagements: Engagement[] = [
 ]
 
 export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0x51e87CD78B620315838e376f8917d81DFc98e2FF"
+	"0x63B087aF3D3cFd6b833d61b61BA0665a4d7C7815"
+
+export const REWARD_MANAGER_CONTRACT_ADDRESS =
+	"0xDf033c55CCaaCc00a9a78a478975f0997D7C2429"
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
@@ -60,11 +63,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 						internalType: "string[]",
 						name: "languages",
 						type: "string[]"
-					},
-					{
-						internalType: "string",
-						name: "baseURI",
-						type: "string"
 					}
 				],
 				internalType: "struct DEVMentor.DEVMentorConfig",
@@ -125,28 +123,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		type: "error"
 	},
 	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "_rewardId",
-				type: "uint256"
-			}
-		],
-		name: "DEVMentor__InsufficientBalance",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "_badgeId",
-				type: "uint256"
-			}
-		],
-		name: "DEVMentor__InvalidBadgeId",
-		type: "error"
-	},
-	{
 		inputs: [],
 		name: "DEVMentor__MinimumEngagementNotReached",
 		type: "error"
@@ -179,30 +155,8 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		type: "error"
 	},
 	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "_badgeId",
-				type: "uint256"
-			}
-		],
-		name: "DEVMentor__NotEnoughXP",
-		type: "error"
-	},
-	{
 		inputs: [],
 		name: "DEVMentor__NotYourSession",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "_badgeId",
-				type: "uint256"
-			}
-		],
-		name: "DEVMentor__PreviousBadgeRequired",
 		type: "error"
 	},
 	{
@@ -214,17 +168,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "DEVMentor__RequestAlreadyOpened",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "_rewardId",
-				type: "uint256"
-			}
-		],
-		name: "DEVMentor__RewardSoldOut",
 		type: "error"
 	},
 	{
@@ -240,108 +183,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [],
 		name: "DEVMentor__WrongRating",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "sender",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "balance",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "needed",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "tokenId",
-				type: "uint256"
-			}
-		],
-		name: "ERC1155InsufficientBalance",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "approver",
-				type: "address"
-			}
-		],
-		name: "ERC1155InvalidApprover",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "idsLength",
-				type: "uint256"
-			},
-			{
-				internalType: "uint256",
-				name: "valuesLength",
-				type: "uint256"
-			}
-		],
-		name: "ERC1155InvalidArrayLength",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "operator",
-				type: "address"
-			}
-		],
-		name: "ERC1155InvalidOperator",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "receiver",
-				type: "address"
-			}
-		],
-		name: "ERC1155InvalidReceiver",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "sender",
-				type: "address"
-			}
-		],
-		name: "ERC1155InvalidSender",
-		type: "error"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "operator",
-				type: "address"
-			},
-			{
-				internalType: "address",
-				name: "owner",
-				type: "address"
-			}
-		],
-		name: "ERC1155MissingApprovalForAll",
 		type: "error"
 	},
 	{
@@ -386,50 +227,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [],
 		name: "ReentrancyGuardReentrantCall",
 		type: "error"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "account",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "address",
-				name: "operator",
-				type: "address"
-			},
-			{
-				indexed: false,
-				internalType: "bool",
-				name: "approved",
-				type: "bool"
-			}
-		],
-		name: "ApprovalForAll",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "user",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "badgeId",
-				type: "uint256"
-			}
-		],
-		name: "BadgeMinted",
-		type: "event"
 	},
 	{
 		anonymous: false,
@@ -634,25 +431,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			{
 				indexed: true,
 				internalType: "address",
-				name: "user",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "amount",
-				type: "uint256"
-			}
-		],
-		name: "MentorTokensGained",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
 				name: "previousOwner",
 				type: "address"
 			},
@@ -677,69 +455,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "RequestCancelled",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "rewardId",
-				type: "uint256"
-			},
-			{
-				indexed: false,
-				internalType: "uint256",
-				name: "price",
-				type: "uint256"
-			},
-			{
-				indexed: false,
-				internalType: "uint256",
-				name: "totalSupply",
-				type: "uint256"
-			},
-			{
-				indexed: false,
-				internalType: "string",
-				name: "metadataURI",
-				type: "string"
-			}
-		],
-		name: "RewardAdded",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "user",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "rewardId",
-				type: "uint256"
-			}
-		],
-		name: "RewardClaimed",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "rewardId",
-				type: "uint256"
-			}
-		],
-		name: "RewardSoldOut",
 		type: "event"
 	},
 	{
@@ -856,484 +571,8 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		type: "event"
 	},
 	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "operator",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "address",
-				name: "from",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "address",
-				name: "to",
-				type: "address"
-			},
-			{
-				indexed: false,
-				internalType: "uint256[]",
-				name: "ids",
-				type: "uint256[]"
-			},
-			{
-				indexed: false,
-				internalType: "uint256[]",
-				name: "values",
-				type: "uint256[]"
-			}
-		],
-		name: "TransferBatch",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "operator",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "address",
-				name: "from",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "address",
-				name: "to",
-				type: "address"
-			},
-			{
-				indexed: false,
-				internalType: "uint256",
-				name: "id",
-				type: "uint256"
-			},
-			{
-				indexed: false,
-				internalType: "uint256",
-				name: "value",
-				type: "uint256"
-			}
-		],
-		name: "TransferSingle",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: false,
-				internalType: "string",
-				name: "value",
-				type: "string"
-			},
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "id",
-				type: "uint256"
-			}
-		],
-		name: "URI",
-		type: "event"
-	},
-	{
-		anonymous: false,
-		inputs: [
-			{
-				indexed: true,
-				internalType: "address",
-				name: "user",
-				type: "address"
-			},
-			{
-				indexed: true,
-				internalType: "uint256",
-				name: "amount",
-				type: "uint256"
-			}
-		],
-		name: "XPGained",
-		type: "event"
-	},
-	{
-		inputs: [],
-		name: "EDU_ELITE_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "EDU_ELITE_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "GUIDANCE_GURU_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "GUIDANCE_GURU_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "KNOWLEDGE_KNIGHT_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "KNOWLEDGE_KNIGHT_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "LEGEND_LUMINARY_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "LEGEND_LUMINARY_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "MENTOR_MAESTRO_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "MENTOR_MAESTRO_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "MENTOR_TOKEN_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "MENTOR_TOKEN_INCREMENT_FACTOR",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "MENTOR_TOKEN_MONTHLY_BONUS",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "MENTOR_TOKEN_PER_SESSION",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
 		inputs: [],
 		name: "MINIMUM_LOCKED_VALUE",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "NEW_NAVIGATOR_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "NEW_NAVIGATOR_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "PIONEER_PATRON_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "PIONEER_PATRON_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "SAGE_SHERPA_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "SAGE_SHERPA_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "SKILL_SEEKER_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "SKILL_SEEKER_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "WISDOM_WARRIOR_ID",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "WISDOM_WARRIOR_XP",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "XP_INCREMENT_FACTOR",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "XP_MONTHLY_BONUS",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "XP_PER_SESSION",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "XP_TOKEN_ID",
 		outputs: [
 			{
 				internalType: "uint256",
@@ -1370,9 +609,19 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				type: "uint256"
 			},
 			{
+				internalType: "uint256",
+				name: "ethAmount",
+				type: "uint256"
+			},
+			{
 				internalType: "string",
 				name: "metadataURI",
 				type: "string"
+			},
+			{
+				internalType: "bool",
+				name: "_externalPrice",
+				type: "bool"
 			}
 		],
 		name: "addReward",
@@ -1420,11 +669,21 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			},
+			{
+				internalType: "address",
 				name: "_mentor",
 				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_engagement",
+				type: "uint256"
 			}
 		],
-		name: "approveMentor",
+		name: "adminUpdateSessionEngagement",
 		outputs: [],
 		stateMutability: "nonpayable",
 		type: "function"
@@ -1432,68 +691,14 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		name: "availableRewardIds",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
 				internalType: "address",
-				name: "account",
+				name: "_mentor",
 				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "id",
-				type: "uint256"
 			}
 		],
-		name: "balanceOf",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address[]",
-				name: "accounts",
-				type: "address[]"
-			},
-			{
-				internalType: "uint256[]",
-				name: "ids",
-				type: "uint256[]"
-			}
-		],
-		name: "balanceOfBatch",
-		outputs: [
-			{
-				internalType: "uint256[]",
-				name: "",
-				type: "uint256[]"
-			}
-		],
-		stateMutability: "view",
+		name: "approveMentor",
+		outputs: [],
+		stateMutability: "nonpayable",
 		type: "function"
 	},
 	{
@@ -1586,38 +791,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "getAvailableRewardIds",
-		outputs: [
-			{
-				internalType: "uint256[]",
-				name: "",
-				type: "uint256[]"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "uint256",
-				name: "badgeId",
-				type: "uint256"
-			}
-		],
-		name: "getBadgeXpCost",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "pure",
 		type: "function"
 	},
 	{
@@ -1961,52 +1134,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
-				internalType: "uint256",
-				name: "rewardId",
-				type: "uint256"
-			}
-		],
-		name: "getRewardById",
-		outputs: [
-			{
-				components: [
-					{
-						internalType: "uint256",
-						name: "id",
-						type: "uint256"
-					},
-					{
-						internalType: "uint256",
-						name: "price",
-						type: "uint256"
-					},
-					{
-						internalType: "uint256",
-						name: "totalSupply",
-						type: "uint256"
-					},
-					{
-						internalType: "uint256",
-						name: "remainingSupply",
-						type: "uint256"
-					},
-					{
-						internalType: "string",
-						name: "metadataURI",
-						type: "string"
-					}
-				],
-				internalType: "struct IRewardManager.Reward",
-				name: "",
-				type: "tuple"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
 				internalType: "address",
 				name: "_mentee",
 				type: "address"
@@ -2069,63 +1196,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				internalType: "address",
-				name: "_user",
-				type: "address"
-			}
-		],
-		name: "getUserBadgeId",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_user",
-				type: "address"
-			}
-		],
-		name: "getUserMentorTokens",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_user",
-				type: "address"
-			}
-		],
-		name: "getUserXp",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
 				name: "_mentee",
 				type: "address"
 			}
@@ -2150,30 +1220,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "isAccountMentor",
-		outputs: [
-			{
-				internalType: "bool",
-				name: "",
-				type: "bool"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "account",
-				type: "address"
-			},
-			{
-				internalType: "address",
-				name: "operator",
-				type: "address"
-			}
-		],
-		name: "isApprovedForAll",
 		outputs: [
 			{
 				internalType: "bool",
@@ -2217,19 +1263,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				internalType: "string",
 				name: "",
 				type: "string"
-			}
-		],
-		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [],
-		name: "nextTokenId",
-		outputs: [
-			{
-				internalType: "uint256",
-				name: "",
-				type: "uint256"
 			}
 		],
 		stateMutability: "view",
@@ -2308,6 +1341,24 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		name: "rawFulfillRandomWords",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_rewardId",
+				type: "uint256"
+			},
+			{
+				internalType: "string[]",
+				name: "_args",
+				type: "string[]"
+			}
+		],
+		name: "redeemReward",
 		outputs: [],
 		stateMutability: "nonpayable",
 		type: "function"
@@ -2408,6 +1459,1583 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
+				internalType: "uint64",
+				name: "_subscriptionId",
+				type: "uint64"
+			}
+		],
+		name: "setCFSubId",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "bytes32",
+				name: "newDonId",
+				type: "bytes32"
+			}
+		],
+		name: "setDonId",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "string",
+				name: "_baseURI",
+				type: "string"
+			}
+		],
+		name: "setRewardBaseUri",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_manager",
+				type: "address"
+			}
+		],
+		name: "setRewardManager",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "tokenId",
+				type: "uint256"
+			},
+			{
+				internalType: "string",
+				name: "_tokenURI",
+				type: "string"
+			}
+		],
+		name: "setRewardTokenURI",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "bytes",
+				name: "_secretReference",
+				type: "bytes"
+			}
+		],
+		name: "setSecretReference",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			}
+		],
+		name: "tipMentor",
+		outputs: [],
+		stateMutability: "payable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "newOwner",
+				type: "address"
+			}
+		],
+		name: "transferOwnership",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "string",
+				name: "_contact",
+				type: "string"
+			}
+		],
+		name: "updateContact",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_rating",
+				type: "uint256"
+			}
+		],
+		name: "validateSessionAsMentee",
+		outputs: [],
+		stateMutability: "payable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			}
+		],
+		name: "validateSessionAsMentor",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	}
+]
+
+export const REWARD_MANAGER_CONTRACT_ABI = [
+	{
+		inputs: [
+			{
+				internalType: "string",
+				name: "_baseURI",
+				type: "string"
+			},
+			{
+				internalType: "address",
+				name: "_router",
+				type: "address"
+			},
+			{
+				internalType: "bytes32",
+				name: "_donId",
+				type: "bytes32"
+			}
+		],
+		stateMutability: "nonpayable",
+		type: "constructor"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_rewardId",
+				type: "uint256"
+			}
+		],
+		name: "DEVMentor__InsufficientBalance",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_badgeId",
+				type: "uint256"
+			}
+		],
+		name: "DEVMentor__InvalidBadgeId",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_rewardId",
+				type: "uint256"
+			}
+		],
+		name: "DEVMentor__InvalidRewardId",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_badgeId",
+				type: "uint256"
+			}
+		],
+		name: "DEVMentor__NotEnoughXP",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_badgeId",
+				type: "uint256"
+			}
+		],
+		name: "DEVMentor__PreviousBadgeRequired",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_rewardId",
+				type: "uint256"
+			}
+		],
+		name: "DEVMentor__RewardSoldOut",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "DEVMentor__TransferFailed",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "sender",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "balance",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "needed",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "tokenId",
+				type: "uint256"
+			}
+		],
+		name: "ERC1155InsufficientBalance",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "approver",
+				type: "address"
+			}
+		],
+		name: "ERC1155InvalidApprover",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "idsLength",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "valuesLength",
+				type: "uint256"
+			}
+		],
+		name: "ERC1155InvalidArrayLength",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "operator",
+				type: "address"
+			}
+		],
+		name: "ERC1155InvalidOperator",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "receiver",
+				type: "address"
+			}
+		],
+		name: "ERC1155InvalidReceiver",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "sender",
+				type: "address"
+			}
+		],
+		name: "ERC1155InvalidSender",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "operator",
+				type: "address"
+			},
+			{
+				internalType: "address",
+				name: "owner",
+				type: "address"
+			}
+		],
+		name: "ERC1155MissingApprovalForAll",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "EmptyArgs",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "EmptySource",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "NoInlineSecrets",
+		type: "error"
+	},
+	{
+		inputs: [],
+		name: "OnlyRouterCanFulfill",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "owner",
+				type: "address"
+			}
+		],
+		name: "OwnableInvalidOwner",
+		type: "error"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "account",
+				type: "address"
+			}
+		],
+		name: "OwnableUnauthorizedAccount",
+		type: "error"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "account",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "operator",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "bool",
+				name: "approved",
+				type: "bool"
+			}
+		],
+		name: "ApprovalForAll",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "badgeId",
+				type: "uint256"
+			}
+		],
+		name: "BadgeMinted",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "amount",
+				type: "uint256"
+			}
+		],
+		name: "MentorTokensGained",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "previousOwner",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "newOwner",
+				type: "address"
+			}
+		],
+		name: "OwnershipTransferred",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "bytes32",
+				name: "id",
+				type: "bytes32"
+			}
+		],
+		name: "RequestFulfilled",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "bytes32",
+				name: "id",
+				type: "bytes32"
+			}
+		],
+		name: "RequestSent",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "price",
+				type: "uint256"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "totalSupply",
+				type: "uint256"
+			},
+			{
+				indexed: false,
+				internalType: "string",
+				name: "metadataURI",
+				type: "string"
+			}
+		],
+		name: "RewardAdded",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			}
+		],
+		name: "RewardClaimed",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			}
+		],
+		name: "RewardRedeemed",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			}
+		],
+		name: "RewardSoldOut",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "operator",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "from",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "to",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256[]",
+				name: "ids",
+				type: "uint256[]"
+			},
+			{
+				indexed: false,
+				internalType: "uint256[]",
+				name: "values",
+				type: "uint256[]"
+			}
+		],
+		name: "TransferBatch",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "operator",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "from",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "address",
+				name: "to",
+				type: "address"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "id",
+				type: "uint256"
+			},
+			{
+				indexed: false,
+				internalType: "uint256",
+				name: "value",
+				type: "uint256"
+			}
+		],
+		name: "TransferSingle",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: false,
+				internalType: "string",
+				name: "value",
+				type: "string"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "id",
+				type: "uint256"
+			}
+		],
+		name: "URI",
+		type: "event"
+	},
+	{
+		anonymous: false,
+		inputs: [
+			{
+				indexed: true,
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				indexed: true,
+				internalType: "uint256",
+				name: "amount",
+				type: "uint256"
+			}
+		],
+		name: "XPGained",
+		type: "event"
+	},
+	{
+		inputs: [],
+		name: "CALLBACK_GAS_LIMIT",
+		outputs: [
+			{
+				internalType: "uint32",
+				name: "",
+				type: "uint32"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "EDU_ELITE_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "EDU_ELITE_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "GUIDANCE_GURU_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "GUIDANCE_GURU_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "KNOWLEDGE_KNIGHT_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "KNOWLEDGE_KNIGHT_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "LEGEND_LUMINARY_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "LEGEND_LUMINARY_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "MENTOR_MAESTRO_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "MENTOR_MAESTRO_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "MENTOR_TOKEN_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "MENTOR_TOKEN_INCREMENT_FACTOR",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "MENTOR_TOKEN_MONTHLY_BONUS",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "MENTOR_TOKEN_PER_SESSION",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "NEW_NAVIGATOR_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "NEW_NAVIGATOR_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "PIONEER_PATRON_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "PIONEER_PATRON_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "SAGE_SHERPA_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "SAGE_SHERPA_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "SKILL_SEEKER_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "SKILL_SEEKER_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "WISDOM_WARRIOR_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "WISDOM_WARRIOR_XP",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "XP_INCREMENT_FACTOR",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "XP_MONTHLY_BONUS",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "XP_PER_SESSION",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "XP_TOKEN_ID",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "_price",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "_totalSupply",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
+				name: "_ethAmount",
+				type: "uint256"
+			},
+			{
+				internalType: "string",
+				name: "_metadataURI",
+				type: "string"
+			},
+			{
+				internalType: "bool",
+				name: "_externalPrice",
+				type: "bool"
+			}
+		],
+		name: "addReward",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_amount",
+				type: "uint256"
+			}
+		],
+		name: "adminMintMentorToken",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_amount",
+				type: "uint256"
+			}
+		],
+		name: "adminMintXp",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		name: "availableRewardIds",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "account",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "id",
+				type: "uint256"
+			}
+		],
+		name: "balanceOf",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address[]",
+				name: "accounts",
+				type: "address[]"
+			},
+			{
+				internalType: "uint256[]",
+				name: "ids",
+				type: "uint256[]"
+			}
+		],
+		name: "balanceOfBatch",
+		outputs: [
+			{
+				internalType: "uint256[]",
+				name: "",
+				type: "uint256[]"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			}
+		],
+		name: "claimReward",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "donId",
+		outputs: [
+			{
+				internalType: "bytes32",
+				name: "",
+				type: "bytes32"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "getAvailableRewardIds",
+		outputs: [
+			{
+				internalType: "uint256[]",
+				name: "",
+				type: "uint256[]"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "badgeId",
+				type: "uint256"
+			}
+		],
+		name: "getBadgeXpCost",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "pure",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "rewardId",
+				type: "uint256"
+			}
+		],
+		name: "getRewardById",
+		outputs: [
+			{
+				components: [
+					{
+						internalType: "uint256",
+						name: "id",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "price",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "ethAmount",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "totalSupply",
+						type: "uint256"
+					},
+					{
+						internalType: "uint256",
+						name: "remainingSupply",
+						type: "uint256"
+					},
+					{
+						internalType: "string",
+						name: "metadataURI",
+						type: "string"
+					},
+					{
+						internalType: "bool",
+						name: "externalPrice",
+						type: "bool"
+					}
+				],
+				internalType: "struct RewardManager.Reward",
+				name: "",
+				type: "tuple"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_user",
+				type: "address"
+			}
+		],
+		name: "getUserBadgeId",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_user",
+				type: "address"
+			}
+		],
+		name: "getUserMentorTokens",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "user",
+				type: "address"
+			}
+		],
+		name: "getUserRewards",
+		outputs: [
+			{
+				internalType: "uint256[]",
+				name: "",
+				type: "uint256[]"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_user",
+				type: "address"
+			}
+		],
+		name: "getUserXp",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "bytes32",
+				name: "requestId",
+				type: "bytes32"
+			},
+			{
+				internalType: "bytes",
+				name: "response",
+				type: "bytes"
+			},
+			{
+				internalType: "bytes",
+				name: "err",
+				type: "bytes"
+			}
+		],
+		name: "handleOracleFulfillment",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "account",
+				type: "address"
+			},
+			{
+				internalType: "address",
+				name: "operator",
+				type: "address"
+			}
+		],
+		name: "isApprovedForAll",
+		outputs: [
+			{
+				internalType: "bool",
+				name: "",
+				type: "bool"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "badgeId",
+				type: "uint256"
+			}
+		],
+		name: "mintMenteeBadge",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "user",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "badgeId",
+				type: "uint256"
+			}
+		],
+		name: "mintMentorBadge",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_engagement",
+				type: "uint256"
+			}
+		],
+		name: "mintMentorToken",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_engagement",
+				type: "uint256"
+			}
+		],
+		name: "mintXP",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "nextTokenId",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "owner",
+		outputs: [
+			{
+				internalType: "address",
+				name: "",
+				type: "address"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_rewardId",
+				type: "uint256"
+			},
+			{
+				internalType: "string[]",
+				name: "_functionArgs",
+				type: "string[]"
+			}
+		],
+		name: "redeemReward",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "renounceOwnership",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
 				internalType: "uint256",
 				name: "",
 				type: "uint256"
@@ -2427,6 +3055,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			},
 			{
 				internalType: "uint256",
+				name: "ethAmount",
+				type: "uint256"
+			},
+			{
+				internalType: "uint256",
 				name: "totalSupply",
 				type: "uint256"
 			},
@@ -2439,6 +3072,95 @@ export const DEVMENTOR_CONTRACT_ABI = [
 				internalType: "string",
 				name: "metadataURI",
 				type: "string"
+			},
+			{
+				internalType: "bool",
+				name: "externalPrice",
+				type: "bool"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		name: "rewardsHistory",
+		outputs: [
+			{
+				internalType: "uint256",
+				name: "",
+				type: "uint256"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "s_lastError",
+		outputs: [
+			{
+				internalType: "bytes",
+				name: "",
+				type: "bytes"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "s_lastRequestId",
+		outputs: [
+			{
+				internalType: "bytes32",
+				name: "",
+				type: "bytes32"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "s_lastResponse",
+		outputs: [
+			{
+				internalType: "bytes",
+				name: "",
+				type: "bytes"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "s_secretReference",
+		outputs: [
+			{
+				internalType: "bytes",
+				name: "",
+				type: "bytes"
+			}
+		],
+		stateMutability: "view",
+		type: "function"
+	},
+	{
+		inputs: [],
+		name: "s_subscriptionId",
+		outputs: [
+			{
+				internalType: "uint64",
+				name: "",
+				type: "uint64"
 			}
 		],
 		stateMutability: "view",
@@ -2544,6 +3266,45 @@ export const DEVMENTOR_CONTRACT_ABI = [
 	{
 		inputs: [
 			{
+				internalType: "uint64",
+				name: "_subscriptionId",
+				type: "uint64"
+			}
+		],
+		name: "setCFSubId",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "bytes32",
+				name: "newDonId",
+				type: "bytes32"
+			}
+		],
+		name: "setDonId",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "bytes",
+				name: "_secretReference",
+				type: "bytes"
+			}
+		],
+		name: "setSecretReference",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
 				internalType: "uint256",
 				name: "tokenId",
 				type: "uint256"
@@ -2582,60 +3343,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				internalType: "address",
-				name: "_mentor",
-				type: "address"
-			}
-		],
-		name: "tipMentor",
-		outputs: [],
-		stateMutability: "payable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
 				name: "newOwner",
 				type: "address"
 			}
 		],
 		name: "transferOwnership",
-		outputs: [],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "string",
-				name: "_contact",
-				type: "string"
-			}
-		],
-		name: "updateContact",
-		outputs: [],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_mentee",
-				type: "address"
-			},
-			{
-				internalType: "address",
-				name: "_mentor",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "_engagement",
-				type: "uint256"
-			}
-		],
-		name: "updateSessionEngagement",
 		outputs: [],
 		stateMutability: "nonpayable",
 		type: "function"
@@ -2657,37 +3369,6 @@ export const DEVMENTOR_CONTRACT_ABI = [
 			}
 		],
 		stateMutability: "view",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_mentor",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "_rating",
-				type: "uint256"
-			}
-		],
-		name: "validateSessionAsMentee",
-		outputs: [],
-		stateMutability: "payable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_mentee",
-				type: "address"
-			}
-		],
-		name: "validateSessionAsMentor",
-		outputs: [],
-		stateMutability: "nonpayable",
 		type: "function"
 	}
 ]

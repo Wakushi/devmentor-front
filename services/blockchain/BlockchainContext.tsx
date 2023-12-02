@@ -8,7 +8,9 @@ import {
 } from "react"
 import {
 	DEVMENTOR_CONTRACT_ABI,
-	DEVMENTOR_CONTRACT_ADDRESS
+	DEVMENTOR_CONTRACT_ADDRESS,
+	REWARD_MANAGER_CONTRACT_ABI,
+	REWARD_MANAGER_CONTRACT_ADDRESS
 } from "../constants"
 import { useRouter } from "next/router"
 import { SnackbarContext } from "../SnackbarContext"
@@ -84,7 +86,8 @@ export default function BlockchainContextProvider({
 
 	useEffect(() => {
 		getAllLanguages()
-		listenToEvents()
+		listenToDEVMentorEvents()
+		listenToRewardManagerEvents()
 	}, [])
 
 	///////////////
@@ -222,7 +225,7 @@ export default function BlockchainContextProvider({
 	// Events
 	///////////////
 
-	function listenToEvents() {
+	function listenToDEVMentorEvents() {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
 			DEVMENTOR_CONTRACT_ADDRESS,
@@ -230,87 +233,73 @@ export default function BlockchainContextProvider({
 			provider
 		)
 
-		contract.on("MentorSelectionRequestSent", (mentee, requestId) => {
-			console.log("MentorSelectionRequestSent event:", mentee, requestId)
-		})
-
 		contract.on("MenteeMatchedWithMentor", (mentee, mentor) => {
-			console.log("MenteeMatchedWithMentor event:", mentee, mentor)
 			setIsWaitingForTransaction(false)
 			router.push("/match")
 		})
 
 		contract.on("MenteeRegistered", (mentee) => {
-			console.log("MenteeRegistered event:", mentee)
 			setIsWaitingForTransaction(false)
 			setIsRegistered(true)
 		})
 
 		contract.on("MentorRegistered", (mentor) => {
-			console.log("Mentor registered event:", mentor)
 			setIsWaitingForTransaction(false)
 			setIsRegistered(true)
 		})
 
 		contract.on("MenteeOpenedRequest", (mentee) => {
-			console.log("MenteeOpenedRequest event:", mentee)
 			setIsWaitingForTransaction(false)
 			openSnackBar("requestOpened")
 			router.push("/mentee/profile")
 		})
 
 		contract.on("MenteeConfirmedSession", (mentee, mentor) => {
-			console.log("MenteeConfirmedSession event:", mentee, mentor)
 			setIsWaitingForTransaction(false)
 			openSnackBar("menteeConfirmedSession")
 		})
 
 		contract.on("MentorConfirmedSession", (mentee, mentor) => {
-			console.log("MentorConfirmedSession event:", mentee, mentor)
 			setIsWaitingForTransaction(false)
 			openSnackBar("mentorConfirmedSession")
 		})
 
 		contract.on("RequestCancelled", (mentee) => {
-			console.log("RequestCancelled event:", mentee)
 			openSnackBar("cancelledRequest")
 			setIsWaitingForTransaction(false)
 		})
 
 		contract.on("MentorTipped", (mentee, mentor, value) => {
-			console.log("Tip event:", mentee, mentor, value)
 			openSnackBar("tipSent")
 		})
+	}
+
+	function listenToRewardManagerEvents() {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const contract = new ethers.Contract(
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
+			provider
+		)
 
 		contract.on("XPGained", (to, xpAmount) => {
-			console.log("Xp gained: ", to, xpAmount)
 			openSnackBar("xpGained")
 		})
 
 		contract.on("BadgeMinted", (to, badgeId) => {
-			console.log("Badge minted: ", to, badgeId)
 			openSnackBar("badgeMinted")
 			setIsWaitingForTransaction(false)
 		})
 
 		contract.on("RewardClaimed", (to, rewardId) => {
-			console.log("Reward claimed : ", to, rewardId)
 			openSnackBar("rewardClaimed")
 			setIsWaitingForTransaction(false)
 		})
 
-		contract.on(
-			"SessionCreated",
-			(mentee, mentor, engagement, valueLocked) => {
-				console.log(
-					"SessionCreated event:",
-					mentee,
-					mentor,
-					engagement,
-					valueLocked
-				)
-			}
-		)
+		contract.on("RewardRedeemed", (to, rewardId) => {
+			openSnackBar("rewardRedeemed")
+			setIsWaitingForTransaction(false)
+		})
 	}
 
 	function listenForTransactionMine(transactionResponse: any, provider: any) {

@@ -101,19 +101,17 @@ export default function SessionContextProvider({
 				signer
 			)
 			try {
-				const transaction = await contract.updateSessionEngagement(
+				const transaction = await contract.adminUpdateSessionEngagement(
 					menteeAddress,
 					mentorAddress,
 					newEngagementDuration
 				)
 				await transaction.wait()
-				console.log("Updated session engagement")
-				alert("Updated session engagement")
 			} catch (error: unknown) {
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 
@@ -144,7 +142,7 @@ export default function SessionContextProvider({
 				errorHandler(error)
 			}
 		} else {
-			console.log("Please install MetaMask")
+			alert("Please install MetaMask")
 		}
 	}
 

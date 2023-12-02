@@ -29,7 +29,6 @@ export default function MentorList({
 	useEffect(() => {
 		getMentorInfo(walletAddress).then((mentor) => {
 			if (mentor?.validated) {
-				console.log("mentor", mentor)
 				setMentorUser(mentor)
 			}
 			setIsLoaded(true)
@@ -80,7 +79,7 @@ export default function MentorList({
 								{leaderboardView && <td>{index + 1}</td>}
 								<td>{getShortenedAddress(mentor.address)}</td>
 								<td>
-									{getMentorAverageRating(mentor)}{" "}
+									{getMentorAverageRating(mentor).toFixed(1)}{" "}
 									<i className="fa-solid fa-star"></i>
 								</td>
 								<td>{mentor.sessionCount}</td>

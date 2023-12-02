@@ -14,6 +14,8 @@ import { MentorContext } from "@/services/blockchain/MentorContext"
 import ConfirmationModal from "../confirmation-modal/confirmation-modal"
 import { SnackbarContext } from "@/services/SnackbarContext"
 import Copy from "../ui/copy/copy"
+import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
+import HoverComponent from "../ui/hover-text/hover-text"
 
 interface SessionProps {
 	session: Session
@@ -38,14 +40,23 @@ export default function SessionCard({
 
 	const [valueLockedInUsd, setValueLockedInUsd] = useState(0)
 	const [mentorContact, setMentorContact] = useState("")
+	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
+		useState(false)
+
+	const [partnerBadge, setPartnerBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
+
 	const { getEthPriceInUsd, getCurrentBlockTimestamp } =
 		useContext(BlockchainContext)
 	const { getMentorContact } = useContext(MentorContext)
 	const { cancelSession } = useContext(SessionContext)
 	const { openSnackBar } = useContext(SnackbarContext)
-
-	const [isConfirmationModalOpen, setIsConfirmationModalOpen] =
-		useState(false)
+	const { getUserBadgeUri } = useContext(RewardContext)
 
 	useEffect(() => {
 		getEthPriceInUsd().then((price) => {
@@ -55,6 +66,22 @@ export default function SessionCard({
 		})
 		getMentorContact(mentor).then((contact) => {
 			setMentorContact(contact)
+		})
+		getUserBadgeUri(mentorView ? mentee : mentor).then((badgeUri) => {
+			if (!badgeUri) return
+			fetch(badgeUri)
+				.then((response) => {
+					return response.json()
+				})
+				.then(({ id, name, image, description }) => {
+					setPartnerBadge({
+						id,
+						name: name,
+						image: image,
+						description: description,
+						cost: 0
+					})
+				})
 		})
 	}, [])
 
@@ -115,6 +142,16 @@ export default function SessionCard({
 					<div className={classes.sessionDetail}>
 						<span className={classes.sessionLabel}>Mentee:</span>{" "}
 						<span className="flex items-center gap-2">
+							{!!partnerBadge.id && (
+								<HoverComponent title={partnerBadge.name}>
+									<div className={classes.badge}>
+										<img
+											src={partnerBadge.image}
+											alt={partnerBadge.name}
+										/>
+									</div>
+								</HoverComponent>
+							)}
 							{getShortenedAddress(mentee)}{" "}
 							<Copy contentToCopy={mentee} />
 						</span>
@@ -126,6 +163,16 @@ export default function SessionCard({
 								Mentor:{" "}
 							</span>
 							<span className="flex items-center gap-2">
+								{!!partnerBadge.id && (
+									<HoverComponent title={partnerBadge.name}>
+										<div className={classes.badge}>
+											<img
+												src={partnerBadge.image}
+												alt={partnerBadge.name}
+											/>
+										</div>
+									</HoverComponent>
+								)}
 								{getShortenedAddress(mentor)}
 								<Copy contentToCopy={mentor} />
 							</span>

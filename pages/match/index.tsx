@@ -8,6 +8,8 @@ import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import Confetti from "react-confetti"
 import { useRouter } from "next/router"
 import Copy from "@/components/ui/copy/copy"
+import { Badge, RewardContext } from "@/services/blockchain/RewardContext"
+import HoverComponent from "@/components/ui/hover-text/hover-text"
 
 export default function Match() {
 	const [menteeInfo, setMenteeInfo] = useState<Mentee | null>(null)
@@ -19,9 +21,18 @@ export default function Match() {
 		height: 0
 	})
 
+	const [mentorBadge, setMentorBadge] = useState<Badge>({
+		id: 0,
+		name: "",
+		image: "",
+		description: "",
+		cost: 0
+	})
+
 	const { walletAddress } = useContext(UserContext)
 	const { getMenteeInfo } = useContext(MenteeContext)
 	const { getMentorInfo, getMentorAverageRating } = useContext(MentorContext)
+	const { getUserBadgeUri } = useContext(RewardContext)
 
 	const router = useRouter()
 
@@ -32,6 +43,22 @@ export default function Match() {
 				if (!mentee) return
 				getMentorInfo(mentee.mentor).then((mentor) => {
 					setMentorInfo(mentor)
+					getUserBadgeUri(mentee.mentor).then((badgeUri) => {
+						if (!badgeUri) return
+						fetch(badgeUri)
+							.then((response) => {
+								return response.json()
+							})
+							.then(({ id, name, image, description }) => {
+								setMentorBadge({
+									id,
+									name: name,
+									image: image,
+									description: description,
+									cost: 0
+								})
+							})
+					})
 				})
 			})
 		}
@@ -81,12 +108,22 @@ export default function Match() {
 									</h2>
 									<Copy contentToCopy={menteeInfo?.mentor} />
 								</span>
-								<p className={classes.mentor_info}>
-									{getMentorAverageRating(mentorInfo).toFixed(
-										2
-									)}{" "}
-									<i className="fa-solid fa-star"></i>
-								</p>
+								<div className="flex items-center gap-4">
+									<HoverComponent title={mentorBadge.name}>
+										<div className={classes.badge}>
+											<img
+												src={mentorBadge.image}
+												alt={mentorBadge.name}
+											/>
+										</div>
+									</HoverComponent>
+									<p className={classes.mentor_info}>
+										{getMentorAverageRating(
+											mentorInfo
+										).toFixed(2)}{" "}
+										<i className="fa-solid fa-star"></i>
+									</p>
+								</div>
 								<p className={classes.mentor_info}>
 									{mentorInfo.sessionCount} session
 									{mentorInfo.sessionCount > 1

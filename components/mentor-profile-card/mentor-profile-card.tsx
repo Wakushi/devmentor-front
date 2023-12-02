@@ -111,16 +111,18 @@ export default function MentorProfileCard({
 						{getLanguageLabel(mentorInfo?.language || 0)}
 					</h3>
 				</div>
-				<div
-					className={`${classes.profileSection} flex items-center gap-2`}
-				>
-					<h3>
-						Current mentee :{" "}
-						{isAddressZero(mentorInfo.mentee)
-							? "You don't have a mentee."
-							: getShortenedAddress(mentorInfo.mentee)}
-					</h3>
-					<Copy contentToCopy={mentorInfo.mentee} />
+				<div className={`${classes.profileSection} `}>
+					<div className="flex items-center gap-2">
+						<h3>
+							Current mentee :{" "}
+							{isAddressZero(mentorInfo.mentee)
+								? "You don't have a mentee."
+								: getShortenedAddress(mentorInfo.mentee)}
+						</h3>
+						{!isAddressZero(mentorInfo.mentee) && (
+							<Copy contentToCopy={mentorInfo.mentee} />
+						)}
+					</div>
 				</div>
 			</div>
 			{isConfirmationModalOpen && (

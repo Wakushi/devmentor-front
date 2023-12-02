@@ -36,7 +36,9 @@ export default function MenteeProfileCard({
 						? "You don't have a mentor yet."
 						: getShortenedAddress(menteeInfo.mentor)}
 				</h3>
-				<Copy contentToCopy={menteeInfo.mentor} />
+				{!isAddressZero(menteeInfo.mentor) && (
+					<Copy contentToCopy={menteeInfo.mentor} />
+				)}
 			</div>
 		</div>
 	)

@@ -2,10 +2,13 @@ import { ethers } from "ethers"
 import { ReactNode, createContext, useContext } from "react"
 import {
 	DEVMENTOR_CONTRACT_ABI,
-	DEVMENTOR_CONTRACT_ADDRESS
+	DEVMENTOR_CONTRACT_ADDRESS,
+	REWARD_MANAGER_CONTRACT_ABI,
+	REWARD_MANAGER_CONTRACT_ADDRESS
 } from "../constants"
 import { BlockchainContext } from "./BlockchainContext"
 import { convertProxyResult } from "../utils"
+import { v4 as uuidv4 } from "uuid"
 
 interface RewardContextProviderProps {
 	children: ReactNode
@@ -22,9 +25,11 @@ export interface Badge {
 export interface Reward {
 	id: number
 	price: number
+	ethAmount: number
 	totalSupply: number
 	remainingSupply: number
 	metadataURI: string
+	externalPrice: boolean
 }
 
 interface RewardContextProps {
@@ -42,6 +47,8 @@ interface RewardContextProps {
 	getAvailableRewardIds: () => Promise<any>
 	getRewardById: (rewardId: string) => Promise<Reward>
 	claimMentorReward: (rewardId: number) => Promise<void>
+	getUserRewards: (userAddress: string) => Promise<any>
+	redeemReward: (rewardId: string, email?: string) => Promise<void>
 }
 
 const RewardContext = createContext<RewardContextProps>({
@@ -59,11 +66,15 @@ const RewardContext = createContext<RewardContextProps>({
 		Promise.resolve({
 			id: 0,
 			price: 0,
+			ethAmount: 0,
 			totalSupply: 0,
 			remainingSupply: 0,
-			metadataURI: ""
+			metadataURI: "",
+			externalPrice: false
 		}),
-	claimMentorReward: async () => Promise.resolve()
+	claimMentorReward: async () => Promise.resolve(),
+	getUserRewards: async () => Promise.resolve(null),
+	redeemReward: async () => Promise.resolve()
 })
 
 export default function RewardContextProvider({
@@ -80,8 +91,8 @@ export default function RewardContextProvider({
 	async function getBaseUri(): Promise<string> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -96,8 +107,8 @@ export default function RewardContextProvider({
 	async function getTokenUri(tokenId: string): Promise<string> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -112,8 +123,8 @@ export default function RewardContextProvider({
 	async function getUserXp(userAddress: string): Promise<string> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -128,8 +139,8 @@ export default function RewardContextProvider({
 	async function getUserBadgeUri(userAddress: string): Promise<string> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -149,8 +160,8 @@ export default function RewardContextProvider({
 	): Promise<{ tokenUri: string; badgeXpCost: number }> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -180,8 +191,8 @@ export default function RewardContextProvider({
 	async function getBadgeXpCost(badgeId: string): Promise<number> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -198,8 +209,8 @@ export default function RewardContextProvider({
 	): Promise<number> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -216,8 +227,8 @@ export default function RewardContextProvider({
 	async function getAvailableRewardIds(): Promise<any> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -229,11 +240,36 @@ export default function RewardContextProvider({
 		return null
 	}
 
+	async function getUserRewards(userAddress: string): Promise<any> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const contract = new ethers.Contract(
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
+			provider
+		)
+		try {
+			const rewardIdsRaw = await contract.getUserRewards(userAddress)
+			const rewardIds = convertProxyResult(rewardIdsRaw)
+
+			const rewardPromises = rewardIds
+				.filter((rewardId: string) => rewardId !== "0")
+				.map(async (rewardId: string) => {
+					return await getRewardById(rewardId)
+				})
+			return await Promise.all(rewardPromises).then((rewards) => {
+				return rewards
+			})
+		} catch (error: unknown) {
+			errorHandler(error)
+		}
+		return null
+	}
+
 	async function getRewardById(rewardId: string): Promise<Reward> {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
-			DEVMENTOR_CONTRACT_ADDRESS,
-			DEVMENTOR_CONTRACT_ABI,
+			REWARD_MANAGER_CONTRACT_ADDRESS,
+			REWARD_MANAGER_CONTRACT_ABI,
 			provider
 		)
 		try {
@@ -241,9 +277,11 @@ export default function RewardContextProvider({
 			return {
 				id: parseInt(rewardArray[0]),
 				price: parseInt(rewardArray[1]),
-				totalSupply: parseInt(rewardArray[2]),
-				remainingSupply: parseInt(rewardArray[3]),
-				metadataURI: rewardArray[4]
+				ethAmount: parseInt(rewardArray[2]),
+				totalSupply: parseInt(rewardArray[3]),
+				remainingSupply: parseInt(rewardArray[4]),
+				metadataURI: rewardArray[5],
+				externalPrice: rewardArray[6]
 			}
 		} catch (error: unknown) {
 			errorHandler(error)
@@ -251,9 +289,11 @@ export default function RewardContextProvider({
 		return {
 			id: 0,
 			price: 0,
+			ethAmount: 0,
 			totalSupply: 0,
 			remainingSupply: 0,
-			metadataURI: ""
+			metadataURI: "",
+			externalPrice: false
 		}
 	}
 
@@ -297,6 +337,32 @@ export default function RewardContextProvider({
 		}
 	}
 
+	async function redeemReward(
+		rewardId: string,
+		email?: string
+	): Promise<void> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const signer = await provider.getSigner()
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			signer
+		)
+		try {
+			const transactionUuid = uuidv4()
+			let args: string[] = []
+			if (email) {
+				args = [email, rewardId, transactionUuid]
+			}
+			const transaction = await contract.redeemReward(rewardId, args)
+			if (waitForTransaction) {
+				waitForTransaction(transaction.hash)
+			}
+		} catch (error: unknown) {
+			errorHandler(error)
+		}
+	}
+
 	const context: RewardContextProps = {
 		getBaseUri,
 		getTokenUri,
@@ -308,7 +374,9 @@ export default function RewardContextProvider({
 		getMentorTokenAmount,
 		getAvailableRewardIds,
 		getRewardById,
-		claimMentorReward
+		claimMentorReward,
+		getUserRewards,
+		redeemReward
 	}
 
 	return (
