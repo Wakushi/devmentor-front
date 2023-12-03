@@ -14,6 +14,7 @@ import {
 } from "../constants"
 import { useRouter } from "next/router"
 import { SnackbarContext } from "../SnackbarContext"
+import { UserContext } from "../UserContext"
 
 interface BlockchainContextProviderProps {
 	children: ReactNode
@@ -81,14 +82,17 @@ export default function BlockchainContextProvider({
 	const [isWaitingForTransaction, setIsWaitingForTransaction] =
 		useState<boolean>(false)
 	const { openSnackBar } = useContext(SnackbarContext)
+	const { walletAddress } = useContext(UserContext)
 
 	const router = useRouter()
 
 	useEffect(() => {
 		getAllLanguages()
-		listenToDEVMentorEvents()
-		listenToRewardManagerEvents()
-	}, [])
+		if (walletAddress) {
+			listenToDEVMentorEvents(walletAddress)
+			listenToRewardManagerEvents(walletAddress)
+		}
+	}, [walletAddress])
 
 	///////////////
 	// Read
@@ -221,7 +225,7 @@ export default function BlockchainContextProvider({
 	// Events
 	///////////////
 
-	function listenToDEVMentorEvents() {
+	function listenToDEVMentorEvents(userAddress: string) {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
 			DEVMENTOR_CONTRACT_ADDRESS,
@@ -229,48 +233,64 @@ export default function BlockchainContextProvider({
 			provider
 		)
 
-		contract.on("MenteeMatchedWithMentor", (mentee, mentor) => {
+		const MenteeMatchedWithMentorFilter =
+			contract.filters.MenteeMatchedWithMentor(userAddress)
+		const MenteeRegisteredFilter =
+			contract.filters.MenteeRegistered(userAddress)
+		const MentorRegisteredFilter =
+			contract.filters.MentorRegistered(userAddress)
+		const MenteeOpenedRequestFilter =
+			contract.filters.MenteeOpenedRequest(userAddress)
+		const MenteeConfirmedSessionFilter =
+			contract.filters.MenteeConfirmedSession(userAddress)
+		const MentorConfirmedSessionFilter =
+			contract.filters.MentorConfirmedSession(userAddress)
+		const RequestCancelledFilter =
+			contract.filters.RequestCancelled(userAddress)
+		const MentorTippedFilter = contract.filters.MentorTipped(userAddress)
+
+		contract.on(MenteeMatchedWithMentorFilter, (mentee, mentor) => {
 			setIsWaitingForTransaction(false)
 			router.push("/match")
 		})
 
-		contract.on("MenteeRegistered", (mentee) => {
+		contract.on(MenteeRegisteredFilter, (mentee) => {
 			setIsWaitingForTransaction(false)
 			setIsRegistered(true)
 		})
 
-		contract.on("MentorRegistered", (mentor) => {
+		contract.on(MentorRegisteredFilter, (mentor) => {
 			setIsWaitingForTransaction(false)
 			setIsRegistered(true)
 		})
 
-		contract.on("MenteeOpenedRequest", (mentee) => {
+		contract.on(MenteeOpenedRequestFilter, (mentee) => {
 			setIsWaitingForTransaction(false)
 			openSnackBar("requestOpened")
 			router.push("/mentee/profile")
 		})
 
-		contract.on("MenteeConfirmedSession", (mentee, mentor) => {
+		contract.on(MenteeConfirmedSessionFilter, (mentee, mentor) => {
 			setIsWaitingForTransaction(false)
 			openSnackBar("menteeConfirmedSession")
 		})
 
-		contract.on("MentorConfirmedSession", (mentee, mentor) => {
+		contract.on(MentorConfirmedSessionFilter, (mentee, mentor) => {
 			setIsWaitingForTransaction(false)
 			openSnackBar("mentorConfirmedSession")
 		})
 
-		contract.on("RequestCancelled", (mentee) => {
+		contract.on(RequestCancelledFilter, (mentee) => {
 			openSnackBar("cancelledRequest")
 			setIsWaitingForTransaction(false)
 		})
 
-		contract.on("MentorTipped", (mentee, mentor, value) => {
+		contract.on(MentorTippedFilter, (mentee, mentor, value) => {
 			openSnackBar("tipSent")
 		})
 	}
 
-	function listenToRewardManagerEvents() {
+	function listenToRewardManagerEvents(userAddress: string) {
 		const provider = new ethers.BrowserProvider(window.ethereum)
 		const contract = new ethers.Contract(
 			REWARD_MANAGER_CONTRACT_ADDRESS,
@@ -278,21 +298,27 @@ export default function BlockchainContextProvider({
 			provider
 		)
 
-		contract.on("XPGained", (to, xpAmount) => {
+		const XPFilter = contract.filters.XPGained(userAddress)
+		const BadgeMintedFilter = contract.filters.BadgeMinted(userAddress)
+		const RewardClaimedFilter = contract.filters.RewardClaimed(userAddress)
+		const RewardRedeemedFilter =
+			contract.filters.RewardRedeemed(userAddress)
+
+		contract.on(XPFilter, (to, xpAmount) => {
 			openSnackBar("xpGained")
 		})
 
-		contract.on("BadgeMinted", (to, badgeId) => {
+		contract.on(BadgeMintedFilter, (to, badgeId) => {
 			openSnackBar("badgeMinted")
 			setIsWaitingForTransaction(false)
 		})
 
-		contract.on("RewardClaimed", (to, rewardId) => {
+		contract.on(RewardClaimedFilter, (to, rewardId) => {
 			openSnackBar("rewardClaimed")
 			setIsWaitingForTransaction(false)
 		})
 
-		contract.on("RewardRedeemed", (to, rewardId) => {
+		contract.on(RewardRedeemedFilter, (to, rewardId) => {
 			openSnackBar("rewardRedeemed")
 			setIsWaitingForTransaction(false)
 		})
