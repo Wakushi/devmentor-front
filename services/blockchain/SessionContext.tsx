@@ -24,7 +24,7 @@ export interface Session {
 
 interface SessionContextProps {
 	getMenteeSession: (menteeAddress: string) => Promise<Session | null>
-	adminUpdateSessionEngagement: (
+	testUpdateSessionEngagement: (
 		menteeAddress: string,
 		mentorAddress: string,
 		newEngagementDuration: number
@@ -38,7 +38,7 @@ interface SessionContextProps {
 
 const SessionContext = createContext<SessionContextProps>({
 	getMenteeSession: async () => Promise.resolve(null),
-	adminUpdateSessionEngagement: async () => Promise.resolve(),
+	testUpdateSessionEngagement: async () => Promise.resolve(),
 	cancelSession: async () => Promise.resolve()
 })
 
@@ -87,7 +87,7 @@ export default function SessionContextProvider({
 	// Write
 	///////////////
 
-	async function adminUpdateSessionEngagement(
+	async function testUpdateSessionEngagement(
 		menteeAddress: string,
 		mentorAddress: string,
 		newEngagementDuration: number
@@ -101,7 +101,7 @@ export default function SessionContextProvider({
 				signer
 			)
 			try {
-				const transaction = await contract.adminUpdateSessionEngagement(
+				const transaction = await contract.testUpdateSessionEngagement(
 					menteeAddress,
 					mentorAddress,
 					newEngagementDuration
@@ -148,7 +148,7 @@ export default function SessionContextProvider({
 
 	const context: SessionContextProps = {
 		getMenteeSession,
-		adminUpdateSessionEngagement,
+		testUpdateSessionEngagement,
 		cancelSession
 	}
 

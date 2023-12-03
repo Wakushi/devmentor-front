@@ -1,6 +1,14 @@
 .footerContainer {
+	position: relative;
 	padding: 20px;
 	text-align: center;
+
+	.debugBtn {
+		border: 1px solid #fff;
+		border-radius: 5px;
+		padding: 5px 10px;
+		color: #fff;
+	}
 }
 
 .footerText {

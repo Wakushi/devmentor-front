@@ -23,11 +23,12 @@ export const engagements: Engagement[] = [
 	{ durationInSeconds: 2419200, label: "1 month" }
 ]
 
-export const DEVMENTOR_CONTRACT_ADDRESS =
-	"0x63B087aF3D3cFd6b833d61b61BA0665a4d7C7815"
+const DEVMENTOR_SEPOLIA = "0x5e0487171a5F978D56B2d047d94687ACa123244F"
+const REWARD_MANAGER_SEPOLIA = "0x1961974b456F75C077daF8FB053440f4A283c193"
 
-export const REWARD_MANAGER_CONTRACT_ADDRESS =
-	"0xDf033c55CCaaCc00a9a78a478975f0997D7C2429"
+export const DEVMENTOR_CONTRACT_ADDRESS = DEVMENTOR_SEPOLIA
+
+export const REWARD_MANAGER_CONTRACT_ADDRESS = REWARD_MANAGER_SEPOLIA
 
 export const DEVMENTOR_CONTRACT_ABI = [
 	{
@@ -571,6 +572,10 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		type: "event"
 	},
 	{
+		stateMutability: "payable",
+		type: "fallback"
+	},
+	{
 		inputs: [],
 		name: "MINIMUM_LOCKED_VALUE",
 		outputs: [
@@ -633,70 +638,11 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				internalType: "address",
-				name: "_to",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "_amount",
-				type: "uint256"
-			}
-		],
-		name: "adminMintMentorToken",
-		outputs: [],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_to",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "_amount",
-				type: "uint256"
-			}
-		],
-		name: "adminMintXp",
-		outputs: [],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
-				name: "_mentee",
-				type: "address"
-			},
-			{
-				internalType: "address",
-				name: "_mentor",
-				type: "address"
-			},
-			{
-				internalType: "uint256",
-				name: "_engagement",
-				type: "uint256"
-			}
-		],
-		name: "adminUpdateSessionEngagement",
-		outputs: [],
-		stateMutability: "nonpayable",
-		type: "function"
-	},
-	{
-		inputs: [
-			{
-				internalType: "address",
 				name: "_mentor",
 				type: "address"
 			}
 		],
-		name: "approveMentor",
+		name: "adminApproveMentor",
 		outputs: [],
 		stateMutability: "nonpayable",
 		type: "function"
@@ -1543,6 +1489,65 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		inputs: [
 			{
 				internalType: "address",
+				name: "_to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_amount",
+				type: "uint256"
+			}
+		],
+		name: "testMintMentorToken",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_to",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_amount",
+				type: "uint256"
+			}
+		],
+		name: "testMintXp",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
+				name: "_mentee",
+				type: "address"
+			},
+			{
+				internalType: "address",
+				name: "_mentor",
+				type: "address"
+			},
+			{
+				internalType: "uint256",
+				name: "_engagement",
+				type: "uint256"
+			}
+		],
+		name: "testUpdateSessionEngagement",
+		outputs: [],
+		stateMutability: "nonpayable",
+		type: "function"
+	},
+	{
+		inputs: [
+			{
+				internalType: "address",
 				name: "_mentor",
 				type: "address"
 			}
@@ -1608,6 +1613,10 @@ export const DEVMENTOR_CONTRACT_ABI = [
 		outputs: [],
 		stateMutability: "nonpayable",
 		type: "function"
+	},
+	{
+		stateMutability: "payable",
+		type: "receive"
 	}
 ]
 

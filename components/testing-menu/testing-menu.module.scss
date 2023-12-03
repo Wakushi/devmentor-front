@@ -1,0 +1,50 @@
+.debugTab {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	background-color: #111111cc;
+	width: 100%;
+
+	padding: 2rem;
+	transition: 500ms ease-in-out;
+	transform: translateY(100%);
+
+	h5,
+	p {
+		color: #fff;
+		margin-bottom: 1rem;
+		font-size: 1.4rem;
+	}
+
+	p {
+		font-weight: 300;
+		width: 70%;
+	}
+
+	label {
+		align-self: baseline;
+	}
+
+	.warningIcon {
+		color: rgb(255, 238, 0);
+	}
+
+	.closeIcon {
+		color: #fff;
+		position: absolute;
+		top: 20px;
+		right: 20px;
+		font-size: 2rem;
+		cursor: pointer;
+		opacity: 0.5;
+		transition: 500ms ease-in-out;
+
+		&:hover {
+			opacity: 1;
+		}
+	}
+
+	&.tabOpen {
+		transform: translateY(0);
+	}
+}

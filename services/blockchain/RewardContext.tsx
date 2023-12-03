@@ -49,6 +49,11 @@ interface RewardContextProps {
 	claimMentorReward: (rewardId: number) => Promise<void>
 	getUserRewards: (userAddress: string) => Promise<any>
 	redeemReward: (rewardId: string, email?: string) => Promise<void>
+	testMintXp: (mentorAddress: string, xpAmount: number) => Promise<void>
+	testMintMentorToken: (
+		mentorAddress: string,
+		xpAmount: number
+	) => Promise<void>
 }
 
 const RewardContext = createContext<RewardContextProps>({
@@ -74,7 +79,9 @@ const RewardContext = createContext<RewardContextProps>({
 		}),
 	claimMentorReward: async () => Promise.resolve(),
 	getUserRewards: async () => Promise.resolve(null),
-	redeemReward: async () => Promise.resolve()
+	redeemReward: async () => Promise.resolve(),
+	testMintXp: async () => Promise.resolve(),
+	testMintMentorToken: async () => Promise.resolve()
 })
 
 export default function RewardContextProvider({
@@ -363,6 +370,42 @@ export default function RewardContextProvider({
 		}
 	}
 
+	async function testMintXp(
+		mentorAddress: string,
+		xpAmount: number
+	): Promise<void> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const signer = await provider.getSigner()
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			signer
+		)
+		try {
+			await contract.testMintXp(mentorAddress, xpAmount)
+		} catch (error: unknown) {
+			errorHandler(error)
+		}
+	}
+
+	async function testMintMentorToken(
+		mentorAddress: string,
+		xpAmount: number
+	): Promise<void> {
+		const provider = new ethers.BrowserProvider(window.ethereum)
+		const signer = await provider.getSigner()
+		const contract = new ethers.Contract(
+			DEVMENTOR_CONTRACT_ADDRESS,
+			DEVMENTOR_CONTRACT_ABI,
+			signer
+		)
+		try {
+			await contract.testMintMentorToken(mentorAddress, xpAmount)
+		} catch (error: unknown) {
+			errorHandler(error)
+		}
+	}
+
 	const context: RewardContextProps = {
 		getBaseUri,
 		getTokenUri,
@@ -376,7 +419,9 @@ export default function RewardContextProvider({
 		getRewardById,
 		claimMentorReward,
 		getUserRewards,
-		redeemReward
+		redeemReward,
+		testMintXp,
+		testMintMentorToken
 	}
 
 	return (

@@ -1,6 +1,10 @@
 import classes from "./footer.module.scss"
 
-export default function Footer() {
+interface FooterProps {
+	setIsDebugTabOpen: (value: boolean) => void
+}
+
+export default function Footer({ setIsDebugTabOpen }: FooterProps) {
 	const currentYear = new Date().getFullYear()
 
 	return (
@@ -18,6 +22,15 @@ export default function Footer() {
 				<a href="/terms" className={classes.footerLink}>
 					Terms & Agreements
 				</a>
+				<a href="/donate" className={classes.footerLink}>
+					Donate
+				</a>
+				<button
+					className={classes.debugBtn}
+					onClick={() => setIsDebugTabOpen(true)}
+				>
+					Testing tab
+				</button>
 			</div>
 		</footer>
 	)

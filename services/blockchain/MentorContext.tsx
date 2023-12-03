@@ -25,7 +25,7 @@ interface MentorContextProps {
 	isAccountMentor: (mentorAddress: string) => Promise<boolean>
 	isMentorValidated: (mentorAddress: string) => Promise<boolean>
 	registerAsMentor: (mentorRegistration: MentorRegistration) => void
-	approveMentor: (mentorAddress: string) => void
+	adminApproveMentor: (mentorAddress: string) => void
 	validateSessionAsMentor: (menteeAddress: string) => void
 	getAllMentors: () => Promise<Mentor[]>
 	updateContact: (newContact: string) => void
@@ -61,7 +61,7 @@ const MentorContext = createContext<MentorContextProps>({
 	isAccountMentor: () => Promise.resolve(false),
 	isMentorValidated: () => Promise.resolve(false),
 	registerAsMentor: () => {},
-	approveMentor: () => {},
+	adminApproveMentor: () => {},
 	validateSessionAsMentor: () => {},
 	getAllMentors: () => Promise.resolve([]),
 	updateContact: () => {},
@@ -234,7 +234,7 @@ export default function MentorContextProvider(
 		}
 	}
 
-	async function approveMentor(mentorAddress: string) {
+	async function adminApproveMentor(mentorAddress: string) {
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.BrowserProvider(window.ethereum)
 			const signer = await provider.getSigner()
@@ -244,7 +244,7 @@ export default function MentorContextProvider(
 				signer
 			)
 			try {
-				const approveMentorTx = await contract.approveMentor(
+				const approveMentorTx = await contract.adminApproveMentor(
 					mentorAddress
 				)
 				await approveMentorTx.wait()
@@ -344,7 +344,7 @@ export default function MentorContextProvider(
 		isAccountMentor,
 		isMentorValidated,
 		registerAsMentor,
-		approveMentor,
+		adminApproveMentor,
 		validateSessionAsMentor,
 		getAllMentors,
 		updateContact,

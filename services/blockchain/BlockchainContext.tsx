@@ -218,10 +218,6 @@ export default function BlockchainContextProvider({
 	}
 
 	///////////////
-	// Write
-	///////////////
-
-	///////////////
 	// Events
 	///////////////
 

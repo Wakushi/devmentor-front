@@ -110,14 +110,18 @@ export default function Match() {
 									<Copy contentToCopy={menteeInfo?.mentor} />
 								</span>
 								<div className="flex items-center gap-4">
-									<HoverComponent title={mentorBadge.name}>
-										<div className={classes.badge}>
-											<img
-												src={mentorBadge.image}
-												alt={mentorBadge.name}
-											/>
-										</div>
-									</HoverComponent>
+									{!!mentorBadge.id && (
+										<HoverComponent
+											title={mentorBadge.name}
+										>
+											<div className={classes.badge}>
+												<img
+													src={mentorBadge.image}
+													alt={mentorBadge.name}
+												/>
+											</div>
+										</HoverComponent>
+									)}
 									<p className={classes.mentor_info}>
 										{getMentorAverageRating(
 											mentorInfo
