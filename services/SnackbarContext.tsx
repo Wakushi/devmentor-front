@@ -26,7 +26,7 @@ export default function SnackbarContextProvider(
 		setIsSnackbarShowing(true)
 		setTimeout(() => {
 			setIsSnackbarShowing(false)
-		}, 6000)
+		}, 2000)
 	}
 
 	const context: SnackbarContextProps = {
