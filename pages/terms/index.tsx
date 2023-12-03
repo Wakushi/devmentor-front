@@ -53,6 +53,24 @@ export default function TermsAndConditions() {
 					may result in suspension or termination of access to
 					DEVMentor services.
 				</p>
+				<h2>Mentor Registration and Review Process</h2>
+				<p>
+					DEVMentor requires prospective mentors to undergo a thorough
+					registration process to maintain a high standard of quality
+					within our community. This process includes submitting an
+					application that details their credentials and past
+					experiences.
+				</p>
+				<p>
+					Applicants are also required to provide proof of their
+					expertise, such as links to published articles, code
+					repositories, past projects, or professional references.
+					Endorsements from reputable professionals in the field can
+					further bolster an applicant's credibility. These steps
+					ensure that DEVMentor mentors possess the necessary
+					knowledge and experience to provide valuable guidance to
+					mentees.
+				</p>
 
 				<h2>Links to Other Websites</h2>
 				<p>
