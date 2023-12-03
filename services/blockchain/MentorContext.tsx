@@ -24,7 +24,7 @@ interface MentorContextProps {
 	getMentorAverageRating: (mentor: Mentor) => number
 	isAccountMentor: (mentorAddress: string) => Promise<boolean>
 	isMentorValidated: (mentorAddress: string) => Promise<boolean>
-	registerAsMentor: (mentorRegistration: MentorRegistration) => void
+	registerAsMentor: (mentorRegistration: MentorRegistration) => Promise<void>
 	adminApproveMentor: (mentorAddress: string) => void
 	validateSessionAsMentor: (menteeAddress: string) => void
 	getAllMentors: () => Promise<Mentor[]>
@@ -60,7 +60,7 @@ const MentorContext = createContext<MentorContextProps>({
 	getMentorAverageRating: () => 0,
 	isAccountMentor: () => Promise.resolve(false),
 	isMentorValidated: () => Promise.resolve(false),
-	registerAsMentor: () => {},
+	registerAsMentor: () => Promise.resolve(),
 	adminApproveMentor: () => {},
 	validateSessionAsMentor: () => {},
 	getAllMentors: () => Promise.resolve([]),
@@ -70,7 +70,8 @@ const MentorContext = createContext<MentorContextProps>({
 export default function MentorContextProvider(
 	props: MentorContextProviderProps
 ) {
-	const { waitForTransaction, errorHandler } = useContext(BlockchainContext)
+	const { waitForTransaction, errorHandler, safeWaitingForTx } =
+		useContext(BlockchainContext)
 	const { openSnackBar } = useContext(SnackbarContext)
 
 	///////////////
@@ -209,29 +210,36 @@ export default function MentorContextProvider(
 	// Write
 	///////////////
 
-	async function registerAsMentor(mentorRegistration: MentorRegistration) {
-		if (typeof window.ethereum !== "undefined") {
-			const provider = new ethers.BrowserProvider(window.ethereum)
-			const signer = await provider.getSigner()
-			const contract = new ethers.Contract(
-				DEVMENTOR_CONTRACT_ADDRESS,
-				DEVMENTOR_CONTRACT_ABI,
-				signer
-			)
-			try {
-				const registerMentorTx = await contract.registerAsMentor(
-					mentorRegistration
+	async function registerAsMentor(
+		mentorRegistration: MentorRegistration
+	): Promise<void> {
+		return new Promise(async (resolve, reject) => {
+			if (typeof window.ethereum !== "undefined") {
+				const provider = new ethers.BrowserProvider(window.ethereum)
+				const signer = await provider.getSigner()
+				const contract = new ethers.Contract(
+					DEVMENTOR_CONTRACT_ADDRESS,
+					DEVMENTOR_CONTRACT_ABI,
+					signer
 				)
-				if (registerMentorTx.hash && waitForTransaction) {
-					waitForTransaction(registerMentorTx.hash)
+
+				try {
+					const registerMentorTx = await contract.registerAsMentor(
+						mentorRegistration
+					)
+					if (registerMentorTx.hash && waitForTransaction) {
+						waitForTransaction(registerMentorTx.hash)
+					}
+					await registerMentorTx.wait()
+					resolve()
+				} catch (error) {
+					errorHandler(error)
 				}
-				await registerMentorTx.wait()
-			} catch (error: unknown) {
-				errorHandler(error)
+			} else {
+				alert("Please install MetaMask")
+				reject(new Error("MetaMask not installed"))
 			}
-		} else {
-			alert("Please install MetaMask")
-		}
+		})
 	}
 
 	async function adminApproveMentor(mentorAddress: string) {
@@ -269,8 +277,8 @@ export default function MentorContextProvider(
 				const transaction = await contract.validateSessionAsMentor(
 					menteeAddress
 				)
-				if (waitForTransaction) {
-					await waitForTransaction(transaction.hash)
+				if (safeWaitingForTx) {
+					await safeWaitingForTx()
 				}
 				await transaction.wait()
 			} catch (error: unknown) {

@@ -1,4 +1,4 @@
-import { MouseEvent, useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { engagements } from "../../services/constants"
 import classes from "./mentee-signup.module.scss"
 import {
@@ -7,7 +7,7 @@ import {
 	MenteeRegistrationAndRequest
 } from "@/services/blockchain/MenteeContext"
 import { ethers } from "ethers"
-import { Mentor } from "@/services/blockchain/MentorContext"
+import { Mentor, MentorContext } from "@/services/blockchain/MentorContext"
 import MentorList from "@/components/mentor-list/mentor-list"
 import MenteeForm, { FormValues } from "@/components/mentee-form/mentee-form"
 import Loader from "@/components/ui/loader/loader"
@@ -19,6 +19,9 @@ import Button from "@/components/ui/button/button"
 import ConfirmationModal from "@/components/confirmation-modal/confirmation-modal"
 import TriangleBackground from "@/components/ui/backgrounds/triangle/triangle-bg"
 import { rankMentors } from "@/services/utils"
+import Image from "next/image"
+import randomIcon from "@/assets/images/picto/random.png"
+import selectIcon from "@/assets/images/picto/select.png"
 
 interface MenteeSignupAndRequestProps {
 	registered?: boolean
@@ -34,12 +37,12 @@ export default function MenteeSignupAndRequest({
 	const {
 		getMatchingMentors,
 		registerAsMenteeAndMakeRequestForSession,
-		openRequestForSession
+		openRequestForSession,
+		getMenteeInfo
 	} = useContext(MenteeContext)
 	const { isWaitingForTransaction } = useContext(BlockchainContext)
 	const { walletAddress } = useContext(UserContext)
-	const { getMenteeInfo } = useContext(MenteeContext)
-
+	const { isAccountMentor } = useContext(MentorContext)
 	/////////////
 	//  STATE  //
 	/////////////
@@ -72,6 +75,13 @@ export default function MenteeSignupAndRequest({
 		if (!menteeInfo) {
 			getMenteeInfo(walletAddress).then((mentee) => {
 				setMenteeInfo(mentee)
+			})
+		}
+		if (walletAddress) {
+			isAccountMentor(walletAddress).then((isMentor) => {
+				if (isMentor) {
+					router.push("/mentor/profile")
+				}
 			})
 		}
 	}, [walletAddress])
@@ -220,6 +230,12 @@ export default function MenteeSignupAndRequest({
 									className={`${classes.big_button}`}
 								>
 									Match with a random mentor
+									<div className={classes.iconContainer}>
+										<Image
+											src={randomIcon}
+											alt="Random icon"
+										></Image>
+									</div>
 								</button>
 								<button
 									className={`${classes.big_button}`}
@@ -228,6 +244,12 @@ export default function MenteeSignupAndRequest({
 									}
 								>
 									Lock asset and choose a mentor
+									<div className={classes.iconContainer}>
+										<Image
+											src={selectIcon}
+											alt="Select icon"
+										></Image>
+									</div>
 								</button>
 							</div>
 						</>

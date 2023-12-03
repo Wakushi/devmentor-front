@@ -35,6 +35,7 @@ interface BlockchainContextProps {
 	getCurrentBlockTimestamp: () => Promise<number>
 	errorHandler: (error: any) => void
 	fulfillPendingRequests: () => void
+	safeWaitingForTx: () => void
 }
 
 export interface Language {
@@ -64,7 +65,8 @@ const BlockchainContext = createContext<BlockchainContextProps>({
 		return 0
 	},
 	errorHandler: (error: any) => {},
-	fulfillPendingRequests: () => {}
+	fulfillPendingRequests: () => {},
+	safeWaitingForTx: () => {}
 })
 
 const ETH_PRICE_MULTIPLIER = 100000000
@@ -334,6 +336,13 @@ export default function BlockchainContextProvider({
 		})
 	}
 
+	function safeWaitingForTx() {
+		setIsWaitingForTransaction(true)
+		setTimeout(() => {
+			setIsWaitingForTransaction(false)
+		}, 30000)
+	}
+
 	const context: BlockchainContextProps = {
 		languages,
 		isRegistered,
@@ -348,7 +357,8 @@ export default function BlockchainContextProvider({
 		getEthPriceInUsd,
 		getCurrentBlockTimestamp,
 		errorHandler,
-		fulfillPendingRequests
+		fulfillPendingRequests,
+		safeWaitingForTx
 	}
 
 	return (

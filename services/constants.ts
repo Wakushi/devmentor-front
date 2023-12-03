@@ -3381,3 +3381,6 @@ export const REWARD_MANAGER_CONTRACT_ABI = [
 		type: "function"
 	}
 ]
+
+export const DEVMENTOR_API_URL =
+	"https://devmentor-api-8206cc9733af.herokuapp.com"

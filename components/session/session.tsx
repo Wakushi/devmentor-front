@@ -219,7 +219,7 @@ export default function SessionCard({
 					isConfirmed={menteeConfirmed}
 					label={mentorView ? "Mentee" : "You"}
 				/>
-				<div className="flex gap-4">
+				<div className="flex justify-center gap-4">
 					<Button
 						onClick={() => setIsConfirmationModalOpen(true)}
 						cancel={true}

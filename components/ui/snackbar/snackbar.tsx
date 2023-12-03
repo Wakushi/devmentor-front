@@ -60,6 +60,9 @@ export default function Snackbar({ snackbarMessageType }: any) {
 			case "notEnoughTokens":
 				return "You don't have enough tokens to claim this reward"
 
+			case "applicationSent":
+				return "Your application has been sent !"
+
 			default:
 				return ""
 		}

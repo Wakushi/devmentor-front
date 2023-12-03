@@ -3,7 +3,8 @@ import { useContext, useEffect, useState } from "react"
 import {
 	teachingSubjects,
 	engagements,
-	Engagement
+	Engagement,
+	DEVMENTOR_API_URL
 } from "../../services/constants"
 import { useRouter } from "next/router"
 import {
@@ -17,6 +18,8 @@ import {
 import WaitingModal from "@/components/waiting-modal/waiting-modal"
 import { getShortenedAddress } from "@/services/utils"
 import TriangleBackground from "@/components/ui/backgrounds/triangle/triangle-bg"
+import { UserContext } from "@/services/UserContext"
+import { SnackbarContext } from "@/services/SnackbarContext"
 
 interface FormValues {
 	language: number
@@ -36,8 +39,10 @@ interface FormErrors {
 }
 
 export default function MentorSignup() {
-	const { registerAsMentor } = useContext(MentorContext)
+	const { registerAsMentor, isAccountMentor } = useContext(MentorContext)
 	const { setIsRegistered } = useContext(BlockchainContext)
+	const { walletAddress } = useContext(UserContext)
+	const { openSnackBar } = useContext(SnackbarContext)
 
 	const {
 		languages,
@@ -56,7 +61,6 @@ export default function MentorSignup() {
 	})
 
 	const [formErrors, setFormErrors] = useState<FormErrors>({})
-	const [submittedForm, setSubmittedForm] = useState(false)
 
 	const router = useRouter()
 
@@ -64,7 +68,14 @@ export default function MentorSignup() {
 		if (setIsRegistered) {
 			setIsRegistered(false)
 		}
-	}, [])
+		if (walletAddress) {
+			isAccountMentor(walletAddress).then((isMentor) => {
+				if (isMentor) {
+					router.push("/mentor/profile")
+				}
+			})
+		}
+	}, [walletAddress])
 
 	function handleInputChange(event: React.ChangeEvent<HTMLInputElement>) {
 		if (event.target.type === "checkbox") {
@@ -138,7 +149,6 @@ export default function MentorSignup() {
 				yearsOfExperience,
 				contact
 			} = formValues
-			setSubmittedForm(true)
 			const mentorRegistration: MentorRegistration = {
 				teachingSubjects,
 				engagement,
@@ -146,12 +156,40 @@ export default function MentorSignup() {
 				yearsOfExperience,
 				contact
 			}
-			registerAsMentor(mentorRegistration)
+			registerAsMentor(mentorRegistration).then(() => {
+				sendApplication()
+			})
 		}
 	}
 
 	function goToProfilePage() {
 		router.push("/mentor/profile")
+	}
+
+	function sendApplication() {
+		const { selfIntroduction, contact, yearsOfExperience } = formValues
+
+		const application = {
+			address: walletAddress,
+			selfIntroduction,
+			contact,
+			yearsOfExperience
+		}
+
+		fetch(`${DEVMENTOR_API_URL}/mailer/application`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(application)
+		})
+			.then((response) => response.json())
+			.then((data) => {
+				openSnackBar(data.message)
+			})
+			.catch(() => {
+				openSnackBar("error")
+			})
 	}
 
 	return (
@@ -161,8 +199,9 @@ export default function MentorSignup() {
 					className={`form_confirmation flex flex-col justify-center items-center gap-4 fade-in-bottom`}
 				>
 					<h4>
-						Your application will be reviewed and if everything is
-						fine we'll validate your mentor account !{" "}
+						Thank you for submitting your application. We are
+						excited to review it and, if all criteria are met, we
+						look forward to validating your mentor account soon!{" "}
 					</h4>
 					<Button onClick={goToProfilePage} filled={true}>
 						My profile

@@ -1,0 +1,92 @@
+@import "../styles/variables.scss";
+
+.introSection {
+	text-align: center;
+	padding: 20px;
+
+	.introContent {
+		min-height: 100vh;
+		h1 {
+			font-size: 6vw;
+			color: #333;
+		}
+
+		p {
+			color: $primary-color;
+			font-size: 1.9vw;
+			margin-bottom: 1rem;
+			max-width: 1000px;
+			line-height: 1.1;
+			font-weight: 300;
+		}
+	}
+}
+
+.landingSection {
+	text-align: center;
+	padding: 0 4rem;
+	min-height: 100vh;
+	opacity: 0;
+
+	&.visible {
+		animation: fade-in-bottom 700ms ease-in-out forwards;
+	}
+
+	.landingContent {
+		max-width: 800px;
+
+		h2 {
+			color: $primary-color;
+			font-size: 4vw;
+			line-height: 1.2;
+		}
+
+		p {
+			line-height: 1.2;
+			color: #111;
+			font-size: 1.5vw;
+			text-align: start !important;
+		}
+
+		li {
+			margin: 10px;
+			font-size: 1.1vw;
+			color: #111;
+		}
+	}
+
+	.landingImgContainer {
+		max-width: 800px;
+		box-shadow: $box-shadow;
+	}
+}
+
+.modernList {
+	list-style: none;
+	padding: 0;
+	align-self: baseline;
+
+	.listItem {
+		display: flex;
+		align-items: center;
+		margin-bottom: 15px;
+		font-size: 16px;
+
+		.icon {
+			margin-right: 10px;
+			color: $primary-color;
+			font-size: 1.4rem;
+		}
+	}
+}
+
+@keyframes fade-in-bottom {
+	0% {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	100% {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
