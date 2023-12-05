@@ -35,6 +35,10 @@ export default function MentorList({
 		})
 	}, [walletAddress])
 
+	if (leaderboardView) {
+		mentors = mentors.slice(0, 10)
+	}
+
 	const tableStyles = {
 		cursor: selectMode ? "pointer" : "default"
 	}

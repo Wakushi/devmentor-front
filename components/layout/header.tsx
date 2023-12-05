@@ -199,6 +199,15 @@ export default function Header() {
 							Rewards
 						</li>
 					)}
+
+					<li
+						className={classes.nav_link}
+						tabIndex={0}
+						onClick={() => router.push("/about")}
+					>
+						About
+					</li>
+
 					<li>
 						{walletAddress && (isMentee || isMentor) ? (
 							<ProfileCard
