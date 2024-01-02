@@ -163,13 +163,9 @@ export default function MenteeProfile() {
 		cancelRequestForSession()
 	}
 
-	/**
-	 * @notice For testing purposes we allow session confirmation even if isSessionOver is true
-	 * Should be > if (menteeSession && !isSessionOver(timestamp, menteeSession)) 
-	 */
 	function onConfirmSession() {
 		getCurrentBlockTimestamp().then((timestamp: number) => {
-			if (menteeSession && isSessionOver(timestamp, menteeSession)) {
+			if (menteeSession && !isSessionOver(timestamp, menteeSession)) {
 				openSnackBar("sessionNotFinished")
 			} else {
 				setIsConfirmationModalOpen(true)

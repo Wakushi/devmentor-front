@@ -15,9 +15,14 @@ function replacer(_: any, value: any) {
 }
 
 function getEngagement(engagementDuration: number) {
-	return engagements.find(
-		(engagement: Engagement) =>
-			engagement.durationInSeconds === +engagementDuration
+	return (
+		engagements.find(
+			(engagement: Engagement) =>
+				engagement.durationInSeconds === +engagementDuration
+		) || {
+			durationInSeconds: engagementDuration,
+			label: `Custom : ${engagementDuration} seconds`
+		}
 	)
 }
 
@@ -43,9 +48,8 @@ function isAddressZero(address: string) {
 
 function isSessionOver(currentTimestamp: number, session: Session) {
 	return (
-		session?.engagement?.durationInSeconds &&
 		session?.startTime + session?.engagement?.durationInSeconds <
-			currentTimestamp
+		currentTimestamp
 	)
 }
 

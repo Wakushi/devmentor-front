@@ -16,7 +16,7 @@ export interface Session {
 	mentor: string
 	mentee: string
 	startTime: number
-	engagement: Engagement | undefined
+	engagement: Engagement
 	valueLocked: number
 	mentorConfirmed: boolean
 	menteeConfirmed: boolean
