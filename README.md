@@ -1,6 +1,6 @@
 ## DEVMENTOR - A Social-Fi dApp for Developers
 
-This project was built for the [Chainlink Constellation 2023 Hackathon](https://chain.link/hackathon).
+This project was built for the [Chainlink Constellation 2023 Hackathon](https://devpost.com/software/devmentor).
 
 ## Inspiration
 
